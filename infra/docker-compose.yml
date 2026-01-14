@@ -71,8 +71,52 @@ services:
     networks:
       - app_net
 
+  api42-postgresql:
+    image: postgres:16-alpine
+    container_name: api42-postgresql
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: ${API42_POSTGRES_DB}
+      POSTGRES_USER: ${API42_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${API42_POSTGRES_PASSWORD}
+    volumes:
+      - api42-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${API42_POSTGRES_USER} -d ${API42_POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - app_net
+
+  api42-service:
+    build:
+      context: ../backend/api42-service
+      dockerfile: Dockerfile
+    container_name: api42-service
+    ports:
+      - "4444:4444"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      POSTGRES_HOST: api42-postgresql
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${API42_POSTGRES_DB}
+      POSTGRES_USER: ${API42_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${API42_POSTGRES_PASSWORD}
+      API42_UID: ${API42_UID}
+      API42_SECRET: ${API42_SECRET}
+    depends_on:
+      api42-postgresql:
+        condition: service_healthy
+    networks:
+      - app_net
+    tty: true
+
+
 volumes:
   pg_data:
+  api42-pg:
 
 networks:
   app_net:
