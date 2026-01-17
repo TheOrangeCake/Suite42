@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Chat WebSocket</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+    <h2>Chat Test</h2>
+    <button onclick="connect()">1. Connexion</button>
+    <br><br>
+    <input type="text" id="recipient" placeholder="Destinataire (ex: Bob)">
+    <input type="text" id="message" placeholder="Ton message...">
+    <button onclick="sendMessage()">2. Envoyer</button>
+
+    <ul id="messagesList"></ul>
+
+    <script>
+        var stompClient = null;
+        const JWT_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCb2IiLCJpYXQiOjE3MTYzODM0MDB9.yE248w7ezO38vw5afhlbNq_VYpEbPqUUkZqr9KD8tU8; // Colle un token valide généré par ton service auth
+
+        function connect() {
+            // L'URL doit pointer vers ton ApiGateway ou directement vers le service
+            var socket = new SockJS('http://localhost:8082/ws-chat');
+            stompClient = Stomp.over(socket);
+
+            const headers = {
+                'Authorization': 'Bearer ' + JWT_TOKEN
+            };
+
+            stompClient.connect(headers, function (frame) {
+                console.log('Connecté : ' + frame);
+
+                // On s'abonne à notre propre file privée
+                stompClient.subscribe('/user/queue/messages', function (msg) {
+                    showMessage(JSON.parse(msg.body));
+                });
+            }, function (error) {
+                console.log('Erreur de connexion : ' + error);
+            });
+        }
+
+        function sendMessage() {
+            var recipient = document.getElementById('recipient').value;
+            var content = document.getElementById('message').value;
+
+            var chatMessage = {
+                senderId: "Moi", // Sera écrasé par le serveur via le JWT
+                recipientId: recipient,
+                content: content
+            };
+
+            // On envoie le message vers le @MessageMapping("/chat")
+            stompClient.send("/app/chat", {}, JSON.stringify(chatMessage));
+        }
+
+        function showMessage(msg) {
+            var response = document.getElementById('messagesList');
+            var li = document.createElement('li');
+            li.appendChild(document.createTextNode(msg.senderId + ": " + msg.content));
+            response.appendChild(li);
+        }
+    </script>
+</body>
+</html>
