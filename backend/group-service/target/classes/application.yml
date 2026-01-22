@@ -1,0 +1,15 @@
+server:
+  port: 8080
+  servlet:
+    # IMPORTANT: behind nginx path /api/group
+    context-path: /api/group
+
+spring:
+  application:
+    name: group-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
