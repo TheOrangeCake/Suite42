@@ -1,9 +1,6 @@
 server:
   port: 8080
   forward-headers-strategy: framework
-  # IMPORTANT: because this service is behind nginx at /api/auth
-  servlet:
-    context-path: /api/auth
 
 spring:
   application:

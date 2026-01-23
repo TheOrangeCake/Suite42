@@ -11,10 +11,14 @@ spring:
           uri: http://auth-service:8080
           predicates:
             - Path=/api/auth/** # Toute requête commençant par /api/users/
+          filters:
+            - StripPrefix=2
         - id: groupe-service
           uri: http://group-service:8080
           predicates:
             - Path=/api/group/**
+          filters:
+            - StripPrefix=2
         - id: api42 
           uri: http://api42-service:4444
           predicates:
