@@ -15,3 +15,7 @@ spring:
           uri: https://group-service:8080
           predicates:
             - Path=/api/group/**
+        - id: api42 
+          uri: http://api42-service:4444
+          predicates:
+            - Path=/api/api42/**
