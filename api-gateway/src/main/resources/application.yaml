@@ -12,7 +12,7 @@ spring:
           predicates:
             - Path=/api/auth/** # Toute requête commençant par /api/users/
         - id: groupe-service
-          uri: https://group-service:8080
+          uri: http://group-service:8080
           predicates:
             - Path=/api/group/**
         - id: api42 
