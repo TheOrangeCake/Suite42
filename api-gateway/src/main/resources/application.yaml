@@ -7,14 +7,11 @@ spring:
       enabled: false # Désactive le client Config pour éviter les erreurs si aucun serveur Config n'est disponible
     gateway:
       routes:
-        - id: service-utilisateur-route
-          uri: lb://SERVICE-UTILISATEUR # "lb://" utilise LoadBalancer avec Eureka
+        - id: auth-service
+          uri: http://auth-service:8080
           predicates:
-            - Path=/api/users/** # Toute requête commençant par /api/users/
-          filters:
-            - StripPrefix=1            # Enlève "/api" avant d'envoyer au service
-
-        - id: google-search-test
-          uri: https://www.google.com
+            - Path=/api/auth/** # Toute requête commençant par /api/users/
+        - id: groupe-service
+          uri: https://group-service:8080
           predicates:
-            - Path=/google/**
+            - Path=/api/group/**
