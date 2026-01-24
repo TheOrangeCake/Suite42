@@ -10,7 +10,8 @@
   </ul>
 <p>Member worked on: Nguyen NGUYEN (hoannguy).</p> 
 
----
+<br>
+
 # Instructions
 ### Requirements
 * Docker: `Docker version 28.2.2`
@@ -34,7 +35,8 @@
 * Run locally <pre>export $(grep -v '^#' .env | xargs)<br>./mvnw spring-boot:run -Dspring-boot.run.profiles=dev</pre>
 * Using Docker <pre>docker build . -t api42-service<br>docker run --env-file .env -p 4444:4444 api42-service:latest</pre>
 
----
+<br>
+
 # API Documentation
 Currently only support Lausanne campus
 
@@ -658,7 +660,8 @@ Currently only support Lausanne campus
 </details>
 <br>
 
----
+<br>
+
 # Folder Structure
 <details>
 <summary>Expand to show folder structure</summary>
@@ -731,7 +734,8 @@ Currently only support Lausanne campus
 </pre>
 </details>
 
----
+<br>
+
 # Database Entity Relationship Diagrams (ERD)
 ```mermaid
 erDiagram
@@ -778,7 +782,8 @@ erDiagram
     STUDENT ||--o{ USER_FINISHED_PROJECT : finished
 ```
 
----
+<br>
+
 # Resources
 * [Learn Spring boot](https://www.codecademy.com/learn/paths/create-rest-apis-with-spring-and-java)
 * [Spring annotation cheat sheets](https://github.com/Elma-dev/Spring_Boot_Annotations_Cheat_sheet?tab=readme-ov-file)

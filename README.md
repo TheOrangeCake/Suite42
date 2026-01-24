@@ -1,4 +1,14 @@
 # Transcendence
 Last project from 42
 
-* [api42-service documentation](https://github.com/ConzaD/Transcendence/tree/feat-42-Data-Manager/backend/api42-service#api-documentation)
+---
+
+### Backend
+* [api42-service documentation](./backend/api42-service/README.md)
+
+
+---
+
+### Design
+
+* [design documentation](./design/README.md)
