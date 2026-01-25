@@ -100,6 +100,7 @@ color palette, typography, and icons. (1p)</li>
 | Big red button          | <img src="./support/reusable_components/Big red button.png">        | Use as primary button. Top is default state, bottom is hover state.       |
 | Small red button        | <img src="./support/reusable_components/Small red button.png">      | Use as secondary button. Top is default state, bottom is hover state.     |
 | Small blue button       | <img src="./support/reusable_components/Small blue button.png">     | Use as non important button. Top is default state, bottom is hover state. |
+| Filter button           | <img src="./support/reusable_components/Filter button.png">         | Use in directory pages, this will open the filter panel.                  |
 | Filter field            | <img src="./support/reusable_components/Filter field.png">          | Use in filter panel (sort, filter and results per page).                  |
 
 <br>
