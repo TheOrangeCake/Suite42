@@ -16,6 +16,8 @@ color palette, typography, and icons. (1p)</li>
 * [M - 768 * 1024 (Tablet size)](https://www.figma.com/proto/q56ux8O9oemt6nCiS9q68Q/Transcendence?node-id=85-207&p=f&t=xLZuyDYqSOp3TFFI-0&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=275%3A3241&show-proto-sidebar=1)
 * [S - 480 * 720 (Mobile size)](https://www.figma.com/proto/q56ux8O9oemt6nCiS9q68Q/Transcendence?node-id=85-207&p=f&t=xLZuyDYqSOp3TFFI-0&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=275%3A3240&show-proto-sidebar=1)
 * [Error pages all size](https://www.figma.com/proto/q56ux8O9oemt6nCiS9q68Q/Transcendence?node-id=85-207&p=f&t=xLZuyDYqSOp3TFFI-0&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=443%3A9440&show-proto-sidebar=1)
+* [dev mode](https://www.figma.com/design/q56ux8O9oemt6nCiS9q68Q/Transcendence?node-id=240-3664&m=dev)
+
 
 
 <br>
