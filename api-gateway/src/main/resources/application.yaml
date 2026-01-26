@@ -1,0 +1,48 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    config:
+      enabled: false
+
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: auth-service
+              uri: http://auth-service:8080
+              predicates:
+                - Path=/api/auth/**
+              filters:
+                - StripPrefix=2
+
+            - id: group-service
+              uri: http://group-service:8080
+              predicates:
+                - Path=/api/group/**
+              filters:
+                - StripPrefix=2
+
+            - id: api42-service
+              uri: http://api42-service:4444
+              predicates:
+                - Path=/api/api42/**
+              filters:
+                - StripPrefix=2
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,mappings,env,configprops
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway.server.mvc: DEBUG
+    org.springframework.web: DEBUG
+

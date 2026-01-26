@@ -1,0 +1,14 @@
+server:
+  port: 8082 # Ou le port de ton choix
+
+spring:
+  application:
+    name: chat-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/chat_db
+    username: user
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
