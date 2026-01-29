@@ -21,9 +21,13 @@ services:
       - app_net
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: containers/Dockerfile
+    image: node:lts-slim
+    working_dir: /app
+    volumes:
+      - ../frontend:/app
+    command: npm run dev
+    ports:
+      - "3000:3000"
     depends_on:
       - api-gateway
     networks:

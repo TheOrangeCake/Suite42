@@ -1,70 +1,117 @@
 <template>
-  <v-container fluid class="hero">
-    <v-row align="center" class="fill-height">
-      <!-- TEXTE -->
-      <v-col cols="12" md="6" class="hero-content">
-        <h1 class="hero-title">
-          PICK THE<br />
-          RIGHT<br />
-          TEAMMATES
-        </h1>
+  <v-container fluid class="index-page">
+    <v-row class="fill-height" align="center">
+      <!-- LEFT -->
+      <v-col cols="12" md="6">
+        <h1 class="hero-title">Let’s get productive !</h1>
 
-        <p class="hero-subtitle">
-          Finding teammates for 42 projects is never easy.<br />
-          We are here to help.
-        </p>
+        <!-- 42 LOGIN -->
+        <div class="login-block">
+          <h3>42 Student login</h3>
 
-        <v-btn variant="outlined" color="primary" class="hero-btn" to="/login">
-          Login to start looking
-        </v-btn>
+          <v-btn
+            variant="outlined"
+            class="login-42"
+            prepend-icon="mdi-school"
+            @click="login42"
+          >
+            Login with 42 account
+          </v-btn>
+        </div>
+
+        <!-- PUBLIC LOGIN -->
+        <div class="login-block">
+          <h3>Public login</h3>
+
+          <v-text-field
+            label="Username"
+            variant="outlined"
+            v-model="username"
+          />
+
+          <v-text-field
+            label="Password"
+            type="password"
+            variant="outlined"
+            v-model="password"
+          />
+
+          <v-btn
+            color="primary"
+            :loading="auth.loading"
+            @click="login"
+          >
+            Log in
+          </v-btn>
+
+          <p class="signup">
+            No account ?
+            <RouterLink to="/signup">Sign up here</RouterLink>
+          </p>
+        </div>
+      </v-col>
+
+      <!-- RIGHT -->
+      <v-col cols="12" md="6" class="illustration">
+        <v-img
+          src="../../design/assets/images/sign_in_illustration.png"
+          max-width="420"
+          class="mx-auto"
+        />
       </v-col>
     </v-row>
   </v-container>
 </template>
 
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+
+const auth = useAuthStore()
+const router = useRouter()
+
+const username = ref('')
+const password = ref('')
+
+async function login() {
+  await auth.login(username.value, password.value)
+  router.push('/profile')
+}
+
+function login42() {
+  window.location.href = import.meta.env.VITE_API_URL + '/oauth/42'
+}
+</script>
+
 <style scoped>
-.hero {
-  min-height: calc(100vh - 64px);
-  position: relative;
-
-  /* BACKGROUND IMAGE */
-  background-image: url("/hand.jpg");
-  background-repeat: no-repeat;
-
-  background-size: cover;
-  background-position: right bottom;
-}
-
-.hero::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: linear-gradient(90deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.35) 60%, rgba(0,0,0,0) 100%);
-  pointer-events:none;
-}
-
-.hero-content{
-  position: relative;
-  z-index: 1;
+.index-page {
+  min-height: calc(100vh - 64px - 40px); /* navbar + footer */
+  padding: 4rem;
 }
 
 .hero-title {
-  font-size: 4rem;
-  font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 24px;
-  color: white;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
 }
 
-.hero-subtitle {
-  font-size: 1.1rem;
-  margin-bottom: 32px;
-  color: rgba(255,255,255,0.7);
+.login-block {
+  margin-bottom: 3rem;
+  max-width: 420px;
 }
 
-.hero-btn {
-  text-transform: none;
-  padding: 12px 24px;
+.login-42 {
+  margin-top: 1rem;
+}
+
+.signup {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.illustration {
+  text-align: center;
 }
 </style>
 
