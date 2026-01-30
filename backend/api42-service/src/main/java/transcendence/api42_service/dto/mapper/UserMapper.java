@@ -19,8 +19,11 @@ public final class UserMapper {
 				user.getLastName(),
 				user.getIntraUrl(),
 				mapAvatar(user),
+				user.getPoolMonth(),
+				user.getPoolYear(),
 				user.getRank(),
-				user.getRankProgressPercent()
+				user.getRankProgressPercent(),
+				user.getLfg()
 		);
 	}
 
@@ -50,6 +53,7 @@ public final class UserMapper {
 				user.getActive(),
 				user.getRank(),
 				user.getRankProgressPercent(),
+				user.getLfg(),
 				user.getFinishedProjects(),
 				user.getEligibleProjects(),
 				userCommonCore

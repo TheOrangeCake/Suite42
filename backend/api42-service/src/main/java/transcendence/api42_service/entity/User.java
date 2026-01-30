@@ -80,6 +80,10 @@ public class User {
     @Column(name="rank_progress_percent")
     private Integer rankProgressPercent;
 
+    @Column(name="lfg")
+    @NonNull
+    private String lfg = "none";
+
     @ElementCollection(fetch=FetchType.LAZY)
     @CollectionTable(
             name="user_finished_projects",

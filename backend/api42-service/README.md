@@ -1,6 +1,6 @@
 # Description
 **Api 42 service** is a microservice to manage data from 42 school API. This service fetch, transform and store data, then expose REST endpoints to retrieve them.
-<p>Tech stacks: Java Spring Boot, Hibernate ORM and PostgreSQL.</p>
+<p>Tech stacks: Java Spring Boot, JPA (Hibernate ORM) and PostgreSQL.</p>
 <p>Module:
   <ul>
     <li>Use a backend framework. (1p)</li>
@@ -43,7 +43,7 @@ Currently only support Lausanne campus
 <details>
   <summary style="font-size:1.2em; font-weight:bold;">User API</summary>
     <details>
-      <summary><code>GET /v1/users</code></summary>
+      <summary><code>GET /v1/42users</code></summary>
       <ul>
         <li>Description: Get all active and non alumni users.<br>Note: Rank 7 mean user has done all rank 6 projects.</li>
         <li>Filter:
@@ -54,6 +54,7 @@ Currently only support Lausanne campus
             <li><code>rank</code></li>
             <li><code>eligibleProject</code> (a project user can do but hasn't done)</li>
             <li><code>finishedProjects</code> (list of finished projects)</li>
+            <li><code>lfg</code></li>
           </ul>
         </li>
         <li>Sorting:
@@ -71,15 +72,15 @@ Currently only support Lausanne campus
         </li>
         <li>Examples:
           <ul>
-            <li><pre>/v1/users?page=0&size=50&campusName=Lausanne&poolMonth=june&poolYear=2024&rank=6&eligibleProject=ft_transcendence&finishedProjects=webserv&finishedProjects=cub3d</pre></li>
-            <li><pre>/v1/users?campusName=Lausanne&page=0&size=25&sort=rank,desc&poolMonth=june</pre></li>
+            <li><pre>/v1/42users?page=0&size=50&campusName=Lausanne&poolMonth=june&poolYear=2024&rank=6&eligibleProject=ft_transcendence&finishedProjects=webserv&finishedProjects=cub3d</pre></li>
+            <li><pre>/v1/42users?campusName=Lausanne&page=0&size=25&sort=rank,desc&poolMonth=june</pre></li>
           </ul>
         </li>
         <li>
           <details>
             <summary>Json response example:</summary>
             <ul>
-              <li>Request:<pre>/v1/users?campusName=Lausanne&page=0&size=2&sort=rank,desc&poolMonth=june</pre></li>
+              <li>Request:<pre>/v1/42users?campusName=Lausanne&page=0&size=2&sort=rank,desc&poolMonth=june</pre></li>
               <li>Response:
                 <pre><code class="language-json">
                   {
@@ -99,8 +100,11 @@ Currently only support Lausanne campus
                             "micro": "url to micro user1 photo"
                           }
                         },
+                        "pool_month": "june",
+                        "pool_year": "2024",
                         "rank": 7,
-                        "rank_progress_percent": 0
+                        "rank_progress_percent": 0,
+                        "lfg": "none"
                       },
                       {
                         "id": 222222,
@@ -117,8 +121,11 @@ Currently only support Lausanne campus
                             "micro": "url to micro user2 photo"
                           }
                         },
+                        "pool_month": "june",
+                        "pool_year": "2023",
                         "rank": 6,
-                        "rank_progress_percent": 34
+                        "rank_progress_percent": 34,
+                        "lfg": "ft_transcendence"
                       }
                     ],
                     "page": {
@@ -136,16 +143,15 @@ Currently only support Lausanne campus
       </ul>
     </details>
     <details>
-      <summary><code>GET /v1/users/id/{id}</code></summary>
+      <summary><code>GET /v1/42users/id/{id}</code></summary>
       <ul>
         <li>Description: Get a user by id.</li>
-        <li>No filter, no sorting and no paging.</li>
-        <li>Example<pre>/v1/users/id/111111</pre></li>
+        <li>Example<pre>/v1/42users/id/111111</pre></li>
         <li>
           <details>
             <summary>Json response example</summary>
             <ul>
-              <li>Request:<pre>/v1/users/id/111111</pre></li>
+              <li>Request:<pre>/v1/42users/id/111111</pre></li>
               <li>Response:
                 <pre><code class="language-json">
                   {
@@ -171,6 +177,7 @@ Currently only support Lausanne campus
                     "active": true,
                     "rank": 6,
                     "rank_progress_percent": 0,
+                    "lfg": "42_collaborative_resume",
                     "finished_projects": [
                       "cpp-module-00",
                       // ... list of finished projects
@@ -219,15 +226,15 @@ Currently only support Lausanne campus
                       ]
                     }
                   }
-                </code></pre><
-              /li>
+                </code></pre>
+              </li>
             </ul>
           </details>
         </li>
       </ul>
     </details>
     <details>
-      <summary><code>GET /v1/users/last_name/{lastName}</code></summary>
+      <summary><code>GET /v1/42users/last_name/{lastName}</code></summary>
       <ul>
         <li>Description: Get all users by last name. Name is case-sensitive.</li>
         <li>No filter and no sorting.</li>
@@ -237,12 +244,12 @@ Currently only support Lausanne campus
             <li><code>size</code> (results per page, default 25, max 50)</li>
           </ul>
         </li>
-        <li>Example<pre>/v1/users/last_name/User</pre></li>
+        <li>Example<pre>/v1/42users/last_name/User</pre></li>
         <li>
           <details>
             <summary>Json response example</summary>
             <ul>
-              <li>Request:<pre>/v1/users/last_name/User</pre></li>
+              <li>Request:<pre>/v1/42users/last_name/User</pre></li>
               <li>Response:
                 <pre><code class="language-json">
 				{
@@ -263,7 +270,8 @@ Currently only support Lausanne campus
 						  }
 					    },
 					    "rank": null,
-					    "rank_progress_percent": null
+					    "rank_progress_percent": null,
+                        "lfg": "none"
 					  },
 					  {
 					    "id": 222222,
@@ -281,7 +289,8 @@ Currently only support Lausanne campus
 						  }
 					    },
 					    "rank": 4,
-					    "rank_progress_percent": 75
+					    "rank_progress_percent": 75,
+                        "lfg": "none"
 					  }
                   	],
 					"page": {
@@ -291,15 +300,15 @@ Currently only support Lausanne campus
 					  "totalPages": 1
 				    }
 				  }
-                </code></pre><
-              /li>
+                </code></pre>
+              </li>
             </ul>
           </details>
         </li>
       </ul>
     </details>
     <details>
-      <summary><code>GET /v1/users/first_name/{firstName}</code></summary>
+      <summary><code>GET /v1/42users/first_name/{firstName}</code></summary>
       <ul>
         <li>Description: Get all users by first name. Name is case-sensitive.</li>
         <li>No filter and not sorting.</li>
@@ -309,12 +318,12 @@ Currently only support Lausanne campus
             <li><code>size</code> (results per page, default 25, max 50)</li>
           </ul>
         </li>
-        <li>Example<pre>/v1/users/first_name/User%20First%20Name</pre></li>
+        <li>Example<pre>/v1/42users/first_name/User%20First%20Name</pre></li>
         <li>
           <details>
             <summary>Json response example</summary>
             <ul>
-              <li>Request:<pre>/v1/users/first_name/User%20First%20Name</pre></li>
+              <li>Request:<pre>/v1/42users/first_name/User%20First%20Name</pre></li>
               <li>Response:
                 <pre><code class="language-json">
                   {
@@ -335,7 +344,8 @@ Currently only support Lausanne campus
 						  }
 					    },
 					    "rank": null,
-					    "rank_progress_percent": null
+					    "rank_progress_percent": null,
+                        "lfg": "none"
 					  },
 					  {
 					    "id": 222222,
@@ -353,7 +363,8 @@ Currently only support Lausanne campus
 						  }
 					    },
 					    "rank": 4,
-					    "rank_progress_percent": 75
+					    "rank_progress_percent": 75,
+                        "lfg": "none"
 					  }
                   	],
 					"page": {
@@ -368,6 +379,21 @@ Currently only support Lausanne campus
             </ul>
           </details>
         </li>
+      </ul>
+    </details>
+    <details>
+      <summary><code>PATCH v1/42users/{id}/lfg?lfg={eligibleProject}</code></summary>
+      <ul>
+        <li>Description: Update user LFG project.<br>Note: query lfg={eligibleProject] is mandatory.</li>
+        <li>Query option: An eligible project (slug) of user or "none"</li>
+        <li>Response code:
+          <ul>
+            <li>204: LFG is successfully updated</li>
+            <li>400: No lfg query (check lfg format)</li>
+            <li>400: Invalid lfg project. Only eligible projects or none are accepted.</li>
+          </ul>
+        </li>
+        <li>Example<pre>/v1/42users/188455/lfg?lfg=none</pre></li>
       </ul>
     </details>
 </details>
@@ -659,6 +685,24 @@ Currently only support Lausanne campus
   </details>
 </details>
 <br>
+<details>
+	<summary style="font-size:1.2em; font-weight:bold;">Heath check API</summary>
+	<details>
+    <summary><code>GET /v1/health</code></summary>
+    <ul>
+      <li>Description: Check if the service is healthy.<br></li>
+	  <li>Response code:
+          <ul>
+            <li>200: Healthy</li>
+            <li>500: Api 42 Secret expired</li>
+            <li>500: Some databases are empty</li>
+            <li>500: Unhealthy</li>
+          </ul>
+	  </li>
+    </ul>
+  </details>
+</details>
+<br>
 
 <br>
 
@@ -682,7 +726,7 @@ Currently only support Lausanne campus
 │   │   │           │   └── (Spring configuration: API clients, pagination)
 │   │   │           │
 │   │   │           ├── controller/
-│   │   │           │   └── (REST controllers: HTTP endpoints for User, Project and Campus)
+│   │   │           │   └── (REST controllers: HTTP endpoints)
 │   │   │           │
 │   │   │           ├── data_import/
 │   │   │           │   ├── (Fetch data and persist in database)

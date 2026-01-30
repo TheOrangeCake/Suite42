@@ -1,0 +1,42 @@
+package transcendence.api42_service.controller;
+
+import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import transcendence.api42_service.data_import.oauth.OauthTokenGetter;
+import transcendence.api42_service.exception.ApiCallFailException;
+import transcendence.api42_service.repositories.CampusRepository;
+import transcendence.api42_service.repositories.ProjectRepository;
+import transcendence.api42_service.repositories.ProjectsUsersRepository;
+import transcendence.api42_service.repositories.UserRepository;
+
+@RestController
+@RequestMapping("/v1/health")
+@AllArgsConstructor
+public class HealthController {
+	private final OauthTokenGetter oauthTokenGetter;
+	private final CampusRepository campusRepository;
+	private final UserRepository userRepository;
+	private final ProjectsUsersRepository projectsUsersRepository;
+	private final ProjectRepository projectRepository;
+
+	@GetMapping
+	public ResponseEntity<String> healthCheck() {
+		try {
+			oauthTokenGetter.retrieveToken();
+			if (!(campusRepository.count() > 0
+				&& userRepository.count() > 0
+				&& projectsUsersRepository.count() > 0
+				&& projectRepository.count() > 0))
+				return ResponseEntity.status(500).body("Some databases are empty");
+			return ResponseEntity.ok("Healthy");
+		} catch (ApiCallFailException e) {
+			System.err.println("API error during Oauth Token request: " + e.getMessage());
+			if (e.getStatus().value() == 401)
+				return ResponseEntity.status(500).body("Api 42 Secret expired");
+			return ResponseEntity.status(500).body("Unhealthy");
+		}
+	}
+}

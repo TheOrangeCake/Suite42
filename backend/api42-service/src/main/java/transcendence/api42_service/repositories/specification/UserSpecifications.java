@@ -66,4 +66,9 @@ public final class UserSpecifications {
 			return inPredicate;
 		};
 	}
+
+	public static Specification<User> hasLfg(String lfg) {
+		return (table, query, criteria) ->
+				lfg == null ? null : criteria.equal(table.get("lfg"), lfg);
+	}
 }

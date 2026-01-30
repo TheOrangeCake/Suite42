@@ -7,7 +7,10 @@ public record UserSimpleResponseDto(
 		String last_name,
 		String intra_url,
 		AvatarDto image,
+		String pool_month,
+		String pool_year,
 		Integer rank,
-		Integer rank_progress_percent
+		Integer rank_progress_percent,
+		String lfg
 ) {
 }

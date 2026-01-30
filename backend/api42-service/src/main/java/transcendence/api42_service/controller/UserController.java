@@ -8,6 +8,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import transcendence.api42_service.dto.UserDetailedResponseDto;
@@ -20,7 +22,7 @@ import transcendence.api42_service.repositories.UserRepository;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@RequestMapping("v1/users")
+@RequestMapping("v1/42users")
 @AllArgsConstructor
 @RestController
 public class UserController {
@@ -40,6 +42,7 @@ public class UserController {
 			@RequestParam(required = false) Integer rank,
 			@RequestParam(required = false) String eligibleProject,
 			@RequestParam(required = false) Set<String> finishedProjects,
+			@RequestParam(required = false) String lfg,
 			@PageableDefault(size = 25) Pageable pageable) {
 		int maxSize = 50;
 		Sort sort = pageable
@@ -63,7 +66,8 @@ public class UserController {
 				.and(UserSpecifications.hasPoolYear(poolYear))
 				.and(UserSpecifications.hasRank(rank))
 				.and(UserSpecifications.hasEligibleProject(eligibleProject))
-				.and(UserSpecifications.hasFinishedProjects(finishedProjects));
+				.and(UserSpecifications.hasFinishedProjects(finishedProjects))
+				.and(UserSpecifications.hasLfg(lfg));
 		return userRepository.findAll(spec, safePageable)
 				.map(UserMapper::mapToSimpleDto);
 	}
@@ -103,4 +107,23 @@ public class UserController {
 		return usersPage.map(UserMapper::mapToSimpleDto);
 	}
 
+	@PatchMapping("/{id}/lfg")
+	@Transactional
+	public ResponseEntity<?> modifyLFG(@PathVariable Long id, @RequestParam String lfg) {
+		User user = this.userRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		if (lfg.equals("none")) {
+			user.setLfg(lfg);
+			userRepository.save(user);
+			return ResponseEntity.noContent().build();
+		}
+		Set<String> eligibleProjects= user.getEligibleProjects();
+		boolean validateLFG = eligibleProjects.stream().anyMatch(s -> s.equals(lfg));
+		if (validateLFG) {
+			user.setLfg(lfg);
+			userRepository.save(user);
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.status(400).body("Invalid lfg project. Only eligible projects or none are accepted.");
+	}
 }

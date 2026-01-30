@@ -14,19 +14,27 @@ import transcendence.api42_service.exception.InvalidTokenException;
 public class OauthTokenGetter {
     private volatile String token;
     private final RestClient restClient;
+    private OauthToken oauthToken;
 
     @Value("${api42.secret}")
     private String apiSecret;
 
+    // Currently not in use.
+    // The challenge is the env secret is needed to be updated manually.
+    // So a system to trigger a secret reload need to be implemented.
+    @Value("${api42.nextSecret")
+    private String apiNextSecret;
+
     @Value("${api42.uid}")
     private String apiUID;
 
-    public OauthTokenGetter(RestClient restClient) {
+    public OauthTokenGetter(RestClient restClient, OauthToken oauthToken) {
         this.restClient = restClient;
+	    this.oauthToken = oauthToken;
     }
 
-    public void retrieveToken() {
-        OauthToken result = restClient.post()
+    public synchronized void retrieveToken() {
+        oauthToken = restClient.post()
                 .uri("oauth/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body("grant_type=client_credentials" +
@@ -38,9 +46,9 @@ public class OauthTokenGetter {
                     throw new ApiCallFailException(response.getStatusCode());
                 }))
                 .body(OauthToken.class);
-        if (result == null || result.getAccessToken() == null) {
+        if (oauthToken == null || oauthToken.getAccessToken() == null) {
             throw new InvalidTokenException();
         }
-        token = result.getAccessToken();
+        token = oauthToken.getAccessToken();
     }
 }
