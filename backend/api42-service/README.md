@@ -29,6 +29,7 @@
     <br>
     <br>API42_UID=
     <br>API42_SECRET=
+    <br>API42_NEXT_SECRET=
     </pre></details>
   
 ### Start as individual service
@@ -396,6 +397,53 @@ Currently only support Lausanne campus
         <li>Example<pre>/v1/42users/188455/lfg?lfg=none</pre></li>
       </ul>
     </details>
+    <details>
+      <summary><code>PATCH v1/42users/{id}/avatar</code></summary>
+      <ul>
+        <li>Description: Update user avatar.</li>
+        <li>Require: 
+          <ul>
+            <li>Header: <code>Content-Type: multipart/form-data</code></li>
+            <li>FormData must have "avatar" as key and the file to upload as value.</li>
+            <li>Only .gif, .jpg, .jpeg, .png, .webp</li>
+          </ul>
+        </li>
+        <li>Response code:
+          <ul>
+            <li>200: Successfully modified avatar</li>
+            <li>400: Request must be multipart/form-data</li>
+            <li>400: Invalid file (empty, not image) or no/wrong Content-Type header</li>
+            <li>400: Invalid file extension. Allowed: .gif, .jpg, .jpeg, .png, .webp</li>
+            <li>500: IO runtime error in server</li>
+          </ul>
+        </li>
+        <li>Example<pre>/v1/42users/188455/avatar</pre></li>
+      </ul>
+    </details>
+    <details>
+      <summary><code>PATCH v1/42users/{id}/banner</code></summary>
+      <ul>
+        <li>Description: Update user banner.</li>
+        <li>Require: 
+          <ul>
+            <li>Header: <code>Content-Type: multipart/form-data</code></li>
+            <li>FormData must have "banner" as key and the file to upload as value.</li>
+            <li>Only .gif, .jpg, .jpeg, .png, .webp</li>
+          </ul>
+        </li>
+        <li>Response code:
+          <ul>
+            <li>200: Successfully modified banner</li>
+            <li>400: Request must be multipart/form-data</li>
+            <li>400: Invalid file (empty, not image) or no/wrong Content-Type header</li>
+            <li>400: Invalid file extension. Allowed: .gif, .jpg, .jpeg, .png, .webp</li>
+            <li>500: IO runtime error in server</li>
+          </ul>
+        </li>
+        <li>Example<pre>/v1/42users/188455/banner</pre></li>
+      </ul>
+    </details>
+
 </details>
 <br>
 <details>
@@ -720,7 +768,7 @@ Currently only support Lausanne campus
 │   │   │   └── transcendence/
 │   │   │       └── api42_service/
 │   │   │           ├── bootstrap/
-│   │   │           │   └── (Startup logic, initial data loading, rank and progress calculations)
+│   │   │           │   └── (Startup logic)
 │   │   │           │
 │   │   │           ├── config/
 │   │   │           │   └── (Spring configuration: API clients, pagination)
@@ -758,7 +806,10 @@ Currently only support Lausanne campus
 │   │   │           │   └── (Spring Data repositories)
 │   │   │           │
 │   │   │           └── scheduler/
-│   │   │               └── (Scheduled background jobs and periodic updates. To be implemented)
+│   │   │           │   └── (Scheduled background jobs and periodic updates. To be implemented)│
+│   │   │           │
+│   │   │           └── service/
+│   │   │               └── (Business logics: File upload, Rank calculator, Rank score calculator)
 │   │   │
 │   │   └── resources/
 │   │       └── (Application configuration, static files, templates)

@@ -1,5 +1,7 @@
 package transcendence.api42_service.dto.mapper;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 import transcendence.api42_service.definition.project.UserCommonCore;
 import transcendence.api42_service.dto.*;
@@ -7,8 +9,16 @@ import transcendence.api42_service.entity.Campus;
 import transcendence.api42_service.entity.User;
 import transcendence.api42_service.exception.NoCommonCoreException;
 
+@Component
 public final class UserMapper {
-	public static UserSimpleResponseDto mapToSimpleDto(User user) {
+
+	@Value("${api42.default-banner}")
+	private String defaultBanner;
+
+	@Value("${api42.image-domain}")
+	private String imageDomain;
+
+	public UserSimpleResponseDto mapToSimpleDto(User user) {
 		if (user == null) {
 			return null;
 		}
@@ -18,6 +28,7 @@ public final class UserMapper {
 				user.getFirstName(),
 				user.getLastName(),
 				user.getIntraUrl(),
+				createCustomAvatarUrl(user),
 				mapAvatar(user),
 				user.getPoolMonth(),
 				user.getPoolYear(),
@@ -28,7 +39,7 @@ public final class UserMapper {
 	}
 
 	@SuppressWarnings("ReassignedVariable")
-	public static UserDetailedResponseDto mapToDetailedDto(User user) {
+	public UserDetailedResponseDto mapToDetailedDto(User user) {
 		if (user == null) {
 			return null;
 		}
@@ -46,6 +57,8 @@ public final class UserMapper {
 				user.getFirstName(),
 				user.getLastName(),
 				user.getIntraUrl(),
+				createCustomAvatarUrl(user),
+				createCustomBannerUrl(user),
 				mapAvatar(user),
 				user.getPoolMonth(),
 				user.getPoolYear(),
@@ -60,7 +73,7 @@ public final class UserMapper {
 		);
 	}
 
-	public static User mapBootStrapRequestToUser(UserRequestDto dto, Campus campus) {
+	public User mapBootStrapRequestToUser(UserRequestDto dto, Campus campus) {
 		if (dto == null) {
 			return null;
 		}
@@ -73,6 +86,8 @@ public final class UserMapper {
 		user.setFirstName(dto.first_name());
 		user.setLastName(dto.last_name());
 		setIntraURl(user, dto.login());
+		user.setCustomAvatarUrl(null);
+		user.setCustomBannerUrl(defaultBanner);
 		user.setPoolMonth(dto.pool_month());
 		user.setPoolYear(dto.pool_year());
 		user.setCreatedAt(dto.created_at());
@@ -99,7 +114,7 @@ public final class UserMapper {
 		return user;
 	}
 
-	private static AvatarDto mapAvatar(User user) {
+	private AvatarDto mapAvatar(User user) {
 		AvatarVersionsDto versions = new AvatarVersionsDto(
 				user.getImageLarge(),
 				user.getImageMedium(),
@@ -112,9 +127,9 @@ public final class UserMapper {
 		);
 	}
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	private  static UserCommonCore fromJson(String json) {
+	private UserCommonCore fromJson(String json) {
 		try {
 			return OBJECT_MAPPER.readValue(json, UserCommonCore.class);
 		} catch (Exception e) {
@@ -122,8 +137,17 @@ public final class UserMapper {
 		}
 	}
 
-	private static void setIntraURl(User user, String login) {
+	private void setIntraURl(User user, String login) {
 		String baseUrl = "https://intra.42.fr/users/";
 		user.setIntraUrl(baseUrl + login);
+	}
+
+	private String createCustomBannerUrl(User user) {
+		return imageDomain + user.getCustomBannerUrl();
+	}
+
+	private String createCustomAvatarUrl(User user) {
+		String customAvatar = user.getCustomAvatarUrl();
+		return customAvatar != null ? imageDomain + customAvatar : null;
 	}
 }

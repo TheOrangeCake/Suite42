@@ -1,10 +1,12 @@
 package transcendence.api42_service.dto.mapper;
 
+import org.springframework.stereotype.Component;
 import transcendence.api42_service.dto.ProjectResponseDto;
 import transcendence.api42_service.entity.Project;
 
+@Component
 public final class ProjectMapper {
-	public static ProjectResponseDto mapToResponseDto(Project project) {
+	public ProjectResponseDto mapToResponseDto(Project project) {
 		return new ProjectResponseDto(
 				project.getId(),
 				project.getName(),

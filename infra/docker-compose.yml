@@ -130,6 +130,9 @@ services:
       POSTGRES_PASSWORD: ${API42_POSTGRES_PASSWORD}
       API42_UID: ${API42_UID}
       API42_SECRET: ${API42_SECRET}
+      API42_NEXT_SECRET: ${API42_NEXT_SECRET}
+    volumes:
+      - api42-images:/app/uploads
     depends_on:
       api42-postgresql:
         condition: service_healthy
@@ -141,6 +144,7 @@ services:
 volumes:
   pg_data:
   api42-pg:
+  api42-images:
 
 networks:
   app_net:

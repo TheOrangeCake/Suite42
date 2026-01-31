@@ -1,6 +1,7 @@
 package transcendence.api42_service.dto.mapper;
 
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 import transcendence.api42_service.definition.curriculum.RankDefinition;
 import transcendence.api42_service.dto.CommonCoreDto;
 import transcendence.api42_service.dto.CommonCoreRankDto;
@@ -14,9 +15,11 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 @AllArgsConstructor
+@Component
 public final class CommonCoreMapper {
+	private final ProjectMapper projectMapper;
 
-	public static CommonCoreDto mapToDto(
+	public CommonCoreDto mapToDto(
 			SortedMap<Integer, RankDefinition> curriculum,
 			ProjectRepository projectRepository
 	) {
@@ -30,7 +33,7 @@ public final class CommonCoreMapper {
 		List<Project> projects = projectRepository.findByRankGreaterThanEqual(0);
 		List<ProjectResponseDto> projectResponseDto = projects
 				.stream()
-				.map(ProjectMapper::mapToResponseDto).toList();
+				.map(projectMapper::mapToResponseDto).toList();
 		return new CommonCoreDto(projectResponseDto, ranks);
 	}
 }

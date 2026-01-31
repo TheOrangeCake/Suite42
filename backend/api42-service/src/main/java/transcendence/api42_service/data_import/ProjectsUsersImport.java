@@ -21,6 +21,7 @@ public class ProjectsUsersImport {
 	private final ProjectsUsersRepository projectsUsersRepository;
 	private final ProjectRepository projectRepository;
 	private final Api42Fetcher api42Fetcher;
+	private final ProjectsUsersMapper projectsUsersMapper;
 
 	@Transactional
 	public void initialize(List<User> users, String token, Long lausanneCampusId, String entityName) {
@@ -46,7 +47,7 @@ public class ProjectsUsersImport {
 				token,
 				entityName,
 				(t, p, rpp) -> api42Fetcher.fetchProjectsUsersDtoData(t, p, rpp, user.getId(), cursusId, campusId)
-						.mapItems(dto -> ProjectsUsersMapper.mapToProjectsUsers(dto, user, projectRepository)),
+						.mapItems(dto -> projectsUsersMapper.mapToProjectsUsers(dto, user, projectRepository)),
 				projectsUsersRepository::saveAll
 		);
 	}

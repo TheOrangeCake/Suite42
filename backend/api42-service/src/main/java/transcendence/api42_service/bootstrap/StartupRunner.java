@@ -17,6 +17,8 @@ import transcendence.api42_service.data_import.Api42Fetcher;
 import transcendence.api42_service.data_import.DatabaseImport;
 import transcendence.api42_service.data_import.ProjectsUsersImport;
 import transcendence.api42_service.data_import.oauth.OauthTokenGetter;
+import transcendence.api42_service.services.UserProgressScoreCalculator;
+import transcendence.api42_service.services.UserRankCalculator;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +35,8 @@ public class StartupRunner implements CommandLineRunner {
     private final DatabaseImport databaseImport;
     private final UserRankCalculator userRankCalculator;
     private final UserProgressScoreCalculator userProgressScoreCalculator;
+    private final UserMapper userMapper;
+    private final CampusMapper campusMapper;
 
     // Hard coded Campus Lausanne id for now due to excess api call per hour for all campus
     @Override
@@ -77,7 +81,7 @@ public class StartupRunner implements CommandLineRunner {
                 token,
                 entityName,
                 (t, p, rpp) -> api42Fetcher.fetchCampusDtoData(t, p, rpp)
-                        .mapItems(CampusMapper::mapToCampus),
+                        .mapItems(campusMapper::mapToCampus),
                 campusRepository::saveAll
         );
     }
@@ -99,7 +103,7 @@ public class StartupRunner implements CommandLineRunner {
                     token,
                     entityName,
                     (t, p, rpp) -> api42Fetcher.fetchUserDtoData(t, p, rpp, lausanneCampusId)
-                            .mapItems(dto -> UserMapper.mapBootStrapRequestToUser(dto, lausanneCampus)),
+                            .mapItems(dto -> userMapper.mapBootStrapRequestToUser(dto, lausanneCampus)),
                     userRepository::saveAll
             );
         } else {

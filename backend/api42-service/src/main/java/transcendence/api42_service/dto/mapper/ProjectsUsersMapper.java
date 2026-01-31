@@ -1,5 +1,7 @@
 package transcendence.api42_service.dto.mapper;
 
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 import transcendence.api42_service.definition.curriculum.CommonCoreCurriculum;
 import transcendence.api42_service.dto.ProjectsUsersRequestDto;
 import transcendence.api42_service.dto.ProjectsUsersResponseDto;
@@ -10,9 +12,12 @@ import transcendence.api42_service.repositories.ProjectRepository;
 
 import java.util.Optional;
 
+@AllArgsConstructor
+@Component
 public final class ProjectsUsersMapper {
+	private final ProjectMapper projectMapper;
 
-	public static ProjectsUsersResponseDto mapToProjectsUsersResponseDto(ProjectsUsers projectsUsers) {
+	public ProjectsUsersResponseDto mapToProjectsUsersResponseDto(ProjectsUsers projectsUsers) {
 		if (projectsUsers == null) {
 			return null;
 		}
@@ -23,12 +28,12 @@ public final class ProjectsUsersMapper {
 				projectsUsers.getStatus(),
 				projectsUsers.getValidated(),
 				projectsUsers.getMarkedAt(),
-				ProjectMapper.mapToResponseDto(projectsUsers.getProject())
+				projectMapper.mapToResponseDto(projectsUsers.getProject())
 		);
 	}
 
 	// TODO: move Project repo save() outside of mapper for clearer role separation
-	public static ProjectsUsers mapToProjectsUsers(
+	public ProjectsUsers mapToProjectsUsers(
 			ProjectsUsersRequestDto projectsUsersDto,
 			User user,
 			ProjectRepository projectRepository) {

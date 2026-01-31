@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @RestController
 public class CampusController {
 	private final CampusRepository campusRepository;
+	private final CampusMapper campusMapper;
 
 	private static final Set<String> ALL_CAMPUSES_ALLOWED_SORTS = Set.of(
 			"name",
@@ -58,14 +59,14 @@ public class CampusController {
 				.and(CampusSpecifications.hasCountry(country))
 				.and(CampusSpecifications.hasCity(city));
 		return campusRepository.findAll(spec, safePageable)
-				.map(CampusMapper::mapToDto);
+				.map(campusMapper::mapToDto);
 	}
 
 	@GetMapping("/id/{id}")
 	public CampusDto getCampusById(@PathVariable Long id) {
 		Campus campus = campusRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-		return CampusMapper.mapToDto(campus);
+		return campusMapper.mapToDto(campus);
 	}
 
 	@GetMapping("/name/{name}")
@@ -78,6 +79,6 @@ public class CampusController {
 				Math.min(pageable.getPageSize(), maxSize)
 		);
 		return campusRepository.findByName(name, safePageable)
-				.map(CampusMapper::mapToDto);
+				.map(campusMapper::mapToDto);
 	}
 }

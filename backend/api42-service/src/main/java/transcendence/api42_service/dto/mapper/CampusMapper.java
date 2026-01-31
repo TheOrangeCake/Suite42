@@ -1,10 +1,12 @@
 package transcendence.api42_service.dto.mapper;
 
+import org.springframework.stereotype.Component;
 import transcendence.api42_service.dto.CampusDto;
 import transcendence.api42_service.entity.Campus;
 
+@Component
 public final class CampusMapper {
-	public static CampusDto mapToDto(Campus campus) {
+	public CampusDto mapToDto(Campus campus) {
 		if (campus == null) {
 			return null;
 		}
@@ -26,7 +28,7 @@ public final class CampusMapper {
 		);
 	}
 
-	public static Campus mapToCampus(CampusDto dto) {
+	public Campus mapToCampus(CampusDto dto) {
 		if (dto == null) {
 			return null;
 		}

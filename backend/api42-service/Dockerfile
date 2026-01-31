@@ -8,9 +8,14 @@ RUN mvn -q -DskipTests package
 
 # Run stage -> set up user -> copy *.jar -> run *.jar
 FROM eclipse-temurin:17-jre
-RUN mkdir /opt/app
 RUN groupadd spring && useradd -r -g spring spring
-USER spring:spring
+RUN mkdir -p /opt/app && \
+    chown spring:spring /opt/app
+RUN mkdir -p /app/uploads && \
+    chown spring:spring /app/uploads && \
+    chmod 755 /app/uploads
 COPY --from=build /app/target/*.jar /opt/app/app.jar
+COPY --chown=spring:spring src/main/resources/static/default_images /opt/app/default_images
+USER spring
 EXPOSE 4444
 ENTRYPOINT ["java", "-jar", "/opt/app/app.jar"]

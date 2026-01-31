@@ -1,4 +1,4 @@
-package transcendence.api42_service.bootstrap;
+package transcendence.api42_service.services;
 
 import lombok.AllArgsConstructor;
 import me.tongfei.progressbar.ProgressBar;

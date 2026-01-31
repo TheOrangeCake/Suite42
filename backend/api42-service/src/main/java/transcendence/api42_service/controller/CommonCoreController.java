@@ -15,10 +15,11 @@ import transcendence.api42_service.repositories.ProjectRepository;
 @RestController
 public class CommonCoreController {
 	private final ProjectRepository projectRepository;
+	private final CommonCoreMapper commonCoreMapper;
 
 	@GetMapping()
 	public CommonCoreDto commonCore() {
-		return CommonCoreMapper.mapToDto(CommonCoreCurriculum.RANKS, projectRepository);
+		return commonCoreMapper.mapToDto(CommonCoreCurriculum.RANKS, projectRepository);
 	}
 
 }

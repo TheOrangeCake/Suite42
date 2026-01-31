@@ -12,6 +12,8 @@ public record UserDetailedResponseDto(
         String first_name,
         String last_name,
         String intra_url,
+		String custom_avatar_url,
+		String custom_banner_url,
         AvatarDto image,
         String pool_month,
         String pool_year,

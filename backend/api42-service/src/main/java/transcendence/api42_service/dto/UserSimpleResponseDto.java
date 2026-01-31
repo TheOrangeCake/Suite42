@@ -6,6 +6,7 @@ public record UserSimpleResponseDto(
 		String first_name,
 		String last_name,
 		String intra_url,
+		String custom_avatar_url,
 		AvatarDto image,
 		String pool_month,
 		String pool_year,

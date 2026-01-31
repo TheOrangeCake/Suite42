@@ -41,6 +41,12 @@ public class User {
     @Column(name="url")
     private String intraUrl;
 
+    @Column(name="custom_avatar_url")
+    private String customAvatarUrl;
+
+    @Column(name="custom_banner_url")
+    private String customBannerUrl;
+
     @Column(name="image_link")
     private String imageLink;
 

@@ -22,7 +22,7 @@ public class OauthTokenGetter {
     // Currently not in use.
     // The challenge is the env secret is needed to be updated manually.
     // So a system to trigger a secret reload need to be implemented.
-    @Value("${api42.nextSecret")
+    @Value("${api42.next-secret")
     private String apiNextSecret;
 
     @Value("${api42.uid}")

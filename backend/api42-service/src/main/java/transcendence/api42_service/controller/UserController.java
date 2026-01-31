@@ -1,5 +1,6 @@
 package transcendence.api42_service.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import transcendence.api42_service.dto.UserDetailedResponseDto;
 import transcendence.api42_service.dto.UserSimpleResponseDto;
@@ -18,7 +20,9 @@ import transcendence.api42_service.repositories.specification.UserSpecifications
 import transcendence.api42_service.dto.mapper.UserMapper;
 import transcendence.api42_service.entity.User;
 import transcendence.api42_service.repositories.UserRepository;
+import transcendence.api42_service.services.FileUploadService;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,6 +31,8 @@ import java.util.stream.Collectors;
 @RestController
 public class UserController {
 	private final UserRepository userRepository;
+	private final FileUploadService fileUploadService;
+	private final UserMapper userMapper;
 
 	private static final Set<String> ALL_USERS_ALLOWED_SORTS = Set.of(
 			"rank",
@@ -69,14 +75,14 @@ public class UserController {
 				.and(UserSpecifications.hasFinishedProjects(finishedProjects))
 				.and(UserSpecifications.hasLfg(lfg));
 		return userRepository.findAll(spec, safePageable)
-				.map(UserMapper::mapToSimpleDto);
+				.map(userMapper::mapToSimpleDto);
 	}
 
 	@GetMapping("/id/{id}")
 	public UserDetailedResponseDto getUserById(@PathVariable Long id) {
 		User user = this.userRepository.findDetailedById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-		return UserMapper.mapToDetailedDto(user);
+		return userMapper.mapToDetailedDto(user);
 	}
 
 	@GetMapping("/last_name/{lastName}")
@@ -90,7 +96,7 @@ public class UserController {
 				Math.min(pageable.getPageSize(), maxSize)
 		);
 		Page<User> usersPage = this.userRepository.findByLastName(lastName, noSortPageable);
-		return usersPage.map(UserMapper::mapToSimpleDto);
+		return usersPage.map(userMapper::mapToSimpleDto);
 	}
 
 	@GetMapping("/first_name/{firstName}")
@@ -104,7 +110,7 @@ public class UserController {
 				Math.min(pageable.getPageSize(), maxSize)
 		);
 		Page<User> usersPage = this.userRepository.findByFirstName(firstName, noSortPageable);
-		return usersPage.map(UserMapper::mapToSimpleDto);
+		return usersPage.map(userMapper::mapToSimpleDto);
 	}
 
 	@PatchMapping("/{id}/lfg")
@@ -125,5 +131,47 @@ public class UserController {
 			return ResponseEntity.noContent().build();
 		}
 		return ResponseEntity.status(400).body("Invalid lfg project. Only eligible projects or none are accepted.");
+	}
+
+	@PatchMapping("/{id}/avatar")
+	public ResponseEntity<?> modifyAvatar(@PathVariable Long id, @RequestParam("avatar") MultipartFile avatar, HttpServletRequest request) {
+			return modifyImage(id, avatar, request, "avatar");
+	}
+
+	@PatchMapping("/{id}/banner")
+	public ResponseEntity<?> modifyBanner(@PathVariable Long id, @RequestParam("banner") MultipartFile banner, HttpServletRequest request) {
+		return modifyImage(id, banner, request, "banner");
+	}
+
+	private ResponseEntity<?> modifyImage(Long id, MultipartFile image, HttpServletRequest request, String type) {
+		if (!request.getContentType().startsWith("multipart/form-data")) {
+			return ResponseEntity.status(400).body("Request must be multipart/form-data");
+		}
+		User user = this.userRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		if (image.isEmpty() || !fileUploadService.isImage(image)) {
+			return ResponseEntity.status(400).body("Invalid file or no Content-Type header");
+		}
+		String fileExtension = fileUploadService.getFileExtension(image);
+		if (fileExtension == null) {
+			return ResponseEntity.status(400).body("Invalid file extension. Allowed: .gif, .jpg, .jpeg, .png, .webp");
+		}
+		try {
+			String fileName = fileUploadService.uploadImage(user.getId().toString(), image, fileExtension);
+			if (type.equals("avatar")) {
+				fileUploadService.deleteImage(user.getCustomAvatarUrl());
+				user.setCustomAvatarUrl(fileName);
+			} else if (type.equals("banner")) {
+				fileUploadService.deleteImage(user.getCustomBannerUrl());
+				user.setCustomBannerUrl(fileName);
+			} else {
+				return ResponseEntity.status(500).body("Fail to upload file, something went wrong in the server.");
+			}
+			userRepository.save(user);
+			return ResponseEntity.ok().body("Successfully modified " + type);
+		} catch(IOException | RuntimeException e) {
+			System.err.println("Fail to upload file. " + e.getMessage());
+			return ResponseEntity.status(500).body("Fail to upload file, something went wrong in the server.");
+		}
 	}
 }
