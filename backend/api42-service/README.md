@@ -97,6 +97,8 @@ Currently only support Lausanne campus
                         "first_name": "User1 First Name",
                         "last_name": "User1 Last Name",
                         "intra_url": "https://intra.42.fr/users/user1Login",
+						"custom_avatar_url": null,
+    					"custom_banner_url": "http://localhost:4444/images42/default_profile_banner.jpg",
                         "image": {
                           "link": "url to original user1 photo",
                           "versions": {
@@ -118,6 +120,8 @@ Currently only support Lausanne campus
                         "first_name": "User2 First Name",
                         "last_name": "User2 Last Name",
                         "intra_url": "https://intra.42.fr/users/user2Login",
+						"custom_avatar_url": null,
+    					"custom_banner_url": "http://localhost:4444/images42/default_profile_banner.jpg",
                         "image": {
                           "link": "url to original user2 photo",
                           "versions": {
@@ -168,6 +172,8 @@ Currently only support Lausanne campus
                     "first_name": "User First Name",
                     "last_name": "User Last Name",
                     "intra_url": "https://intra.42.fr/users/userLogin",
+					"custom_avatar_url": null,
+					"custom_banner_url": "http://localhost:4444/images42/default_profile_banner.jpg",
                     "image": {
                       "link": "url to original user photo",
                       "versions": {
@@ -266,6 +272,8 @@ Currently only support Lausanne campus
 					    "first_name": "User1 First Name",
 					    "last_name": "User",
 					    "intra_url": "https://intra.42.fr/users/user1",
+						"custom_avatar_url": null,
+    					"custom_banner_url": "http://localhost:4444/images42/default_profile_banner.jpg",
 					    "image": {
 						  "link": "url to original user photo",
 						  "versions": {
@@ -285,6 +293,8 @@ Currently only support Lausanne campus
 					    "first_name": "User2 First Name",
 					    "last_name": "User",
 					    "intra_url": "https://intra.42.fr/users/user2",
+						"custom_avatar_url": null,
+    					"custom_banner_url": "http://localhost:4444/images42/default_profile_banner.jpg",
 					    "image": {
 						  "link": "url to original user photo",
 						  "versions": {
@@ -340,6 +350,8 @@ Currently only support Lausanne campus
 					    "first_name": "User First Name",
 					    "last_name": "UserNumber1",
 					    "intra_url": "https://intra.42.fr/users/user1",
+						"custom_avatar_url": null,
+    					"custom_banner_url": "http://localhost:4444/images42/default_profile_banner.jpg",
 					    "image": {
 						  "link": "url to original user photo",
 						  "versions": {
