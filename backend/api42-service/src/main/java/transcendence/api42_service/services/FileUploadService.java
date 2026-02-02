@@ -1,8 +1,10 @@
 package transcendence.api42_service.services;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import transcendence.api42_service.exception.DeleteDefaultException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -11,6 +13,7 @@ import java.nio.file.*;
 import java.util.Arrays;
 import java.util.UUID;
 
+@Getter
 @Service
 public class FileUploadService {
 
@@ -34,9 +37,12 @@ public class FileUploadService {
 
 	public void deleteImage(String imageName) throws IOException {
 		if (imageName == null || imageName.isEmpty() || imageName.equals(defaultBanner))
-			return;
-		Path uploadPath = Paths.get(uploadDir);
-		Files.deleteIfExists(uploadPath.resolve(imageName));
+			throw new DeleteDefaultException();
+		Path imagePath = Paths.get(uploadDir).resolve(imageName).normalize();
+		if (!imagePath.startsWith(Paths.get(uploadDir).toAbsolutePath())) {
+			throw new SecurityException();
+		}
+		Files.deleteIfExists(imagePath);
 	}
 
 	public boolean isImage(MultipartFile file) {

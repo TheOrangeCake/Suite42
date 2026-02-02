@@ -1,5 +1,10 @@
+# IMPORTANT TODO
+- Oauth validation for PATCH and DELETE endpoints
+
 # Description
-**Api 42 service** is a microservice to manage data from 42 school API. This service fetch, transform and store data, then expose REST endpoints to retrieve them.
+**Api 42 service** is a microservice to manage students from 42.
+<br>This service fetches, transforms and stores data from official 42 API to update students profile. Students can also upload their own avatar, banner and LFG status.
+<br>REST endpoints are exposed to API Gateway for communication.
 <p>Tech stacks: Java Spring Boot, JPA (Hibernate ORM) and PostgreSQL.</p>
 <p>Module:
   <ul>
@@ -144,15 +149,15 @@ Currently only support Lausanne campus
       </ul>
     </details>
     <details>
-      <summary><code>GET /v1/42users/id/{id}</code></summary>
+      <summary><code>GET /v1/42users/{id}/profile</code></summary>
       <ul>
         <li>Description: Get a user by id.</li>
-        <li>Example<pre>/v1/42users/id/111111</pre></li>
+        <li>Example<pre>/v1/42users/111111/profile</pre></li>
         <li>
           <details>
             <summary>Json response example</summary>
             <ul>
-              <li>Request:<pre>/v1/42users/id/111111</pre></li>
+              <li>Request:<pre>/v1/42users/111111/profile</pre></li>
               <li>Response:
                 <pre><code class="language-json">
                   {
@@ -421,6 +426,20 @@ Currently only support Lausanne campus
       </ul>
     </details>
     <details>
+      <summary><code>DELETE v1/42users/{id}/avatar</code></summary>
+      <ul>
+        <li>Description: Delete user avatar.</li>
+        <li>Response code:
+          <ul>
+            <li>200: Successfully deleted avatar</li>
+            <li>404: File not found</li>
+            <li>500: IO runtime error in server</li>
+          </ul>
+        </li>
+        <li>Example<pre>/v1/42users/188455/avatar</pre></li>
+      </ul>
+    </details>
+    <details>
       <summary><code>PATCH v1/42users/{id}/banner</code></summary>
       <ul>
         <li>Description: Update user banner.</li>
@@ -443,6 +462,21 @@ Currently only support Lausanne campus
         <li>Example<pre>/v1/42users/188455/banner</pre></li>
       </ul>
     </details>
+    <details>
+      <summary><code>DELETE v1/42users/{id}/banner</code></summary>
+      <ul>
+        <li>Description: Delete user banner.</li>
+        <li>Response code:
+          <ul>
+            <li>200: Successfully deleted banner</li>
+            <li>404: File not found</li>
+            <li>500: IO runtime error in server</li>
+          </ul>
+        </li>
+        <li>Example<pre>/v1/42users/188455/banner</pre></li>
+      </ul>
+    </details>
+
 
 </details>
 <br>
@@ -498,7 +532,7 @@ Currently only support Lausanne campus
 						  "address": "Harzer Strasse 39",
 						  "zip": "12059",
 						  "city": "Berlin",
-						  "website": "http://42berlin.de/",
+						  "website": "https://42berlin.de/",
 						  "facebook": "",
 						  "twitter": "",
 						  "active": true,
@@ -530,7 +564,7 @@ Currently only support Lausanne campus
 						  "address": "Porschestraße 2c",
 						  "zip": "38440",
 						  "city": "Wolfsburg",
-						  "website": "http://42wolfsburg.de/",
+						  "website": "https://42wolfsburg.de/",
 						  "facebook": "",
 						  "twitter": "",
 						  "active": true,
@@ -580,7 +614,7 @@ Currently only support Lausanne campus
 					  "address": "Harzer Strasse 39",
 					  "zip": "12059",
 					  "city": "Berlin",
-					  "website": "http://42berlin.de/",
+					  "website": "https://42berlin.de/",
 					  "facebook": "",
 					  "twitter": "",
 					  "active": true,
@@ -889,3 +923,4 @@ erDiagram
 * [Terminal progress bar by ctongfei](https://github.com/ctongfei/progressbar)
 * [ChatGPT - Used as learning tool and occasional debug](https://chatgpt.com/)
 * [IDE Intellij IDEA](https://www.jetbrains.com/idea/)
+* [MIME list](https://www.iana.org/assignments/media-types/media-types.xhtml)

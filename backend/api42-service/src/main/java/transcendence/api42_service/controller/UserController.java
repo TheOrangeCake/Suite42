@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import transcendence.api42_service.dto.UserDetailedResponseDto;
 import transcendence.api42_service.dto.UserSimpleResponseDto;
+import transcendence.api42_service.exception.DeleteDefaultException;
 import transcendence.api42_service.repositories.specification.UserSpecifications;
 import transcendence.api42_service.dto.mapper.UserMapper;
 import transcendence.api42_service.entity.User;
@@ -78,7 +79,7 @@ public class UserController {
 				.map(userMapper::mapToSimpleDto);
 	}
 
-	@GetMapping("/id/{id}")
+	@GetMapping("/{id}/profile")
 	public UserDetailedResponseDto getUserById(@PathVariable Long id) {
 		User user = this.userRepository.findDetailedById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -113,6 +114,7 @@ public class UserController {
 		return usersPage.map(userMapper::mapToSimpleDto);
 	}
 
+	// TODO: Validate user with Oauth service
 	@PatchMapping("/{id}/lfg")
 	@Transactional
 	public ResponseEntity<?> modifyLFG(@PathVariable Long id, @RequestParam String lfg) {
@@ -133,11 +135,13 @@ public class UserController {
 		return ResponseEntity.status(400).body("Invalid lfg project. Only eligible projects or none are accepted.");
 	}
 
+	// TODO: Validate user with Oauth service
 	@PatchMapping("/{id}/avatar")
 	public ResponseEntity<?> modifyAvatar(@PathVariable Long id, @RequestParam("avatar") MultipartFile avatar, HttpServletRequest request) {
 			return modifyImage(id, avatar, request, "avatar");
 	}
 
+	// TODO: Validate user with Oauth service
 	@PatchMapping("/{id}/banner")
 	public ResponseEntity<?> modifyBanner(@PathVariable Long id, @RequestParam("banner") MultipartFile banner, HttpServletRequest request) {
 		return modifyImage(id, banner, request, "banner");
@@ -171,7 +175,42 @@ public class UserController {
 			return ResponseEntity.ok().body("Successfully modified " + type);
 		} catch(IOException | RuntimeException e) {
 			System.err.println("Fail to upload file. " + e.getMessage());
-			return ResponseEntity.status(500).body("Fail to upload file, something went wrong in the server.");
+			return ResponseEntity.status(500).body("Fail to upload file. Something went wrong in the server.");
+		}
+	}
+
+	// TODO: Validate user with Oauth service
+	@DeleteMapping("/{id}/avatar")
+	public ResponseEntity<?> deleteAvatar(@PathVariable Long id) {
+		return deleteImage(id, "avatar");
+	}
+
+	// TODO: Validate user with Oauth service
+	@DeleteMapping("/{id}/banner")
+	public ResponseEntity<?> deleteBanner(@PathVariable Long id) {
+		return deleteImage(id, "banner");
+	}
+
+	private ResponseEntity<?> deleteImage(Long id, String type) {
+		User user = this.userRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		try {
+			if (type.equals("banner")) {
+				fileUploadService.deleteImage(user.getCustomBannerUrl());
+				user.setCustomBannerUrl(fileUploadService.getDefaultBanner());
+			} else if (type.equals("avatar")) {
+				fileUploadService.deleteImage(user.getCustomAvatarUrl());
+				user.setCustomAvatarUrl(null);
+			} else
+				return ResponseEntity.status(500).body("Image deletion failed. Something went wrong in the server");
+			userRepository.save(user);
+			return ResponseEntity.ok("Successfully deleted " + type);
+		} catch(IOException e) {
+			return ResponseEntity.status(500).body("Image deletion failed. Something went wrong in the server");
+		} catch(SecurityException e) {
+			return ResponseEntity.status(403).body("Access denied");
+		} catch(DeleteDefaultException e) {
+			return ResponseEntity.status(400).body("No image specified or can not delete default image");
 		}
 	}
 }
