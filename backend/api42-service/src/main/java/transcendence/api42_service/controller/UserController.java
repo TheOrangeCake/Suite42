@@ -19,7 +19,7 @@ import transcendence.api42_service.dto.UserSimpleResponseDto;
 import transcendence.api42_service.exception.DeleteDefaultException;
 import transcendence.api42_service.repositories.specification.UserSpecifications;
 import transcendence.api42_service.dto.mapper.UserMapper;
-import transcendence.api42_service.entity.User;
+import transcendence.api42_service.entities.User;
 import transcendence.api42_service.repositories.UserRepository;
 import transcendence.api42_service.services.FileUploadService;
 
@@ -114,7 +114,7 @@ public class UserController {
 		return usersPage.map(userMapper::mapToSimpleDto);
 	}
 
-	// TODO: Validate user with Oauth service
+	// TODO: Validate user with JWT
 	@PatchMapping("/{id}/lfg")
 	@Transactional
 	public ResponseEntity<?> modifyLFG(@PathVariable Long id, @RequestParam String lfg) {
@@ -135,13 +135,13 @@ public class UserController {
 		return ResponseEntity.status(400).body("Invalid lfg project. Only eligible projects or none are accepted.");
 	}
 
-	// TODO: Validate user with Oauth service
+	// TODO: Validate user with JWT
 	@PatchMapping("/{id}/avatar")
 	public ResponseEntity<?> modifyAvatar(@PathVariable Long id, @RequestParam("avatar") MultipartFile avatar, HttpServletRequest request) {
 			return modifyImage(id, avatar, request, "avatar");
 	}
 
-	// TODO: Validate user with Oauth service
+	// TODO: Validate user with JWT
 	@PatchMapping("/{id}/banner")
 	public ResponseEntity<?> modifyBanner(@PathVariable Long id, @RequestParam("banner") MultipartFile banner, HttpServletRequest request) {
 		return modifyImage(id, banner, request, "banner");
@@ -163,10 +163,14 @@ public class UserController {
 		try {
 			String fileName = fileUploadService.uploadImage(user.getId().toString(), image, fileExtension);
 			if (type.equals("avatar")) {
-				fileUploadService.deleteImage(user.getCustomAvatarUrl());
+				if (user.getCustomAvatarUrl() != null) {
+					fileUploadService.deleteImage(user.getCustomAvatarUrl());
+				}
 				user.setCustomAvatarUrl(fileName);
 			} else if (type.equals("banner")) {
-				fileUploadService.deleteImage(user.getCustomBannerUrl());
+				if (!user.getCustomBannerUrl().equals(fileUploadService.getDefaultBanner())) {
+					fileUploadService.deleteImage(user.getCustomBannerUrl());
+				}
 				user.setCustomBannerUrl(fileName);
 			} else {
 				return ResponseEntity.status(500).body("Fail to upload file, something went wrong in the server.");
@@ -179,13 +183,13 @@ public class UserController {
 		}
 	}
 
-	// TODO: Validate user with Oauth service
+	// TODO: Validate user with JWT
 	@DeleteMapping("/{id}/avatar")
 	public ResponseEntity<?> deleteAvatar(@PathVariable Long id) {
 		return deleteImage(id, "avatar");
 	}
 
-	// TODO: Validate user with Oauth service
+	// TODO: Validate user with JWT
 	@DeleteMapping("/{id}/banner")
 	public ResponseEntity<?> deleteBanner(@PathVariable Long id) {
 		return deleteImage(id, "banner");

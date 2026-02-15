@@ -30,7 +30,7 @@ All backend microservices (each service is its own Spring Boot project).
 - `backend/auth-service/`
 - `backend/group-service/`
 - `backend/api42-service/` ==>  [api42-service documentation](./backend/api42-service/README.md)
-
+- `backend/regular-user-service/` ==> [regular-user-service documentation](./backend/regular-user-service/README.md)
 
 ### `chat-service/`
 Another Spring Boot service (separate folder, not inside `backend/` (maybe we gonna move it later)).

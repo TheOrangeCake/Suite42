@@ -8,7 +8,7 @@ import transcendence.api42_service.data_import.interfaces.EntitySaverInterface;
 import transcendence.api42_service.data_import.interfaces.PageFetcherInterface;
 import transcendence.api42_service.dto.PageResult;
 import transcendence.api42_service.dto.mapper.ProjectsUsersMapper;
-import transcendence.api42_service.entity.User;
+import transcendence.api42_service.entities.User;
 import transcendence.api42_service.exception.ApiCallFailException;
 import transcendence.api42_service.repositories.ProjectRepository;
 import transcendence.api42_service.repositories.ProjectsUsersRepository;

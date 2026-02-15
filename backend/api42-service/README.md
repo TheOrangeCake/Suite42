@@ -1,5 +1,6 @@
 # IMPORTANT TODO
-- Oauth validation for PATCH and DELETE endpoints
+- JWT access token validation for all API endpoints.
+- JWT validation for PATCH and DELETE endpoints for stateless session. As result, user validation will be through JWT instead of {id} for security reason.
 
 # Description
 **Api 42 service** is a microservice to manage students from 42.
@@ -11,6 +12,8 @@
     <li>Use a backend framework. (1p)</li>
     <li>Use an ORM for the database. (1p)</li>
     <li>Implement advanced search functionality with filters, sorting, and pagination. (1p)</li>
+    <li>Allow users to interact with other users. (part - user profile)</li>
+    <li>Standard user management and authentication. (part - update profile, upload avatar, profile)</li>
     <li>Backend as microservice. (part)</li>
   </ul>
 <p>Member worked on: Nguyen NGUYEN (hoannguy).</p> 
@@ -400,7 +403,7 @@ Currently only support Lausanne campus
       </ul>
     </details>
     <details>
-      <summary><code>PATCH v1/42users/{id}/lfg?lfg={eligibleProject}</code></summary>
+      <summary><code>PATCH v1/42users/{id}/lfg?lfg={eligibleProject}</code> Attention: {id} will be deleted and user will be validated with JWT instead.</summary>
       <ul>
         <li>Description: Update user LFG project.<br>Note: query lfg={eligibleProject] is mandatory.</li>
         <li>Query option: An eligible project (slug) of user or "none"</li>
@@ -415,7 +418,7 @@ Currently only support Lausanne campus
       </ul>
     </details>
     <details>
-      <summary><code>PATCH v1/42users/{id}/avatar</code></summary>
+      <summary><code>PATCH v1/42users/{id}/avatar</code> Attention: {id} will be deleted and user will be validated with JWT instead.</summary>
       <ul>
         <li>Description: Update user avatar.</li>
         <li>Require: 
@@ -438,7 +441,7 @@ Currently only support Lausanne campus
       </ul>
     </details>
     <details>
-      <summary><code>DELETE v1/42users/{id}/avatar</code></summary>
+      <summary><code>DELETE v1/42users/{id}/avatar</code> Attention: {id} will be deleted and user will be validated with JWT instead.</summary>
       <ul>
         <li>Description: Delete user avatar.</li>
         <li>Response code:
@@ -452,7 +455,7 @@ Currently only support Lausanne campus
       </ul>
     </details>
     <details>
-      <summary><code>PATCH v1/42users/{id}/banner</code></summary>
+      <summary><code>PATCH v1/42users/{id}/banner</code> Attention: {id} will be deleted and user will be validated with JWT instead.</summary>
       <ul>
         <li>Description: Update user banner.</li>
         <li>Require: 
@@ -475,7 +478,7 @@ Currently only support Lausanne campus
       </ul>
     </details>
     <details>
-      <summary><code>DELETE v1/42users/{id}/banner</code></summary>
+      <summary><code>DELETE v1/42users/{id}/banner</code> Attention: {id} will be deleted and user will be validated with JWT instead.</summary>
       <ul>
         <li>Description: Delete user banner.</li>
         <li>Response code:

@@ -1,4 +1,4 @@
-package transcendence.api42_service.entity;
+package transcendence.api42_service.entities;
 
 import jakarta.persistence.*;
 import lombok.*;

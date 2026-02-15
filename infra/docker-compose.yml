@@ -95,6 +95,7 @@ services:
 #      - group-service
 #    networks:
 #      - app_net
+
   api42-postgresql:
     image: postgres:16-alpine
     container_name: api42-postgresql
@@ -140,11 +141,55 @@ services:
       - app_net
     tty: true
 
+  regular-user-postgresql:
+    image: postgres:16-alpine
+    container_name: regular-user-postgresql
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: ${REGULAR_USER_POSTGRES_DB}
+      POSTGRES_USER: ${REGULAR_USER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${REGULAR_USER_POSTGRES_PASSWORD}
+    volumes:
+      - regular-user-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${REGULAR_USER_POSTGRES_USER} -d ${REGULAR_USER_POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - app_net
+
+  regular-user-service:
+    build:
+      context: ../backend/regular-user-service
+      dockerfile: Dockerfile
+    container_name: regular-user-service
+    ports:
+      - "4445:4445"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      POSTGRES_HOST: regular-user-postgresql
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${REGULAR_USER_POSTGRES_DB}
+      POSTGRES_USER: ${REGULAR_USER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${REGULAR_USER_POSTGRES_PASSWORD}
+      REGULAR_USER_JWT_KEY: ${REGULAR_USER_JWT_KEY}
+    volumes:
+      - regular-user-images:/app/uploads
+    depends_on:
+      regular-user-postgresql:
+        condition: service_healthy
+    networks:
+      - app_net
+    tty: true
 
 volumes:
   pg_data:
   api42-pg:
   api42-images:
+  regular-user-pg:
+  regular-user-images:
 
 networks:
   app_net:

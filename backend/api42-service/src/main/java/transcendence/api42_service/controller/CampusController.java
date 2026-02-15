@@ -13,7 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import transcendence.api42_service.repositories.specification.CampusSpecifications;
 import transcendence.api42_service.dto.CampusDto;
 import transcendence.api42_service.dto.mapper.CampusMapper;
-import transcendence.api42_service.entity.Campus;
+import transcendence.api42_service.entities.Campus;
 import transcendence.api42_service.repositories.CampusRepository;
 
 import java.util.Set;

@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component;
 import transcendence.api42_service.definition.curriculum.CommonCoreCurriculum;
 import transcendence.api42_service.dto.ProjectsUsersRequestDto;
 import transcendence.api42_service.dto.ProjectsUsersResponseDto;
-import transcendence.api42_service.entity.Project;
-import transcendence.api42_service.entity.ProjectsUsers;
-import transcendence.api42_service.entity.User;
+import transcendence.api42_service.entities.Project;
+import transcendence.api42_service.entities.ProjectsUsers;
+import transcendence.api42_service.entities.User;
 import transcendence.api42_service.repositories.ProjectRepository;
 
 import java.util.Optional;

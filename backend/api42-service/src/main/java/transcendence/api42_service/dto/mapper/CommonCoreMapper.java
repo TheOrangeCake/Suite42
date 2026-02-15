@@ -6,7 +6,7 @@ import transcendence.api42_service.definition.curriculum.RankDefinition;
 import transcendence.api42_service.dto.CommonCoreDto;
 import transcendence.api42_service.dto.CommonCoreRankDto;
 import transcendence.api42_service.dto.ProjectResponseDto;
-import transcendence.api42_service.entity.Project;
+import transcendence.api42_service.entities.Project;
 import transcendence.api42_service.repositories.ProjectRepository;
 
 import java.util.List;

@@ -26,7 +26,7 @@ public class FileUploadService {
 	public String uploadImage(String userId, MultipartFile image, String fileExtension) throws IOException {
 		if (uploadDir.isEmpty())
 			throw new RuntimeException("No upload location or domain specified");
-		Path uploadPath = Paths.get(uploadDir);
+		Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
 		if(!Files.exists(uploadPath)) {
 			Files.createDirectories(uploadPath);
 		}

@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import transcendence.api42_service.entity.Campus;
+import transcendence.api42_service.entities.Campus;
 
 import java.util.Optional;
 

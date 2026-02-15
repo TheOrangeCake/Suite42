@@ -2,7 +2,7 @@ package transcendence.api42_service.repositories.specification;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
-import transcendence.api42_service.entity.Campus;
+import transcendence.api42_service.entities.Campus;
 
 @Component
 public final class CampusSpecifications {

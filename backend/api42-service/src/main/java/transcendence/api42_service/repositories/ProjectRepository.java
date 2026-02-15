@@ -1,7 +1,7 @@
 package transcendence.api42_service.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import transcendence.api42_service.entity.Project;
+import transcendence.api42_service.entities.Project;
 
 import java.util.List;
 

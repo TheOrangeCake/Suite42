@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import transcendence.api42_service.definition.curriculum.CommonCoreCurriculum;
 import transcendence.api42_service.definition.curriculum.RankDefinition;
-import transcendence.api42_service.entity.User;
+import transcendence.api42_service.entities.User;
 import transcendence.api42_service.repositories.UserRepository;
 
 import java.util.List;

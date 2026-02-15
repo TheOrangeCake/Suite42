@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 import transcendence.api42_service.definition.project.UserCommonCore;
 import transcendence.api42_service.dto.*;
-import transcendence.api42_service.entity.Campus;
-import transcendence.api42_service.entity.User;
+import transcendence.api42_service.entities.Campus;
+import transcendence.api42_service.entities.User;
 import transcendence.api42_service.exception.NoCommonCoreException;
 
 @Component

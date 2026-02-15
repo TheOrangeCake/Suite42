@@ -11,8 +11,8 @@ import transcendence.api42_service.definition.project.IndividualProject;
 import transcendence.api42_service.definition.project.IndividualRank;
 import transcendence.api42_service.definition.project.LastProjectsUsers;
 import transcendence.api42_service.definition.project.UserCommonCore;
-import transcendence.api42_service.entity.ProjectsUsers;
-import transcendence.api42_service.entity.User;
+import transcendence.api42_service.entities.ProjectsUsers;
+import transcendence.api42_service.entities.User;
 import transcendence.api42_service.repositories.ProjectsUsersRepository;
 import transcendence.api42_service.repositories.UserRepository;
 

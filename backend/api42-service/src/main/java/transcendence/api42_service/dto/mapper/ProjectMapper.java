@@ -2,7 +2,7 @@ package transcendence.api42_service.dto.mapper;
 
 import org.springframework.stereotype.Component;
 import transcendence.api42_service.dto.ProjectResponseDto;
-import transcendence.api42_service.entity.Project;
+import transcendence.api42_service.entities.Project;
 
 @Component
 public final class ProjectMapper {
