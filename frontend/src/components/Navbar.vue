@@ -1,63 +1,59 @@
 <script setup lang="ts">
-import logo from '/design/assets/logo/logo_icon.png'
+import logo from '/design/assets/logo/logo_full.svg'
 </script>
 
-
 <template>
-  <v-app-bar
-    app
-    flat
-    color="#f3f3f3"
-    height="96"
-    class="px-10"
-  >
-    <div class="brand">
-      <img  src="/design/assets/logo/logo_full.png"
-      class="logo"
-      />
+  <div class="nav">
+    <RouterLink to="/" class="logo-link">
+      <img :src="logo" class="logo" alt="logo"/>
+    </RouterLink>
+
+    <div class="menu">
+      <RouterLink to="/campuses" class="campuses">Campuses</RouterLink>
+      <RouterLink to="/login" class="signin">Sign in</RouterLink>
     </div>
-
-    <v-spacer />
-
-    <v-btn variant="text" class="nav-link">
-      Campuses
-    </v-btn>
-
-    <v-btn
-      color="#ff5a5a"
-      class="signin-btn"
-      rounded="lg"
-    >
-      Sign in
-    </v-btn>
-
-  </v-app-bar>
+  </div>
 </template>
 
 <style scoped>
-.brand {
+.logo {
+  color: black;
+  height: clamp(36px, 5vw, 64px);
+}
+.nav {
   display: flex;
   align-items: center;
-  gap: 12px;
+
+  padding-left: 5%;
+  padding-top: 3%;
+  padding-right: 5%;
 }
 
-.logo {
-  margin-left: 40px;
-  opacity: 0.8;
-  height: 40px;
+
+.campuses {
+  font-family: monda;
+  color: #111;
+  font-size: 15px;
+
 }
 
-.nav-link {
-  font-size: 18px;
-  margin-right: 24px;
-  text-transform: none;
+.menu {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 38px;
 }
-
-.signin-btn {
-  font-size: 18px;
-  padding: 12px 22px;
-  text-transform: none;
+.signin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 10px;
+  background-color: #FF5959;
+  border-radius: 3px;
+  font-family: monda;
   color: white;
+  text-decoration: none;
+  font-weight: 500;
 }
 </style>
 
