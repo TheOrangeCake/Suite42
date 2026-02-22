@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,21 +22,31 @@ public class ChatController {
 
     /**
      * Cette méthode est appelée quand un client envoie un message à "/app/chat"
+     * FIX: Ajout de la validation et de la gestion d'erreur
      */
     @MessageMapping("/chat")
     public void processMessage(@Payload ChatMessage chatMessage) {
+        // FIX: Validation des données
+        if (chatMessage == null || chatMessage.getRecipientId() == null || 
+            chatMessage.getContent() == null || chatMessage.getContent().trim().isEmpty()) {
+            throw new IllegalArgumentException("Message ou destinataire invalide");
+        }
 
-        // 1. On sauvegarde le message en base de données via le service
-        ChatMessage savedMsg = chatMessageService.save(chatMessage);
+        try {
+            // 1. On sauvegarde le message en base de données via le service
+            ChatMessage savedMsg = chatMessageService.save(chatMessage);
 
-        // 2. On l'envoie au destinataire (recipientId)
-        // Spring va transformer "/user/queue/messages" en une file privée
-        // propre à l'utilisateur ciblé.
-        messagingTemplate.convertAndSendToUser(
-                chatMessage.getRecipientId(),
-                "/queue/messages",
-                savedMsg
-        );
+            // 2. On l'envoie au destinataire (recipientId)
+            // Spring va transformer "/user/queue/messages" en une file privée
+            // propre à l'utilisateur ciblé.
+            messagingTemplate.convertAndSendToUser(
+                    chatMessage.getRecipientId(),
+                    "/queue/messages",
+                    savedMsg
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de l'envoi du message: " + e.getMessage(), e);
+        }
     }
 
     /**

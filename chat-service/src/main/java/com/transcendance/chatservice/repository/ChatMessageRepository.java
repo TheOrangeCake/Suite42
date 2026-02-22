@@ -4,14 +4,20 @@ import com.transcendance.chatservice.model.ChatMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
 
-    // Cette méthode magique permet de récupérer toute la conversation entre deux personnes
-    // Spring Data JPA va comprendre tout seul la requête SQL à générer !
+    // FIX: Méthode simple - conversation d'une direction
     List<ChatMessage> findBySenderIdAndRecipientId(String senderId, String recipientId);
 
-    // Pour récupérer l'historique complet (Alice vers Bob ET Bob vers Alice)
-    List<ChatMessage> findBySenderIdAndRecipientIdOrSenderIdAndRecipientIdOrderByTimestampAsc(
-        String s1, String r1, String s2, String r2
-    );
+    // FIX: Requête JPQL pour récupérer l'historique complet (dans les deux sens)
+    // et trier par timestamp croissant
+    @Query("SELECT m FROM ChatMessage m WHERE " +
+           "(m.senderId = :senderId AND m.recipientId = :recipientId) OR " +
+           "(m.senderId = :recipientId AND m.recipientId = :senderId) " +
+           "ORDER BY m.timestamp ASC")
+    List<ChatMessage> findConversation(@Param("senderId") String senderId, 
+                                       @Param("recipientId") String recipientId);
 }
