@@ -16,16 +16,20 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String senderId;    // Le pseudo ou l'ID de celui qui envoie
+
+    @Column(nullable = false)
     private String recipientId; // Le pseudo ou l'ID de celui qui reçoit
-    private String content;     // Le texte du message
+
+    @Column(nullable = false, length = 5000)
+    private String content;     // Le texte du message (max 5000 caractères)
 
     @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
     private Date timestamp;     // L'heure d'envoi
 
-    private MessageStatus status; // Reçu, Lu, etc. (Optionnel)
-}
-
-enum MessageStatus {
-    RECEIVED, DELIVERED
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MessageStatus status; // Reçu, Lu, etc.
 }

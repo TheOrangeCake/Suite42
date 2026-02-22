@@ -17,7 +17,8 @@
 
     <script>
         var stompClient = null;
-        const JWT_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBbGljZSIsImlhdCI6MTcxNjM4MzQwMH0.PPoccqPYIRZv1RJePvZnXFKyd_XJx3sfoOEQN7_1zHw; // Colle un token valide généré par ton service auth
+        // FIX: Ajouter les guillemets autour du token JWT
+        const JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBbGljZSIsImlhdCI6MTcxNjM4MzQwMH0.PPoccqPYIRZv1RJePvZnXFKyd_XJx3sfoOEQN7_1zHw"; // Token valide généré par le service auth
 
         function connect() {
             // L'URL doit pointer vers ton ApiGateway ou directement vers le service
@@ -44,6 +45,12 @@
             var recipient = document.getElementById('recipient').value;
             var content = document.getElementById('message').value;
 
+            // FIX: Validation des entrées
+            if (!recipient || !content.trim()) {
+                alert('Veuillez remplir le destinataire et le message');
+                return;
+            }
+
             var chatMessage = {
                 senderId: "Moi", // Sera écrasé par le serveur via le JWT
                 recipientId: recipient,
@@ -52,12 +59,17 @@
 
             // On envoie le message vers le @MessageMapping("/chat")
             stompClient.send("/app/chat", {}, JSON.stringify(chatMessage));
+            
+            // FIX: Vider le champ après envoi
+            document.getElementById('message').value = '';
         }
 
         function showMessage(msg) {
             var response = document.getElementById('messagesList');
             var li = document.createElement('li');
-            li.appendChild(document.createTextNode(msg.senderId + ": " + msg.content));
+            // FIX: Ajouter le timestamp et un meilleur formatage
+            const time = new Date(msg.timestamp).toLocaleTimeString();
+            li.appendChild(document.createTextNode(`[${time}] ${msg.senderId}: ${msg.content}`));
             response.appendChild(li);
         }
     </script>
