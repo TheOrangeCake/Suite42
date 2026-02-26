@@ -15,7 +15,7 @@ public class User {
 
 	@Id
 	@GeneratedValue
-	Long id;
+	private Long id;
 
 	@NotBlank(message="Username can not be blank")
 	@Pattern(
@@ -23,26 +23,26 @@ public class User {
 			message = "Username may only contain letters, numbers, spaces, and underscores. No leading or trailing whitespaces."
 	)
 	@Column(name = "username", unique = true, nullable = false)
-	String username;
+	private String username;
 
 	@NotBlank(message="Email can not be blank")
 	@Email(regexp = ".+@.+\\..+")
 	@Column(name = "email", unique = true, nullable = false)
-	String email;
+	private String email;
 
 	@NotBlank(message="Password can not be blank")
 	@Column(name = "password")
-	String password;
+	private String password;
 
 	@Column(name = "custom_avatar_url")
-	String customAvatarUrl;
+	private String customAvatarUrl;
 
 	@Column(name = "custom_banner_url")
-	String customBannerUrl;
+	private String customBannerUrl;
 
 	@Column(name = "first_name")
-	String firstName;
+	private String firstName;
 
 	@Column(name = "last_name")
-	String lastName;
+	private String lastName;
 }

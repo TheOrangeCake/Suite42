@@ -10,11 +10,14 @@ import com.example.regular_user_service.exception.BadTokenException;
 import com.example.regular_user_service.exception.DeleteDefaultException;
 import com.example.regular_user_service.repositories.UserRepository;
 import com.example.regular_user_service.services.FileUploadService;
+import com.example.regular_user_service.services.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +36,7 @@ public class UserController {
 	private final EnvVariables envVariables;
 	private final PasswordEncoder passwordEncoder;
 	private final FileUploadService fileUploadService;
+	private final JwtService jwtService;
 
 	@GetMapping("/profile/{id}")
 	public ResponseEntity<?> getUser(@PathVariable Long id) {
@@ -190,6 +194,30 @@ public class UserController {
 			return ResponseEntity.status(403).body(e.getMessage());
 		} catch(DeleteDefaultException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
+
+	@GetMapping("/signout")
+	public ResponseEntity<String> logoutUser(HttpServletRequest request) {
+		try {
+			String currentRefreshToken = jwtService.extractRefreshToken(request);
+			String currentAccessToken = jwtService.extractAccessToken(request);
+			jwtService.validateJwtToken(currentAccessToken, "access token");
+			jwtService.revokeToken(currentAccessToken, "access token");
+			jwtService.validateJwtToken(currentRefreshToken, "refresh token");
+			jwtService.revokeToken(currentRefreshToken, "refresh token");
+			ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "")
+					.httpOnly(true)
+					.secure(true)
+					.sameSite("Strict")
+					.path("/")
+					.maxAge(0)
+					.build();
+			return ResponseEntity.ok()
+					.header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+					.body("Sign out successfully");
+		} catch (BadTokenException e) {
+			return ResponseEntity.badRequest().body("{\"error\": \"" + e.getMessage() + "\"}");
 		}
 	}
 }

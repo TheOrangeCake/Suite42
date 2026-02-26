@@ -1,8 +1,3 @@
-# IMPORTANT TODO
-- JWT logout via blacklist
-  - Check for security (csrf, etc.)
-  - Maybe forgot password and get all users with pagination endpoints?
-
 # Description
 **Regular User service** is a microservice to manage external user.
 <br>This service authenticate and authorize external user using JWT and Spring Security filtering chain
@@ -131,7 +126,7 @@ Body:
       <summary><code>GET /v1/regular-user/auth/refresh-token</code></summary>
       <ul>
         <li>Description: Refresh access token.</li>
-        <li>How this work: User needs to have a valid refresh token.
+        <li>How this work: User needs to have a valid refresh token and an access token (can be expired).
             <br>Access token is short-lived token (15min) used to verify user identity. It is verified for every request. Once access token expired, call this end point to get another access token.
             <br>Refresh token is long-lived token (7days) used to manage user session and renew access token. If refresh token is invalid (expired or tampered), refresh request will be rejected and user will need to sign in again.
         <li>Examples:
@@ -390,8 +385,18 @@ Body:
         <li>Example<pre>/v1/regular-user/user/profile/banner</pre></li>
       </ul>
     </details>
-
-
+    <details>
+          <summary><code>GET /v1/regular-user/user/signout</code></summary>
+          <ul>
+            <li>Description: Sign user out.<br>Note: Protected path. Require valid JWT tokens.</li>
+            <li>Response:
+              <ul>
+                <li>200: Sign out successfully</li>
+                <li>400: Problem with JWT tokens</li>
+              </ul>
+            </li>
+          </ul>
+        </details>
 
 </details>
 <br>
@@ -439,6 +444,8 @@ Body:
 │   │   │               │   └── (Spring Data repositories)
 │   │   │               ├── services/
 │   │   │               │   └── (Business logic services)
+│   │   │               ├── scheduler/
+│   │   │               │   └── (Scheduled tasks)
 │   │   │               └── RegularUserServiceApplication.java
 │   │   │
 │   │   └── resources/
@@ -456,8 +463,10 @@ Body:
 │   └── (Project documentation)
 ├── runDocker.sh
 │   └── (Script to run the application in Docker)
-└── runLocal.sh
-    └── (Script to run the application locally)
+├── runLocal.sh
+│   └── (Script to run the application locally)
+│
+└── target/                     (Compiled class files and resources)
 </pre>
 </details>
 
@@ -474,7 +483,12 @@ erDiagram
         String custom_banner
         String first_name
         String last_name
-     }
+     
+    REVOKED_TOKEN {
+        String token PK
+        String type
+        Date revoked_at
+    }
 ```
 
 <br>

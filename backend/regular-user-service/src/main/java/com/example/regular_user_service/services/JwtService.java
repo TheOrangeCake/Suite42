@@ -1,6 +1,8 @@
 package com.example.regular_user_service.services;
 
+import com.example.regular_user_service.entities.RevokedToken;
 import com.example.regular_user_service.exception.BadTokenException;
+import com.example.regular_user_service.repositories.RevokeTokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -8,6 +10,8 @@ import io.jsonwebtoken.Jwts;
 import java.util.Date;
 import java.util.HexFormat;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,9 +23,11 @@ import javax.crypto.spec.SecretKeySpec;
 @Service
 public class JwtService {
 	private final SecretKey secretKey;
+	private final RevokeTokenRepository revokeTokenRepository;
 
-	public JwtService(@Value("${REGULAR_USER_JWT_KEY}") String hexKey) {
-		byte[] keyBytes = HexFormat.of().parseHex(hexKey);
+	public JwtService(@Value("${REGULAR_USER_JWT_KEY}") String hexKey, RevokeTokenRepository revokeTokenRepository) {
+        this.revokeTokenRepository = revokeTokenRepository;
+        byte[] keyBytes = HexFormat.of().parseHex(hexKey);
 		this.secretKey = new SecretKeySpec(keyBytes, "HmacSHA256");
 	}
 
@@ -45,16 +51,18 @@ public class JwtService {
 				.compact();
 	}
 
-	public void validateJwtToken(String JwtToken, String type) {
+	public void validateJwtToken(String jwtToken, String type) {
 		try {
 			if (!Jwts.parser()
 					.verifyWith(secretKey)
 					.build()
-					.parseSignedClaims(JwtToken)
+					.parseSignedClaims(jwtToken)
 					.getPayload()
 					.getIssuer()
 					.equals("Regular User Service"))
 				throw new BadTokenException("Invalid " + type + ": wrong issuer");
+			if(revokeTokenRepository.findById(jwtToken).isPresent())
+				throw new BadTokenException("Invalid " + type + ": revoked token");
 		} catch (ExpiredJwtException e) {
 			if (type.equals("access token"))
 				throw new BadTokenException("Invalid " + type + ": expired, please renew at /v1/user-regular/auth/refresh-token");
@@ -76,5 +84,33 @@ public class JwtService {
 			throw new BadTokenException("Invalid "  + type +  ": user ID not found");
 		}
 		return userId;
+	}
+
+	public String extractAccessToken(HttpServletRequest request) {
+		String authHeader = request.getHeader("Authorization");
+		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+		} else {
+			throw new BadTokenException("Invalid Authorization header");
+		}
+	}
+
+	public String extractRefreshToken(HttpServletRequest request) {
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals("refreshToken"))
+					return cookie.getValue();
+			}
+		}
+		throw new BadTokenException("Invalid Refresh Cookie");
+	}
+
+	public void revokeToken(String token, String type) {
+		RevokedToken revokedToken = new RevokedToken();
+		revokedToken.setToken(token);
+		revokedToken.setType(type);
+		revokedToken.setRevokedAt(new Date());
+		revokeTokenRepository.save(revokedToken);
 	}
 }

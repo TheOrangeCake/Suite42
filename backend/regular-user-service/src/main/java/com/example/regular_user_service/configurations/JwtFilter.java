@@ -21,21 +21,31 @@ public class JwtFilter extends OncePerRequestFilter {
 	private final JwtService jwtService;
 
 	@Override
-	public void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws IOException, ServletException {
+	public void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws IOException, ServletException {
+		if (isPublicEndpoint(request)) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 		try {
-			String authHeader = request.getHeader("Authorization");
-			if (authHeader != null && authHeader.startsWith("Bearer ")) {
-				String jwtToken = authHeader.substring(7);
-				jwtService.validateJwtToken(jwtToken, "access token");
-				String userId = jwtService.getUserId(jwtToken, "access token");
-				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
-				SecurityContextHolder.getContext().setAuthentication(authToken);
-			}
+			String jwtToken = jwtService.extractAccessToken(request);
+			jwtService.validateJwtToken(jwtToken, "access token");
+			String userId = jwtService.getUserId(jwtToken, "access token");
+			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
+			SecurityContextHolder.getContext().setAuthentication(authToken);
 			filterChain.doFilter(request, response);
 		} catch (BadTokenException e) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
 			response.setContentType("application/json");
 		}
+	}
+
+	private boolean isPublicEndpoint(HttpServletRequest request) {
+		String path = request.getRequestURI();
+		return path.startsWith("/v1/regular-user/auth/") ||
+				path.startsWith("/error") ||
+				path.startsWith("/images-regular/") ||
+				path.equals("/v1/regular-user/health") ||
+				path.equals(("/h2-console"));
 	}
 }

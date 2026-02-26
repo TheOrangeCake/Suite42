@@ -26,6 +26,7 @@ public class SecurityConfig {
 						.requestMatchers("/error").permitAll()
 						.requestMatchers("/images-regular/**").permitAll()
 						.requestMatchers("/v1/regular-user/health").permitAll()
+						.requestMatchers("/h2-console").permitAll()
 						.anyRequest().authenticated())
 				.sessionManagement(session -> session
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
