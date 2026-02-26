@@ -483,6 +483,7 @@ erDiagram
         String custom_banner
         String first_name
         String last_name
+  }
      
     REVOKED_TOKEN {
         String token PK
