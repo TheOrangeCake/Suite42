@@ -1,13 +1,3 @@
-<script>
-export default {
-  data() {
-    return {
-      msg: 'Hello World!'
-    }
-  }
-}
-</script>
-
 <template>
   <v-app class="app-root">
     <router-view/>
@@ -19,6 +9,12 @@ export default {
   background: white !important;
   color: black;
   min-height: 100vh;
+  overflow-x: hidden; /* empêche le scroll horizontal */
+}
+
+.v-application__wrap {
+  min-height: unset !important;
+  padding: 0 !important;
 }
 </style>
 
