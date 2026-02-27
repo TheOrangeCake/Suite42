@@ -1,216 +1,300 @@
-<template>
-  <div class="page">
-    <div class="card">
-      <!-- Décor à gauche : ligne + corners -->
-      <div class="decor" aria-hidden="true">
-        <div class="rail rail-blue"></div>
+<script setup lang="ts">
+import Corner from '../../ui/Corner.vue'
+import { ref } from 'vue'
 
-        <!-- Wrappers pour “ancrer” la taille des corners -->
-        <div class="cornerWrap c1">
-          <Corner :verticalLength="80" :horizontalLength="35" :thickness="3" :color="colors.turquoise" />
-        </div>
+const emit = defineEmits(['login42', 'loginPublic', 'signup'])
 
-        <div class="cornerWrap c2">
-          <Corner :verticalLength="80" :horizontalLength="35" :thickness="3" :color="colors.turquoise" />
-        </div>
+const username = ref('')
+const password = ref('')
 
-        <div class="cornerWrap c3">
-          <Corner :verticalLength="80" :horizontalLength="35" :thickness="3" :color="colors.turquoise" />
-        </div>
-
-        <div class="rail rail-green"></div>
-      </div>
-
-      <!-- Contenu -->
-      <div class="content">
-
-        <form class="form" @submit.prevent="onSubmit">
-          <div class="field">
-            <label class="label" for="username">USERNAME</label>
-            <input
-              id="username"
-              v-model="username"
-              class="input"
-              type="text"
-              autocomplete="username"
-            />
-          </div>
-
-          <div class="field">
-            <label class="label" for="password">PASSWORD</label>
-            <input
-              id="password"
-              v-model="password"
-              class="input"
-              type="password"
-              autocomplete="current-password"
-            />
-          </div>
-
-          <button class="btn" type="submit">Log in</button>
-
-          <p class="footer">
-            <span>No account ?</span>
-            <a class="link" href="#">Sign up here</a>
-          </p>
-        </form>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup>
-import { ref } from "vue";
-import Corner from "@/components/ui/Corner.vue";
-
-const username = ref("Pookie42");
-const password = ref("****************");
-
-const colors = {
-  turquoise: "var(--turquoise)",
-  green: "var(--green)",
-};
-
-function onSubmit() {
-  console.log("login", username.value, password.value);
+function handlePublicLogin() {
+  emit('loginPublic', { username: username.value, password: password.value })
 }
 </script>
 
+<template>
+  <section class="container2">
+
+    <!-- Titre principal -->
+    <h1 class="headline">Let's get productive !</h1>
+
+    <div class="body">
+
+      <!-- Colonne gauche : formulaires -->
+      <div class="leftCol">
+
+          <div class="sections">
+
+            <!-- 42 Student login -->
+            <div class="loginBlock">
+              <div class="blockTitle">
+                <Corner :vSize="64" :hSize="26" :thickness="5" color="var(--color-coral, #FF5959)" />
+                <h2 class="blockName">42 Student login</h2>
+              </div>
+
+              <div class="blockContent">
+                <Corner :vSize="34" :hSize="36" :thickness="5" color="var(--color-coral, #FF5959)" />
+                <button class="btn42" @click="emit('login42')">
+                  Login with 42 account
+                </button>
+              </div>
+
+            <!-- Public login -->
+            <div class="loginBlock">
+              <div class="blockTitle">
+
+                <Corner :vSize="64" :hSize="26" :thickness="5" color="var(--color-turquoise)" />
+                <h2 class="blockName">Public login</h2>
+              </div>
+
+              <div class="blockContent">
+                <Corner :vSize="160" :hSize="16" :thickness="5" color="var(--color-turquoise)" />
+
+                <div class="formFields">
+                  <div class="field">
+                    <label class="fieldLabel">USERNAME</label>
+                    <input
+                      v-model="username"
+                      type="text"
+                      class="fieldInput"
+                      placeholder="Pookie42"
+                    />
+                  </div>
+
+                  <div class="field">
+                    <label class="fieldLabel">PASSWORD</label>
+                    <input
+                      v-model="password"
+                      type="password"
+                      class="fieldInput"
+                    />
+                  </div>
+
+                  <button class="btnLogin" @click="handlePublicLogin">
+                    Log in
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Sign up en dehors de la ligne rouge -->
+        <div class="signupRow">
+          <p class="signupText">
+            No account ?
+            <span class="signupLink" @click="emit('signup')">Sign up here</span>
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Colonne droite : illustration -->
+      <div class="rightCol">
+        <img
+          src="/design/assets/images/sign_in_illustration.png"
+          alt="Astronaut on rocket"
+          class="illustration"
+        />
+      </div>
+
+    </div>
+  </section>
+</template>
+
 <style scoped>
-/* Variables (scoped-friendly) */
-.page {
-  --turquoise: #2fd3c8;
-  --green: #33c06b;
-  --border: #dcdcdc;
-  --btn: #ff5a4f;
-  --text: #111;
-  --muted: #777;
+* { box-sizing: border-box; }
 
-  margin-left: 150px;
-  background: #fff;
-  padding: 18px 16px;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  color: var(--text);
+.container2 {
+  width: 100%;
+  padding: 4% 5%;
+  background-color: #f0f0f0;
 }
 
-.card {
-  width: 320px;
-  display: grid;
-  grid-template-columns: 90px 1fr; /* <-- CHANGEMENT IMPORTANT */
-  column-gap: 10px;
-  align-items: start;
+.headline {
+  color: #202020;
+  font-family: monda;
+  font-weight: 700;
+  font-size: clamp(3rem, 6vw, 64px);
+
 }
 
-/* ✅ décor : on CLIPPE vers la droite pour empêcher les coins d’entrer dans le contenu */
-.decor {
-  position: relative;
-  height: 340px;
-  overflow: hidden; /* <-- CHANGEMENT IMPORTANT */
+.body {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
-/* ligne verticale */
-.rail {
-  position: absolute;
-  left: 12px;
-  width: 3px;
-  border-radius: 2px;
+.leftCol {
+  flex: 0 0 42%;
+  display: flex;
+  flex-direction: column;
 }
 
-.rail-blue {
-
-  height: 235px;
-  background: var(--turquoise);
+.redSection {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
 }
 
-.rail-green {
-  top: 186px;
-  height: 160px;
-  background: var(--green);
+.redLine {
+  flex-shrink: 0;
+  margin-top: 4px;
 }
 
-/* ✅ wrapper qui donne une vraie boîte au composant Corner */
-.cornerWrap {
-  position: absolute;
-  left: 12px;         /* aligné avec la ligne */
-  width: 38px;        /* ~ horizontalLength + thickness */
-  height: 83px;       /* ~ verticalLength + thickness */
-  pointer-events: none;
+.sections {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-/* positions des corners */
-.c1 { top: 62px; }   /* username */
-.c2 { top: 156px; }  /* password */
-.c3 { top: 248px; }  /* bouton */
-
-/* contenu */
-.title {
-  margin: 0 0 14px 0;
-  font-size: 34px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
+.loginBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.form {
-  display: grid;
-  gap: 16px;
+.blockTitle {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.blockName {
+  font-family: Monda, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+  color: #202020;
+  margin: 0;
+  line-height: 1;
+}
+
+.blockContent {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+  padding-left: 26px;
+
+}
+
+.formFields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .field {
-  display: grid;
-  gap: 6px;
-}
-
-.label {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  color: #111;
-}
-
-.input {
-  height: 34px;
-  width: 210px; /* proche modèle */
-  border: 1px solid var(--border);
-  border-radius: 2px;
-  padding: 0 10px;
-  font-size: 13px;
-  outline: none;
-  background: #fff;
-}
-
-.input:focus {
-  border-color: #bfbfbf;
-  box-shadow: 0 0 0 3px rgba(47, 211, 200, 0.18);
-}
-
-.btn {
-  width: 88px;
-  height: 34px;
-  border: none;
-  border-radius: 2px;
-  background: var(--btn);
-  color: #fff;
-  font-weight: 800;
-  font-size: 13px;
-  cursor: pointer;
-  justify-self: start;
-}
-
-.footer {
-  margin: 2px 0 0;
   display: flex;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--muted);
+  flex-direction: column;
+  gap: 3px;
 }
 
-.link {
-  color: #111;
-  font-weight: 800;
-  text-decoration: none;
+.fieldLabel {
+  font-size: 0.68rem;
+  font-family: Monda, system-ui, sans-serif;
+  color: #888;
+  letter-spacing: 0.08em;
 }
-.link:hover {
+
+.fieldInput {
+  background: white;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 0.88rem;
+  font-family: Monda, system-ui, sans-serif;
+  color: #202020;
+  outline: none;
+  width: 100%;
+  max-width: 240px;
+  transition: border-color 0.2s;
+}
+
+.fieldInput:focus {
+  border-color: var(--color-turquoise, #00C9C8);
+}
+
+.btn42 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  background: white;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  font-family: Monda, system-ui, sans-serif;
+  font-size: 0.82rem;
+  color: #202020;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn42:hover { background: #f0f0f0; }
+
+.logo42 {
+  height: 16px;
+  width: auto;
+}
+
+.btnLogin {
+  padding: 9px 24px;
+  background: var(--color-coral, #FF5959);
+  border: none;
+  border-radius: 6px;
+  font-family: Monda, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: white;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: opacity 0.2s;
+}
+
+.btnLogin:hover { opacity: 0.85; }
+
+.signupRow {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.signupText {
+  font-size: 0.8rem;
+  color: #888;
+  font-family: Monda, system-ui, sans-serif;
+  margin: 0;
+}
+
+.signupLink {
+  color: #202020;
+  font-weight: 700;
+  cursor: pointer;
   text-decoration: underline;
 }
-</style>
 
+.signupLink:hover { color: var(--color-green); }
+
+.rightCol {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.illustration {
+  width: 90%;
+  max-width: 480px;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .body { flex-direction: column; }
+  .leftCol { flex: none; max-width: 100%; width: 100%; }
+}
+</style>
