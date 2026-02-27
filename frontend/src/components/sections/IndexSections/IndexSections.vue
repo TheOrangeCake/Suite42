@@ -3,17 +3,16 @@ import Corner from '../../ui/Corner.vue'
 </script>
 
 <template>
-  <section class="container">
+  <section class="container2">
     <div class="title">
-      <div class="titleCorner" aria-hidden="true">
+      <div class="titleCorner" >
         <Corner :vSize="60" :hSize="30" :thickness="5" color="var(--color-turquoise)" />
-
-        <Corner :vSize="160" :hSize="3" :thickness="5" color="var(--color-green)" />
+        <Corner :vSize="15" :hSize="3" :thickness="5" color=white />
+        <Corner :vSize="130" :hSize="3" :thickness="5" color="var(--color-green)" />
       </div>
 
       <h1 class="headline">
-        A practical companion<br />
-        for the 42 journey !
+        A practical companion for </br>the 42 journey !
       </h1>
     </div>
     <div class="sndcontainer">
@@ -25,18 +24,18 @@ import Corner from '../../ui/Corner.vue'
         <h3> An unofficial collection of tools for learning <br/> and collaboration dedicated to 42 students</h3>
       </div>
       <div class= "boxCorner2">
-         <Corner class="corner" :vSize="90" :hSize="40" :thickness="5" color="var(--color-turquoise)" />
+         <Corner class="corner" :vSize="70" :hSize="40" :thickness="5" color="var(--color-turquoise)" />
         <button > Start your 42 journey here </button>
       </div>
     </div>
 
-    </div>
       <img
     src="/design/assets/images/homepage_illustration.png"
     alt=""
     class="illustration"
     aria-hidden="true"
   />
+    </div>
   </section>
 </template>
 
@@ -45,14 +44,13 @@ import Corner from '../../ui/Corner.vue'
 
 .illustration {
   position: absolute;
-  bottom: 0;
   right: 0;
+  bottom: 0;
 
   width: clamp(230px, 43vw, 720px);
   height: auto;
 
   pointer-events: none;
-  z-index: 0;
 }
 
 button {
@@ -60,7 +58,7 @@ button {
   margin-left: 19px;
   background-color: #FF5959;
   font-size: clamp(0.85rem, 2.2vw, 1.4rem);
-  line-height: 1.3; /* virgule -> point */
+  line-height: 1.3;
   padding: 12px 36px;
   color: white;
   border-radius: 4px;
@@ -69,8 +67,8 @@ button {
 
 .boxCorner2 {
   position: absolute;
-  top: clamp(68px, 2vw, 100px);
-  left: clamp(10px, 2vw, 18px);
+  top: clamp(78px, 3vw, 120px);
+  left: clamp(20px, 4vw, 36px);
 
   min-height: 180px;
   width: calc(100% - 2 * clamp(10px, 2vw, 18px));
@@ -99,22 +97,21 @@ h3 {
 
 }
 .sndcontainer {
+
   display: flex;
   gap: clamp(12px, 2vw, 24px);
   position: relative;
   align-items: flex-start;
-
 }
-.container {
-  padding: clamp(16px, 5vw, 48px);
-  width: 100%;
-  min-height: 100vh;
-  box-sizing: border-box;
-   position: relative;
-  overflow: hidden;
+.container2 {
+  padding-left: 5%;
+  padding-right: 5%;
 }
 
-.container > * {
+.container2 > * {
+  /*
+  border: 3px solid red;
+  */
 }
 
 .title {
@@ -123,18 +120,12 @@ h3 {
   flex-wrap: nowrap;
   align-items: flex-start;
   gap: clamp(10px, 2vw, 20px);
-  width: 100%;
-  max-width: var(--Text-text-hero-width-max, 1900px);
-  min-width: 0;
-
 }
 
 .titleCorner {
   display: flex;
   flex-direction: column;
-  flex: 0 0 auto;
   align-items: flex-start;
-  gap: 10px;
 }
 
 .headline {
@@ -157,15 +148,13 @@ h3 {
 .box {
   width: 85%;
   max-width: 85%;
-  margin-left: auto;
-  margin-right: auto;
   min-height: clamp(140px, 35vh, 420px);
   position: relative;
 }
 
 .boxCorner {
     position: absolute;
-  top: clamp(10px, 2vw, 18px);
+  top: clamp(4px, 1vw, 18px);
   left: clamp(10px, 2vw, 18px);
 
   display: flex;
