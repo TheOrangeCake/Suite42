@@ -4,17 +4,19 @@
   </v-app>
 </template>
 
-<style>
-.app-root {
-  background: white !important;
-  color: black;
-  min-height: 100vh;
-  overflow-x: hidden; /* empêche le scroll horizontal */
-}
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { refreshToken } from './api/auth'
+import { useAuthStore } from './stores/auth'
 
-.v-application__wrap {
-  min-height: unset !important;
-  padding: 0 !important;
-}
-</style>
+const authStore = useAuthStore()
 
+onMounted(async () => {
+  try {
+    const user = await refreshToken()
+    authStore.setSession(user, authStore.accessToken!)
+  } catch {
+    authStore.clearSession()
+  }
+})
+</script>

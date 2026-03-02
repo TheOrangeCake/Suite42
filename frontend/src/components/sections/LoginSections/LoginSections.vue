@@ -1,18 +1,23 @@
 <script setup lang="ts">
 import Corner from '../../ui/Corner.vue'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const emit = defineEmits(['login42', 'loginPublic', 'signup'])
-
+const emit = defineEmits(['login', 'login42'])
 const username = ref('')
 const password = ref('')
+
+const props = defineProps<{
+  isLoading?: boolean
+  errorMessage?: string
+}>()
+
 
 function handleLogin() {
   emit('login', { username: username.value, password: password.value })
 }
 
 
-import { useRouter } from 'vue-router'
 
 const router = useRouter();
 </script>
@@ -75,9 +80,15 @@ const router = useRouter();
                     />
                   </div>
 
-                  <button class="btnLogin" @click="handleLogin">
-                    Log in
-                  </button>
+              <p v-if="errorMessage" class="errorMsg">{{ errorMessage }}</p>
+
+            <button
+              class="btnLogin"
+              @click="handleLogin"
+              :disabled="isLoading"
+              >
+              {{ isLoading ? 'Connexion...' : 'Log in' }}
+            </button>
                 </div>
               </div>
             </div>
@@ -109,6 +120,18 @@ const router = useRouter();
 </template>
 
 <style scoped>
+
+.errorMsg {
+  color: #FF5959;
+  font-size: 0.8rem;
+  font-family: Monda, system-ui, sans-serif;
+  margin: 0;
+}
+
+.btnLogin:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 * { box-sizing: border-box; }
 
 .container2 {

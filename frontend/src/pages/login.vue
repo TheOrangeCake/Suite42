@@ -1,32 +1,42 @@
 <template>
-    <LoginSections @login="onLogin"/>
+  <LoginSections
+    @login="onLogin"
+    :isLoading="isLoading"
+    :errorMessage="errorMessage"
+  />
 </template>
 
-  <script setup lang="ts">
+<script setup lang="ts">
+import { ref } from 'vue'
+import { signin } from '../api/auth'
+import LoginSections from '../components/sections/LoginSections/LoginSections.vue'
+import { useAuthStore } from '../stores/auth'
+import { useRouter } from 'vue-router'
 
-    import { login } from '../api/auth'
-    import Corner from '../components/ui/Corner.vue'
-    import HeroSections from '../components/sections/LoginSections/HeroSections.vue'
-    import LoginSections from '../components/sections/LoginSections/LoginSections.vue'
-    import { useRouter } from 'vue-router'
+type LoginPayload = { username: string; password: string }
 
-    type LoginPayload = {
-      username: string
-      password: string
+const router = useRouter()
+const authStore = useAuthStore()
+
+const isLoading = ref(false)
+const errorMessage = ref('')
+
+async function onLogin(payload: LoginPayload) {
+  isLoading.value = true
+  errorMessage.value = ''
+
+  try {
+    const user = await signin(payload.username, payload.password)
+    console.log(user)
+    authStore.setSession(user, authStore.accessToken!)
+    router.push('/profile')
+  } catch (error) {
+    if (error instanceof Error) {
+      errorMessage.value = error.message
+      console.log(errorMessage.value)
     }
-
-    const router = useRouter()
-
-    async function onLogin(payload: LoginPayload) {
-      try {
-      console.log("ayo");
-        await login(payload.username, payload.password);
-        router.push('/home')
-      } catch(error) {
-        console.error('Login failed');
-        alert('Login failed')
-      }
-    }
-
-  </script>
-
+  } finally {
+    isLoading.value = false
+  }
+}
+</script>

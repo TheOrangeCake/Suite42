@@ -19,19 +19,12 @@ const router = createRouter({
 })
 
 
-/*
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
-
-  if (auth.user === null) {
-    await auth.fetchUser()
-  }
-
-  if (to.meta.requiresAuth && !auth.isAuthenticated) {
+   if (to.meta.requiresAuth && !auth.isLoggedIn) {
     return '/login'
   }
 })
-*/
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {

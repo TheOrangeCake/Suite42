@@ -1,82 +1,53 @@
-import {
-  UnauthenticatedError,
-  ForbiddenError,
-  NotFoundError,
-  ValidationError,
-  ServerError,
-} from './errors'
+import { UnauthenticatedError, ForbiddenError, NotFoundError, ValidationError, ServerError } from './errors'
+import { useAuthStore } from '../stores/auth'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL
 
-async function request<T>(
-  url: string,
-  options: RequestInit = {}
-): Promise<T> {
+async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
+  const authStore = useAuthStore()
 
   const response = await fetch(`${API_BASE_URL}${url}`, {
-    credentials: 'include', //  ENVOIE LES COOKIES HttpOnly
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      ...(authStore.accessToken && {
+        'Authorization': `Bearer ${authStore.accessToken}`
+      }),
       ...options.headers,
     },
     ...options,
   })
 
-  // Succes
   if (response.ok) {
-    // 204 = No Content
-    if (response.status === 204) {
-      return null as T
-    }
+    const token = response.headers.get('Authorization')?.replace('Bearer ', '')
+    if (token) authStore.accessToken = token
+
+    if (response.status === 204) return null as T
     return response.json()
   }
 
-  // Erreurs normalisees
-  if (response.status === 401) {
-    throw new UnauthenticatedError()
-  }
+  const errorData = await response.json().catch(() => ({}))
+  const message = errorData.message || errorData.error || 'Unknown error'
 
-  if (response.status === 403) {
-    throw new ForbiddenError()
-  }
-
-  if (response.status === 404) {
-    throw new NotFoundError()
-  }
-
-  if (response.status === 422) {
-    const data = await response.json()
-    throw new ValidationError(data)
-  }
-
-  throw new ServerError()
+  if (response.status === 401) throw new UnauthenticatedError(message)
+  if (response.status === 403) throw new ForbiddenError(message)
+  if (response.status === 404) throw new NotFoundError(message)
+  if (response.status === 422) throw new ValidationError(errorData)
+  throw new ServerError(message)
 }
 
-// API publique
 export const http = {
   get<T>(url: string, params?: Record<string, string>) {
     const query = params ? `?${new URLSearchParams(params)}` : ''
     return request<T>(`${url}${query}`)
   },
-
   post<T>(url: string, body?: unknown) {
-    return request<T>(url, {
-      method: 'POST',
-      body: JSON.stringify(body),
-    })
+    return request<T>(url, { method: 'POST', body: JSON.stringify(body) })
   },
-
   put<T>(url: string, body?: unknown) {
-    return request<T>(url, {
-      method: 'PUT',
-      body: JSON.stringify(body),
-    })
+    return request<T>(url, { method: 'PUT', body: JSON.stringify(body) })
   },
-
   delete<T>(url: string) {
-    return request<T>(url, {
-      method: 'DELETE',
-    })
+    return request<T>(url, { method: 'DELETE' })
   },
 }
-

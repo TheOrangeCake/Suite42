@@ -3,26 +3,39 @@ export class ApiError extends Error {
     super(message)
   }
 }
-
-// 401 → pas connecter
-export class UnauthenticatedError extends ApiError {}
-
-// 403 → connecter mais interdit
-export class ForbiddenError extends ApiError {}
-
-// 404 → ressource inexistante
-export class NotFoundError extends ApiError {}
-
-// 422 → donnees invalides
-export class ValidationError extends ApiError {
-  errors: unknown
-
-  constructor(errors: unknown) {
-    super('Validation error')
-    this.errors = errors
+export class UnauthenticatedError extends Error {
+  constructor(message = 'Unauthenticated') {
+    super(message)
+    this.name = 'UnauthenticatedError'
   }
 }
 
-// 500 bug server
-export class ServerError extends ApiError {}
+export class ForbiddenError extends Error {
+  constructor(message = 'Forbidden') {
+    super(message)
+    this.name = 'ForbiddenError'
+  }
+}
 
+export class NotFoundError extends Error {
+  constructor(message = 'Not found') {
+    super(message)
+    this.name = 'NotFoundError'
+  }
+}
+
+export class ValidationError extends Error {
+  data: unknown
+  constructor(data: unknown) {
+    super('Validation error')
+    this.name = 'ValidationError'
+    this.data = data
+  }
+}
+
+export class ServerError extends Error {
+  constructor(message = 'Server error') {
+    super(message)
+    this.name = 'ServerError'
+  }
+}

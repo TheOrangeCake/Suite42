@@ -3,29 +3,27 @@ import { http } from './http'
 export interface User {
   id: number
   username: string
+  email: string
+  custom_avatar_url: string
+  custom_banner_url: string
+  first_name: string | null
+  last_name: string | null
 }
 
+const BASE = '/api/regular-user/v1/regular-user'
 
 export function signup(username: string, email: string, password: string) {
-  return http.post<void>('/api/regular-user/v1/regular-user/auth/signup', {
-    username,
-    email,
-    password,
-  })
+  return http.post<User>(`${BASE}/auth/signup`, { username, email, password })
 }
 
-export function login(login: string, password: string) {
-  return http.post<void>('/api/regular-user/v1/regular-user/auth/signin', {
-    login,
-    password,
-  })
+export function signin(login: string, password: string) {
+  return http.post<User>(`${BASE}/auth/signin`, { login, password })
 }
 
-export function logout() {
-  return http.post<void>('/logout')
+export function refreshToken() {
+  return http.get<User>(`${BASE}/auth/refresh-token`)
 }
 
-export function me() {
-  return http.get<User>('/me')
+export function signout() {
+  return http.get<void>(`${BASE}/user/signout`)
 }
-

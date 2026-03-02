@@ -9,6 +9,11 @@ const password = ref('')
 const confirmPassword = ref('')
 const agreeToTerms = ref(false)
 
+const props = defineProps<{
+  isLoading?: boolean
+  errorMessage?: string
+}>()
+
 function handleSignup() {
   emit('signup', {
     username: username.value,
@@ -76,7 +81,10 @@ function handleSignup() {
 
         <div class="signupRow">
           <Corner :vSize="36" :hSize="16" :thickness="5" color="var(--color-turquoise)" />
-          <button class="btnSignup" @click="handleSignup">Sign up</button>
+          <button
+            class="btnSignup"
+            @click="handleSignup"
+            :disabled="isLoading" >{{ isLoading ? 'Connexion...' : 'Log in'}}</button>
         </div>
 
       </div>
@@ -94,6 +102,17 @@ function handleSignup() {
 </template>
 
 <style scoped>
+.errorMsg {
+  color: #FF5959;
+  font-size: 0.8rem;
+  font-family: Monda, system-ui, sans-serif;
+  margin: 0;
+}
+
+.btnLogin:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 * { box-sizing: border-box; }
 
 .container2 {

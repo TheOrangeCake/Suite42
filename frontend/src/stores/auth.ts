@@ -1,51 +1,49 @@
 import { defineStore } from 'pinia'
-import * as authApi from '@/api/auth'
-import { UnauthenticatedError } from '@/api/errors'
+
+export interface User {
+  id: number
+  username: string
+  email: string
+  custom_avatar_url: string
+  custom_banner_url: string
+  first_name: string | null
+  last_name: string | null
+}
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null as null | authApi.User,
-    loading: false,
+    user: null as User | null,
+    accessToken: null as string | null,
   }),
 
   getters: {
-    isAuthenticated: (state) => state.user !== null,
+    isLoggedIn: (state) => !!state.user && !!state.accessToken,
   },
 
+  // actions = les fonctions qui modifient le state
   actions: {
-async fetchUser() {
-    this.loading = true
-    try {
-      this.user = await authApi.me()
-    } catch (err) {
-      if (err instanceof UnauthenticatedError) {
-        this.user = null
-      } else {
-        throw err
-      }
-    } finally {
-      this.loading = false
-    }
-  },
+    // Appelée après un login ou signup réussi
+    // On stocke aussi le token dans sessionStorage pour survivre
+    // au refresh de page (sessionStorage est vidé quand on ferme l'onglet)
+    setSession(user: User, token: string) {
+      this.user = user
+      this.accessToken = token
+      sessionStorage.setItem('access_token', token)
+    },
 
-  async login(username: string, password: string) {
-    this.loading = true
-    try {
-      await authApi.login(username, password)
-      await this.fetchUser()
-    } finally {
-      this.loading = false
-    }
-  },
-
-    async logout() {
-    try {
-      await authApi.logout()
-    } finally {
+    // Appelée au logout — remet tout à zéro
+    clearSession() {
       this.user = null
-    }
-  }
+      this.accessToken = null
+      sessionStorage.removeItem('access_token')
+    },
 
+    // Appelée au démarrage de l'app pour récupérer le token
+    // si l'utilisateur a déjà été connecté dans cet onglet
+    loadFromStorage() {
+      const token = sessionStorage.getItem('access_token')
+      if (token) this.accessToken = token
+        console.log('loadFromStorage')
+    },
   },
 })
-
