@@ -1,7 +1,18 @@
 <template>
-    <signupSections/>
+    <signupSections @signup="onSignup"/>
   </template>
 
-  <script>
-    import singupSections from '../components/sections/SignupSections/signupSections.vue'
-    </script >
+  <script setup lang="ts">
+    import signupSections from '../components/sections/SignupSections/signupSections.vue'
+    type SignupPayload = {
+      username: string
+      email: string
+      password: string
+      confirmPassword: string
+    }
+
+function onSignup(payload: SignupPayload) {
+  console.log('Signup reçu du composant enfant:', payload)
+
+}
+  </script >
