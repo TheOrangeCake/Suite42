@@ -164,7 +164,6 @@ const tools = [
   background-color: #e8384f;
   color: white;
   border: none;
-  border-radius: 20px;
   padding: 10px 24px;
   font-size: 0.85rem;
   font-weight: 600;
