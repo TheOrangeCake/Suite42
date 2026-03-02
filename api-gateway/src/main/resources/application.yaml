@@ -10,6 +10,13 @@ spring:
       server:
         webmvc:
           routes:
+            - id: regular-user-service
+              uri: http://regular-user-service:4445
+              predicates:
+                - Path=/api/regular-user/**
+              filters:
+                - StripPrefix=2
+            
             - id: auth-service
               uri: http://auth-service:8080
               predicates:

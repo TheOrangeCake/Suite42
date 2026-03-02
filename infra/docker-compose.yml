@@ -32,6 +32,8 @@ services:
       - api-gateway
     networks:
       - app_net
+    environment:
+    - VITE_API_URL=${VITE_API_URL}
 
   auth-service:
     build:
