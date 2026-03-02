@@ -24,11 +24,7 @@ mkcert -install
 
 # Générer les certifs
 cd "$CERT_DIR"
-mkcert localhost 127.0.0.1 ::1
-
-# Normaliser les noms
-mv localhost+*.pem localhost.pem
-mv localhost+*-key.pem localhost-key.pem
+mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1
 
 echo "✅ Certificats générés avec succès"
 
