@@ -10,6 +10,11 @@ const password = ref('')
 function handlePublicLogin() {
   emit('loginPublic', { username: username.value, password: password.value })
 }
+
+
+import { useRouter } from 'vue-router'
+
+const router = useRouter();
 </script>
 
 <template>
@@ -84,7 +89,7 @@ function handlePublicLogin() {
         <div class="signupRow">
           <p class="signupText">
             No account ?
-            <span class="signupLink" @click="emit('signup')">Sign up here</span>
+            <span class="signupLink" @click="router.push('/signup')">Sign up here</span>
           </p>
         </div>
 

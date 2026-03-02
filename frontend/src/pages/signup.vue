@@ -1,3 +1,7 @@
 <template>
-    <p> this is the Transcendance project by Dconza, alletond, Nguyen,  Vgomes, DengelBarts. </p>
+    <signupSections/>
   </template>
+
+  <script>
+    import singupSections from '../components/sections/SignupSections/signupSections.vue'
+    </script >

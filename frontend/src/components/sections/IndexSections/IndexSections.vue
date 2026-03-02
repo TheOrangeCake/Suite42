@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import Corner from '../../ui/Corner.vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
 </script>
 
 <template>
@@ -25,7 +28,7 @@ import Corner from '../../ui/Corner.vue'
       </div>
       <div class= "boxCorner2">
          <Corner class="corner" :vSize="70" :hSize="40" :thickness="5" color="var(--color-turquoise)" />
-        <button > Start your 42 journey here </button>
+         <button @click="router.push('/login')"> Start your 42 journey here </button>
       </div>
     </div>
 

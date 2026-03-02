@@ -1,10 +1,14 @@
 <template>
+  <v-main class="container">
   <Navbar />
-
-  <v-main>
     <router-view />
   </v-main>
-
   <AppFooter />
 </template>
 
+
+<style scoped>
+  .container {
+    height: 100%;
+  }
+</style>
