@@ -13,29 +13,39 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    async fetchUser() {
-      try {
-        this.user = await authApi.me()
-      } catch (err) {
-        if (err instanceof UnauthenticatedError) {
-          this.user = null
-        } else {
-          throw err
-        }
+async fetchUser() {
+    this.loading = true
+    try {
+      this.user = await authApi.me()
+    } catch (err) {
+      if (err instanceof UnauthenticatedError) {
+        this.user = null
+      } else {
+        throw err
       }
-    },
+    } finally {
+      this.loading = false
+    }
+  },
 
-    async login(username: string, password: string) {
-      this.loading = true
+  async login(username: string, password: string) {
+    this.loading = true
+    try {
       await authApi.login(username, password)
       await this.fetchUser()
+    } finally {
       this.loading = false
-    },
+    }
+  },
 
     async logout() {
+    try {
       await authApi.logout()
+    } finally {
       this.user = null
-    },
+    }
+  }
+
   },
 })
 

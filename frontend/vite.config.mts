@@ -12,12 +12,18 @@ import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
 
+import tailwindcss from "@tailwindcss/vite"
+
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     VueRouter({
       dts: 'src/typed-router.d.ts',
     }),
+    tailwindcss(),
+
+
     Layouts(),
     AutoImport({
       imports: [
@@ -83,6 +89,13 @@ export default defineConfig({
     ],
   },
   server: {
+  host: true,
+  port: 3000,
+  hmr: {
+    protocol: 'ws',
+    host: 'localhost',
     port: 3000,
-  },
+  }
+}
+
 })

@@ -11,10 +11,20 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AboutSections: typeof import('./components/sections/IndexSections/AboutSections.vue')['default']
     AppFooter: typeof import('./components/AppFooter.vue')['default']
+    Corner: typeof import('./components/ui/Corner.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
+    HeroSections: typeof import('./components/sections/LoginSections/HeroSections.vue')['default']
+    IndexSections: typeof import('./components/sections/IndexSections/IndexSections.vue')['default']
+    LabeledCorner: typeof import('./components/ui/LabeledCorner.vue')['default']
+    LoginSections: typeof import('./components/sections/LoginSections/LoginSections.vue')['default']
     Navbar: typeof import('./components/Navbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SignupSections: typeof import('./components/sections/SignupSections/signupSections.vue')['default']
+    TechSectins: typeof import('./components/sections/IndexSections/TechSectins.vue')['default']
+    TechSections: typeof import('./components/sections/IndexSections/TechSections.vue')['default']
+    ToolkitSections: typeof import('./components/sections/IndexSections/ToolkitSections.vue')['default']
   }
 }
