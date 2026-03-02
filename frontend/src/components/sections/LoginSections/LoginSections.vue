@@ -7,8 +7,8 @@ const emit = defineEmits(['login42', 'loginPublic', 'signup'])
 const username = ref('')
 const password = ref('')
 
-function handlePublicLogin() {
-  emit('loginPublic', { username: username.value, password: password.value })
+function handleLogin() {
+  emit('login', { username: username.value, password: password.value })
 }
 
 
@@ -75,7 +75,7 @@ const router = useRouter();
                     />
                   </div>
 
-                  <button class="btnLogin" @click="handlePublicLogin">
+                  <button class="btnLogin" @click="handleLogin">
                     Log in
                   </button>
                 </div>
