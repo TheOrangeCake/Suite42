@@ -209,7 +209,7 @@ public class UserController {
 			ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "")
 					.httpOnly(true)
 					.secure(true)
-					.sameSite("Strict")
+					.sameSite("Lax")
 					.path("/")
 					.maxAge(0)
 					.build();
