@@ -81,6 +81,8 @@ function handleSignup() {
 
         <div class="signupRow">
           <Corner :vSize="36" :hSize="16" :thickness="5" color="var(--color-turquoise)" />
+         <p v-if="errorMessage" class="errorMsg">{{ errorMessage }}</p>
+
           <button
             class="btnSignup"
             @click="handleSignup"
@@ -109,10 +111,6 @@ function handleSignup() {
   margin: 0;
 }
 
-.btnLogin:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 * { box-sizing: border-box; }
 
 .container2 {

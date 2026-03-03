@@ -25,17 +25,14 @@ const router = useRouter();
 <template>
   <section class="container2">
 
-    <!-- Titre principal -->
     <h1 class="headline">Let's get productive !</h1>
 
     <div class="body">
 
-      <!-- Colonne gauche : formulaires -->
       <div class="leftCol">
 
           <div class="sections">
 
-            <!-- 42 Student login -->
             <div class="loginBlock">
               <div class="blockTitle">
                 <Corner :vSize="64" :hSize="26" :thickness="5" color="var(--color-coral, #FF5959)" />
@@ -49,7 +46,6 @@ const router = useRouter();
                 </button>
               </div>
 
-            <!-- Public login -->
             <div class="loginBlock">
               <div class="blockTitle">
 
@@ -96,7 +92,6 @@ const router = useRouter();
           </div>
         </div>
 
-        <!-- Sign up en dehors de la ligne rouge -->
         <div class="signupRow">
           <p class="signupText">
             No account ?
@@ -106,7 +101,6 @@ const router = useRouter();
 
       </div>
 
-      <!-- Colonne droite : illustration -->
       <div class="rightCol">
         <img
           src="/design/assets/images/sign_in_illustration.png"

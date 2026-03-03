@@ -24,7 +24,6 @@ const errorMessage = ref('')
 async function onLogin(payload: LoginPayload) {
   isLoading.value = true
   errorMessage.value = ''
-
   try {
     const user = await signin(payload.username, payload.password)
     console.log(user)
