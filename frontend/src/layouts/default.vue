@@ -1,9 +1,7 @@
 <template>
   <v-main class="container">
-  <Navbar />
     <router-view />
   </v-main>
-  <AppFooter />
 </template>
 
 
