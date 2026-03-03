@@ -7,7 +7,6 @@
 import '@/styles/themes.css'
 import "tailwindcss";
 
-import { createPinia } from 'pinia'
 // Plugins
 import { registerPlugins } from '@/plugins'
 
@@ -23,7 +22,6 @@ import '@/styles/tailwind.css'
 
 const app = createApp(App)
 
-app.use(createPinia())
 registerPlugins(app)
 
 app.mount('#app')

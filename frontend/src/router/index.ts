@@ -21,6 +21,19 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
+   if (!auth.authReady) {
+    await new Promise<void>(resolve => {
+      const unwatch = watch(
+        () => auth.authReady,
+        (ready) => {
+          if (ready) {
+            unwatch()
+            resolve()
+          }
+        }
+      )
+    })
+  }
    if (to.meta.requiresAuth && !auth.isLoggedIn) {
     return '/login'
   }

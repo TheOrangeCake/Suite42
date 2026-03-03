@@ -14,6 +14,7 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null as User | null,
     accessToken: null as string | null,
+    authReady: false,
   }),
 
   getters: {
@@ -27,6 +28,9 @@ export const useAuthStore = defineStore('auth', {
       sessionStorage.setItem('access_token', token)
     },
 
+  setAuthReady() {
+    this.authReady = true
+  },
     clearSession() {
       this.user = null
       this.accessToken = null
