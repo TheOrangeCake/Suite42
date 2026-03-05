@@ -1,0 +1,791 @@
+# Description
+**Api 42 service** is a microservice to manage data from 42 school API. This service fetch, transform and store data, then expose REST endpoints to retrieve them.
+<p>Tech stacks: Java Spring Boot, Hibernate ORM and PostgreSQL.</p>
+<p>Module:
+  <ul>
+    <li>Use a backend framework. (1p)</li>
+    <li>Use an ORM for the database. (1p)</li>
+    <li>Implement advanced search functionality with filters, sorting, and pagination. (1p)</li>
+    <li>Backend as microservice. (part)</li>
+  </ul>
+<p>Member worked on: Nguyen NGUYEN (hoannguy).</p> 
+
+---
+# Instructions
+### Requirements
+* Docker: `Docker version 28.2.2`
+* Docker compose: `Docker Compose version v5.0.1`
+* env file location: `backend/api42-service/.env`
+  * <details>
+    <summary>Example of env file</summary>
+    <pre>H2_URL=jdbc:h2:./data/users.db
+    <br>H2_USER=
+    <br>H2_PASS=
+    <br>
+    <br>POSTGRES_URL=
+    <br>POSTGRES_USER=
+    <br>POSTGRES_PASS=
+    <br>
+    <br>API42_UID=
+    <br>API42_SECRET=
+    </pre></details>
+  
+### Start as individual service
+* Run locally <pre>export $(grep -v '^#' .env | xargs)<br>./mvnw spring-boot:run -Dspring-boot.run.profiles=dev</pre>
+* Using Docker <pre>docker build . -t api42-service<br>docker run --env-file .env -p 4444:4444 api42-service:latest</pre>
+
+---
+# API Documentation
+Currently only support Lausanne campus
+
+<details>
+  <summary style="font-size:1.2em; font-weight:bold;">User API</summary>
+    <details>
+      <summary><code>GET /v1/users</code></summary>
+      <ul>
+        <li>Description: Get all active and non alumni users.<br>Note: Rank 7 mean user has done all rank 6 projects.</li>
+        <li>Filter:
+          <ul>
+            <li><code>campusName</code> (mandatory, Lausanne only)</li>
+            <li><code>poolMonth</code></li>
+            <li><code>poolYear</code></li>
+            <li><code>rank</code></li>
+            <li><code>eligibleProject</code> (a project user can do but hasn't done)</li>
+            <li><code>finishedProjects</code> (list of finished projects)</li>
+          </ul>
+        </li>
+        <li>Sorting:
+          <ul>
+            <li><code>poolYear</code></li>
+            <li><code>rank</code></li>
+            <li><code>rankProgressPercent</code></li>
+          </ul>
+        </li>
+        <li>Paging:
+          <ul>
+            <li><code>page</code> (page number, start from 0)</li>
+            <li><code>size</code> (results per page, default 25, max 50)</li>
+          </ul>
+        </li>
+        <li>Examples:
+          <ul>
+            <li><pre>/v1/users?page=0&size=50&campusName=Lausanne&poolMonth=june&poolYear=2024&rank=6&eligibleProject=ft_transcendence&finishedProjects=webserv&finishedProjects=cub3d</pre></li>
+            <li><pre>/v1/users?campusName=Lausanne&page=0&size=25&sort=rank,desc&poolMonth=june</pre></li>
+          </ul>
+        </li>
+        <li>
+          <details>
+            <summary>Json response example:</summary>
+            <ul>
+              <li>Request:<pre>/v1/users?campusName=Lausanne&page=0&size=2&sort=rank,desc&poolMonth=june</pre></li>
+              <li>Response:
+                <pre><code class="language-json">
+                  {
+                    "content": [
+                      {
+                        "id": 111111,
+                        "login": "user1Login",
+                        "first_name": "User1 First Name",
+                        "last_name": "User1 Last Name",
+                        "intra_url": "https://intra.42.fr/users/user1Login",
+                        "image": {
+                          "link": "url to original user1 photo",
+                          "versions": {
+                            "large": "url to large user1 photo",
+                            "medium": "url to medium user1 photo",
+                            "small": "url to small user1 photo",
+                            "micro": "url to micro user1 photo"
+                          }
+                        },
+                        "rank": 7,
+                        "rank_progress_percent": 0
+                      },
+                      {
+                        "id": 222222,
+                        "login": "user2Login",
+                        "first_name": "User2 First Name",
+                        "last_name": "User2 Last Name",
+                        "intra_url": "https://intra.42.fr/users/user2Login",
+                        "image": {
+                          "link": "url to original user2 photo",
+                          "versions": {
+                            "large": "url to large user2 photo",
+                            "medium": "url to medium user2 photo",
+                            "small": "url to small user2 photo",
+                            "micro": "url to micro user2 photo"
+                          }
+                        },
+                        "rank": 6,
+                        "rank_progress_percent": 34
+                      }
+                    ],
+                    "page": {
+                      "size": 2,
+                      "number": 0,
+                      "totalElements": 122,
+                      "totalPages": 61
+                    }
+                  }
+                </code></pre>
+              </li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+    </details>
+    <details>
+      <summary><code>GET /v1/users/id/{id}</code></summary>
+      <ul>
+        <li>Description: Get a user by id.</li>
+        <li>No filter, no sorting and no paging.</li>
+        <li>Example<pre>/v1/users/id/111111</pre></li>
+        <li>
+          <details>
+            <summary>Json response example</summary>
+            <ul>
+              <li>Request:<pre>/v1/users/id/111111</pre></li>
+              <li>Response:
+                <pre><code class="language-json">
+                  {
+                    "id": 111111,
+                    "campus": "Lausanne",
+                    "email": "email@student.42lausanne.ch",
+                    "login": "userLogin",
+                    "first_name": "User First Name",
+                    "last_name": "User Last Name",
+                    "intra_url": "https://intra.42.fr/users/userLogin",
+                    "image": {
+                      "link": "url to original user photo",
+                      "versions": {
+                        "large": "url to large user photo",
+                        "medium": "url to medium user photo",
+                        "small": "url to small user photo",
+                        "micro": "url to micro user photo"
+                      }
+                    },
+                    "pool_month": "june",
+                    "pool_year": "2024",
+                    "alumni": false,
+                    "active": true,
+                    "rank": 6,
+                    "rank_progress_percent": 0,
+                    "finished_projects": [
+                      "cpp-module-00",
+                      // ... list of finished projects
+                      "42cursus-push_swap"
+                    ],
+                    "eligible_projects": [
+                      "exam-rank-06",
+                      // ... list of eligible projects
+                      "42_collaborative_resume"
+                    ],
+                    "common_core": {
+                      "rank": [
+                        {
+                          "rank": 0,
+                          "projects": [
+                            {
+                              "cursus_project_id": 1314,
+                              "name": "Libft",
+                              "slug": "42cursus-libft",
+                              "projects_users": {
+                                "occurrence": 0,
+                                "final_mark": 124,
+                                "status": "finished",
+                                "validated": true
+                              }
+                            }
+                          ]
+                        },
+                        // ... other ranks
+                        {
+                          "rank": 6,
+                          "projects": [
+                            {
+                              "cursus_project_id": 2623,
+                              "name": "42_Collaborative_resume",
+                              "slug": "42_collaborative_resume",
+                              "projects_users": {
+                                "occurrence": 0,
+                                "final_mark": null,
+                                "status": "creating_group",
+                                "validated": null
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                </code></pre><
+              /li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+    </details>
+    <details>
+      <summary><code>GET /v1/users/last_name/{lastName}</code></summary>
+      <ul>
+        <li>Description: Get all users by last name. Name is case-sensitive.</li>
+        <li>No filter and no sorting.</li>
+		<li>Paging:
+          <ul>
+            <li><code>page</code> (page number, start from 0)</li>
+            <li><code>size</code> (results per page, default 25, max 50)</li>
+          </ul>
+        </li>
+        <li>Example<pre>/v1/users/last_name/User</pre></li>
+        <li>
+          <details>
+            <summary>Json response example</summary>
+            <ul>
+              <li>Request:<pre>/v1/users/last_name/User</pre></li>
+              <li>Response:
+                <pre><code class="language-json">
+				{
+					"content": [
+					  {
+					    "id": 111111,
+					    "login": "user1",
+					    "first_name": "User1 First Name",
+					    "last_name": "User",
+					    "intra_url": "https://intra.42.fr/users/user1",
+					    "image": {
+						  "link": "url to original user photo",
+						  "versions": {
+						    "large": "url to large user photo",
+						    "medium": "url to medium user photo",
+						    "small": "url to small user photo",
+						    "micro": "url to micro user photo"
+						  }
+					    },
+					    "rank": null,
+					    "rank_progress_percent": null
+					  },
+					  {
+					    "id": 222222,
+					    "login": "user2",
+					    "first_name": "User2 First Name",
+					    "last_name": "User",
+					    "intra_url": "https://intra.42.fr/users/user2",
+					    "image": {
+						  "link": "url to original user photo",
+						  "versions": {
+						    "large": "url to large user photo",
+						    "medium": "url to medium user photo",
+						    "small": "url to small user photo",
+						    "micro": "url to micro user photo"
+						  }
+					    },
+					    "rank": 4,
+					    "rank_progress_percent": 75
+					  }
+                  	],
+					"page": {
+					  "size": 25,
+					  "number": 0,
+					  "totalElements": 2,
+					  "totalPages": 1
+				    }
+				  }
+                </code></pre><
+              /li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+    </details>
+    <details>
+      <summary><code>GET /v1/users/first_name/{firstName}</code></summary>
+      <ul>
+        <li>Description: Get all users by first name. Name is case-sensitive.</li>
+        <li>No filter and not sorting.</li>
+		<li>Paging:
+          <ul>
+            <li><code>page</code> (page number, start from 0)</li>
+            <li><code>size</code> (results per page, default 25, max 50)</li>
+          </ul>
+        </li>
+        <li>Example<pre>/v1/users/first_name/User%20First%20Name</pre></li>
+        <li>
+          <details>
+            <summary>Json response example</summary>
+            <ul>
+              <li>Request:<pre>/v1/users/first_name/User%20First%20Name</pre></li>
+              <li>Response:
+                <pre><code class="language-json">
+                  {
+					"content": [
+					  {
+					    "id": 111111,
+					    "login": "user1",
+					    "first_name": "User First Name",
+					    "last_name": "UserNumber1",
+					    "intra_url": "https://intra.42.fr/users/user1",
+					    "image": {
+						  "link": "url to original user photo",
+						  "versions": {
+						    "large": "url to large user photo",
+						    "medium": "url to medium user photo",
+						    "small": "url to small user photo",
+						    "micro": "url to micro user photo"
+						  }
+					    },
+					    "rank": null,
+					    "rank_progress_percent": null
+					  },
+					  {
+					    "id": 222222,
+					    "login": "user2",
+					    "first_name": "User First Name",
+					    "last_name": "UserNumber2",
+					    "intra_url": "https://intra.42.fr/users/user2",
+					    "image": {
+						  "link": "url to original user photo",
+						  "versions": {
+						    "large": "url to large user photo",
+						    "medium": "url to medium user photo",
+						    "small": "url to small user photo",
+						    "micro": "url to micro user photo"
+						  }
+					    },
+					    "rank": 4,
+					    "rank_progress_percent": 75
+					  }
+                  	],
+					"page": {
+					  "size": 25,
+					  "number": 0,
+					  "totalElements": 2,
+					  "totalPages": 1
+				    }
+				  }
+                </code></pre>
+              </li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+    </details>
+</details>
+<br>
+<details>
+	<summary style="font-size:1.2em; font-weight:bold;">Campus API</summary>
+	<details>
+    <summary><code>GET /v1/campuses</code></summary>
+    <ul>
+      <li>Description: Get all active and public campuses.</li>
+      <li>Filter list:
+        <ul>
+          <li><code>name</code></li>
+          <li><code>country</code></li>
+          <li><code>city</code></li>
+        </ul>
+      </li>
+      <li>Sorting list:
+        <ul>
+          <li><code>name</code></li>
+          <li><code>country</code></li>
+          <li><code>city</code></li>
+		  <li><code>usersCount</code></li>
+        </ul>
+      </li>
+      <li>Paging:
+		<ul>
+		  <li><code>page</code> (page number, start from 0)</li>
+		  <li><code>size</code> (results per page, default 25, max 50)</li>
+		</ul>
+	  </li>
+	  <li>Example:
+		<ul>
+		  <li><pre>/v1/campuses?page=0&sort=name,asc&country=Spain</pre></li>
+		</ul>
+	  </li>
+	  <li>
+		<details>
+			<summary>response example</summary>
+			<ul>
+			  <li>Request:
+				<pre>/v1/campuses?page=0&sort=name,asc&country=Spain</pre>
+			  </li>
+			  <li>Response:
+				<pre><code class="language-json">
+				  {
+					  "content": [
+						{
+						  "id": 51,
+						  "name": "Berlin",
+						  "time_zone": "Europe/Berlin",
+						  "users_count": 3047,
+						  "country": "Germany",
+						  "address": "Harzer Strasse 39",
+						  "zip": "12059",
+						  "city": "Berlin",
+						  "website": "http://42berlin.de/",
+						  "facebook": "",
+						  "twitter": "",
+						  "active": true,
+						  "public": true,
+						  "email_extension": "42berlin.de"
+						},
+						{
+						  "id": 39,
+						  "name": "Heilbronn",
+						  "time_zone": "Europe/Berlin",
+						  "users_count": 3097,
+						  "country": "Germany",
+						  "address": "Weipertstr 8 - 10",
+						  "zip": "74076",
+						  "city": "Heilbronn",
+						  "website": "https://42heilbronn.de/",
+						  "facebook": "https://www.facebook.com/42heilbronn",
+						  "twitter": "https://twitter.com/42Heilbronn",
+						  "active": true,
+						  "public": true,
+						  "email_extension": "42heilbronn.de"
+						},
+						{
+						  "id": 44,
+						  "name": "Wolfsburg",
+						  "time_zone": "Europe/Berlin",
+						  "users_count": 3660,
+						  "country": "Germany",
+						  "address": "Porschestraße 2c",
+						  "zip": "38440",
+						  "city": "Wolfsburg",
+						  "website": "http://42wolfsburg.de/",
+						  "facebook": "",
+						  "twitter": "",
+						  "active": true,
+						  "public": true,
+						  "email_extension": "42wolfsburg.de"
+						}
+					  ],
+					  "page": {
+						"size": 25,
+						"number": 0,
+						"totalElements": 3,
+						"totalPages": 1
+					  }
+					}
+				</code></pre>
+			  </li>
+			</ul>
+		</details>
+	  </li>
+    </ul>
+  </details>
+	<details>
+    <summary><code>GET /v1/campuses/id/{id}</code></summary>
+    <ul>
+      <li>Description: Get a campus by id.</li>
+      <li>No filter, no sorting and no paging.</li>
+	  <li>Example:
+		<ul>
+		  <li><pre>/v1/campuses/id/51</pre></li>
+		</ul>
+	  </li>
+	  <li>
+		<details>
+			<summary>response example</summary>
+			<ul>
+			  <li>Request:
+				<pre>/v1/campuses/id/51</pre>
+			  </li>
+			  <li>Response:
+				<pre><code class="language-json">
+				  {
+					  "id": 51,
+					  "name": "Berlin",
+					  "time_zone": "Europe/Berlin",
+					  "users_count": 3047,
+					  "country": "Germany",
+					  "address": "Harzer Strasse 39",
+					  "zip": "12059",
+					  "city": "Berlin",
+					  "website": "http://42berlin.de/",
+					  "facebook": "",
+					  "twitter": "",
+					  "active": true,
+					  "public": true,
+					  "email_extension": "42berlin.de"
+				  }
+				</code></pre>
+			  </li>
+			</ul>
+		</details>
+	  </li>
+    </ul>
+  </details>
+	<details>
+    <summary><code>GET /v1/campuses/name/{name}</code></summary>
+    <ul>
+      <li>Description: Get all active and public campuses by campus name. Name is case-sensitive.</li>
+      <li>No filter and no sorting.
+      </li>
+      <li>Paging:
+		<ul>
+		  <li><code>page</code> (page number, start from 0)</li>
+		  <li><code>size</code> (results per page, default 25, max 50)</li>
+		</ul>
+	  </li>
+	  <li>Example:
+		<ul>
+		  <li><pre>/v1/campuses/name/Lausanne</pre></li>
+		</ul>
+	  </li>
+	  <li>
+		<details>
+			<summary>response example</summary>
+			<ul>
+			  <li>Request:
+				<pre>/v1/campuses/name/Lausanne</pre>
+			  </li>
+			  <li>Response:
+				<pre><code class="language-json">
+				  {
+					  "content": [
+					    {
+					      "id": 47,
+					      "name": "Lausanne",
+					      "time_zone": "Europe/Zurich",
+					      "users_count": 2251,
+					      "country": "Switzerland",
+					      "address": "64 Rue de Lausanne",
+					      "zip": "1020",
+					      "city": "Renens",
+					      "website": "https://42lausanne.ch/",
+					      "facebook": "https://www.facebook.com/42Lausanne",
+					      "twitter": "https://twitter.com/42lausanne",
+					      "active": true,
+					      "public": true,
+					      "email_extension": "42lausanne.ch"
+					    }
+					  ],
+					  "page": {
+					    "size": 25,
+					    "number": 0,
+					    "totalElements": 1,
+					    "totalPages": 1
+					  }
+					}
+				</code></pre>
+			  </li>
+			</ul>
+		</details>
+	  </li>
+    </ul>
+  </details>
+</details>
+<br>
+<details>
+	<summary style="font-size:1.2em; font-weight:bold;">Common Core API</summary>
+	<details>
+    <summary><code>GET /v1/commoncore</code></summary>
+    <ul>
+      <li>Description: Get the current Common Core projects.</li>
+      <li>No filter, no sorting and no paging.</li>
+	  <li>Example:
+		<ul>
+		  <li><pre>/v1/commoncore</pre></li>
+		</ul>
+	  </li>
+	  <li>
+		<details>
+			<summary>response example</summary>
+			<ul>
+			  <li>Request:
+				<pre>/v1/commoncore</pre>
+			  </li>
+			  <li>Response:
+				<pre><code class="language-json">
+				  {
+					  "projects": [
+					    {
+					      "id": 1314,
+					      "name": "Libft",
+					      "slug": "42cursus-libft",
+					      "rank": 0
+					    },
+					        // ... More projects
+					    {
+					      "id": 2309,
+					      "name": "CPP Module 09",
+					      "slug": "cpp-module-09",
+					      "rank": 5
+					    },
+					    {
+					      "id": 2623,
+					      "name": "42_Collaborative_resume",
+					      "slug": "42_collaborative_resume",
+					      "rank": 6
+					    }
+					  ],
+					  "ranks": {
+					    "0": {
+					      "mandatory": [
+					        "42cursus-libft"
+					      ],
+					      "choices": []
+					    },
+					    "1": {
+					      "mandatory": [
+					        "42cursus-get_next_line",
+					        "42cursus-ft_printf",
+					        "born2beroot"
+					      ],
+					      "choices": []
+					    },
+						// ... More ranks
+					    "6": {
+					      "mandatory": [
+					        "exam-rank-06",
+					        "ft_transcendence",
+					        "42_collaborative_resume"
+					      ],
+					      "choices": []
+					    }
+					  }
+					}
+				</code></pre>
+			  </li>
+			</ul>
+		</details>
+	  </li>
+    </ul>
+  </details>
+</details>
+<br>
+
+---
+# Folder Structure
+<details>
+<summary>Expand to show folder structure</summary>
+<pre>
+.
+├── data/
+│   └── (Local database files and persistence artifacts for H2)
+│
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── transcendence/
+│   │   │       └── api42_service/
+│   │   │           ├── bootstrap/
+│   │   │           │   └── (Startup logic, initial data loading, rank and progress calculations)
+│   │   │           │
+│   │   │           ├── config/
+│   │   │           │   └── (Spring configuration: API clients, pagination)
+│   │   │           │
+│   │   │           ├── controller/
+│   │   │           │   └── (REST controllers: HTTP endpoints for User, Project and Campus)
+│   │   │           │
+│   │   │           ├── data_import/
+│   │   │           │   ├── (Fetch data and persist in database)
+│   │   │           │   ├── interfaces/
+│   │   │           │   │   └── (Abstractions for paginated fetch & persistence)
+│   │   │           │   └── oauth/
+│   │   │           │       └── (OAuth authentication with 42 API)
+│   │   │           │
+│   │   │           ├── definition/
+│   │   │           │   ├── curriculum/
+│   │   │           │   │   └── (Common Core curriculum & rank definitions)
+│   │   │           │   └── project/
+│   │   │           │       └── (Domain representations of projects & ranks)
+│   │   │           │
+│   │   │           ├── dto/
+│   │   │           │   ├── mapper/
+│   │   │           │   │   └── (Entity ↔ DTO mapping logic)
+│   │   │           │   └── (Request & response DTOs)
+│   │   │           │
+│   │   │           ├── entity/
+│   │   │           │   └── (JPA entities: User, Campus, Project, ProjectsUsers)
+│   │   │           │
+│   │   │           ├── exception/
+│   │   │           │   └── (Custom application exceptions)
+│   │   │           │
+│   │   │           ├── repositories/
+│   │   │           │   ├── specification/
+│   │   │           │   │   └── (JPA Specifications for dynamic filtering)
+│   │   │           │   └── (Spring Data repositories)
+│   │   │           │
+│   │   │           └── scheduler/
+│   │   │               └── (Scheduled background jobs and periodic updates. To be implemented)
+│   │   │
+│   │   └── resources/
+│   │       └── (Application configuration, static files, templates)
+│   │
+│   └── test/
+│       └── java/
+│           └── (No test)
+│
+├── mvnw/
+│   └── (Maven Wrapper scripts)
+│
+├── pom.xml
+│   └── (Maven project configuration)
+│
+└── README.md
+└── (Project documentation)
+</pre>
+</details>
+
+---
+# Database Entity Relationship Diagrams (ERD)
+```mermaid
+erDiagram
+    CAMPUS ||--o{ STUDENT : contains
+    CAMPUS {
+        Long id PK
+        String name
+        Long users_count
+        String country
+        String city
+        Boolean active
+        Boolean public
+    }
+    STUDENT ||--o{ PROJECTS_USERS : participates
+    STUDENT {
+        Long id PK
+        String email
+        String login
+        String first_name
+        String last_name
+        String url "Intranet profile url"
+        String image_link "intranet avatar"
+        String pool_month
+        String pool_year
+        Boolean active
+        Integer current_rank "derived attribute"
+        Integer rank_progress_percent "derived attribute"
+        String detailed_profile_json "user common core in json, derived attribute"
+    }
+    PROJECTS_USERS {
+        Long id PK
+        Integer occurrence "Number of try, start at 0"
+        Integer final_mark
+        Boolean validated
+    }
+    PROJECT ||--o{ PROJECTS_USERS : referenced_by
+    PROJECT {
+        Long id PK
+        String name "project name"
+        String slug "project slug, used for most queries"
+        Integer rank "derived attribute"
+    }
+    STUDENT ||--o{ USER_ELIGIBLE_PROJECT : eligible
+    STUDENT ||--o{ USER_FINISHED_PROJECT : finished
+```
+
+---
+# Resources
+* [Learn Spring boot](https://www.codecademy.com/learn/paths/create-rest-apis-with-spring-and-java)
+* [Spring annotation cheat sheets](https://github.com/Elma-dev/Spring_Boot_Annotations_Cheat_sheet?tab=readme-ov-file)
+* [Mermaids ERD tool](https://www.mermaidchart.com/)
+* [Learn ERD](https://www.lucidchart.com/pages/er-diagrams)
+* [Java language resources](https://www.baeldung.com/)
+* [Hibernate ORM documentation](https://hibernate.org/)
+* [Terminal progress bar by ctongfei](https://github.com/ctongfei/progressbar)
+* [ChatGPT - Used as learning tool and occasional debug](https://chatgpt.com/)
+* [IDE Intellij IDEA](https://www.jetbrains.com/idea/)
