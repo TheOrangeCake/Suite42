@@ -10,7 +10,6 @@ import transcendence.api42_service.dto.PageResult;
 import transcendence.api42_service.dto.mapper.ProjectsUsersMapper;
 import transcendence.api42_service.entities.User;
 import transcendence.api42_service.exception.ApiCallFailException;
-import transcendence.api42_service.repositories.ProjectRepository;
 import transcendence.api42_service.repositories.ProjectsUsersRepository;
 
 import java.util.List;
@@ -19,7 +18,6 @@ import java.util.List;
 @Service
 public class ProjectsUsersImport {
 	private final ProjectsUsersRepository projectsUsersRepository;
-	private final ProjectRepository projectRepository;
 	private final Api42Fetcher api42Fetcher;
 	private final ProjectsUsersMapper projectsUsersMapper;
 
@@ -47,7 +45,7 @@ public class ProjectsUsersImport {
 				token,
 				entityName,
 				(t, p, rpp) -> api42Fetcher.fetchProjectsUsersDtoData(t, p, rpp, user.getId(), cursusId, campusId)
-						.mapItems(dto -> projectsUsersMapper.mapToProjectsUsers(dto, user, projectRepository)),
+						.mapItems(dto -> projectsUsersMapper.mapToProjectsUsers(dto, user)),
 				projectsUsersRepository::saveAll
 		);
 	}

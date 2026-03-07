@@ -16,6 +16,7 @@ import java.util.Optional;
 @Component
 public final class ProjectsUsersMapper {
 	private final ProjectMapper projectMapper;
+	private final ProjectRepository projectRepository;
 
 	public ProjectsUsersResponseDto mapToProjectsUsersResponseDto(ProjectsUsers projectsUsers) {
 		if (projectsUsers == null) {
@@ -32,12 +33,9 @@ public final class ProjectsUsersMapper {
 		);
 	}
 
-	// TODO: move Project repo save() outside of mapper for clearer role separation
-	// TODO: move PoolResult repo outside of mapper for clearer role separation
 	public ProjectsUsers mapToProjectsUsers(
 			ProjectsUsersRequestDto projectsUsersDto,
-			User user,
-			ProjectRepository projectRepository) {
+			User user) {
 		if (projectsUsersDto == null) {
 			return null;
 		}
@@ -49,7 +47,12 @@ public final class ProjectsUsersMapper {
 		projectsUsers.setValidated(projectsUsersDto.validated());
 		projectsUsers.setMarkedAt(projectsUsersDto.marked_at());
 		projectsUsers.setUser(user);
+		projectsUsers.setProject(mapToProject(projectsUsersDto));
 
+		return projectsUsers;
+	}
+
+	private Project mapToProject(ProjectsUsersRequestDto projectsUsersDto) {
 		Optional<Project> projectOptional = projectRepository.findById(projectsUsersDto.project().id());
 		Project project;
 		if (projectOptional.isPresent()) {
@@ -62,8 +65,6 @@ public final class ProjectsUsersMapper {
 			project.setRank(CommonCoreCurriculum.getProjectRank(projectsUsersDto.project().slug()));
 			projectRepository.save(project);
 		}
-		projectsUsers.setProject(project);
-
-		return projectsUsers;
+		return project;
 	}
 }

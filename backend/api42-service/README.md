@@ -417,7 +417,7 @@ Currently only support Lausanne campus
         <li>Query option: An eligible project (slug) of user or "none"</li>
         <li>Response code:
           <ul>
-            <li>204: LFG is successfully updated</li>
+            <li>200: Ok, user object returned</li>
             <li>400: No lfg query (check lfg format)</li>
             <li>400: Invalid lfg project. Only eligible projects or none are accepted.</li>
           </ul>
@@ -438,7 +438,7 @@ Currently only support Lausanne campus
         </li>
         <li>Response code:
           <ul>
-            <li>200: Successfully modified avatar</li>
+            <li>200: Ok, user object returned</li>
             <li>400: Request must be multipart/form-data</li>
             <li>400: Invalid file (empty, not image) or no/wrong Content-Type header</li>
             <li>400: Invalid file extension. Allowed: .gif, .jpg, .jpeg, .png, .webp</li>
@@ -454,7 +454,7 @@ Currently only support Lausanne campus
         <li>Description: Delete user avatar.</li>
         <li>Response code:
           <ul>
-            <li>200: Successfully deleted avatar</li>
+            <li>200: Ok, user object returned</li>
             <li>404: File not found</li>
             <li>500: IO runtime error in server</li>
           </ul>
@@ -475,7 +475,7 @@ Currently only support Lausanne campus
         </li>
         <li>Response code:
           <ul>
-            <li>200: Successfully modified banner</li>
+            <li>200: Ok, user object returned</li>
             <li>400: Request must be multipart/form-data</li>
             <li>400: Invalid file (empty, not image) or no/wrong Content-Type header</li>
             <li>400: Invalid file extension. Allowed: .gif, .jpg, .jpeg, .png, .webp</li>
@@ -491,7 +491,7 @@ Currently only support Lausanne campus
         <li>Description: Delete user banner.</li>
         <li>Response code:
           <ul>
-            <li>200: Successfully deleted banner</li>
+            <li>200: Ok, user object returned</li>
             <li>404: File not found</li>
             <li>500: IO runtime error in server</li>
           </ul>

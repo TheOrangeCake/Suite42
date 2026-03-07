@@ -1,9 +1,11 @@
 package transcendence.api42_service.services;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import transcendence.api42_service.dto.EnvVariables;
 import transcendence.api42_service.exception.DeleteDefaultException;
 
 import javax.imageio.ImageIO;
@@ -14,16 +16,13 @@ import java.util.Arrays;
 import java.util.UUID;
 
 @Getter
+@RequiredArgsConstructor
 @Service
 public class FileUploadService {
-
-	@Value("${api42.upload-location}")
-	private String uploadDir;
-
-	@Value("${api42.default-banner}")
-	private String defaultBanner;
+	private final EnvVariables envVariables;
 
 	public String uploadImage(String userId, MultipartFile image, String fileExtension) throws IOException {
+		String uploadDir = envVariables.getUploadDir();
 		if (uploadDir.isEmpty())
 			throw new RuntimeException("No upload location or domain specified");
 		Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
@@ -36,11 +35,14 @@ public class FileUploadService {
 	}
 
 	public void deleteImage(String imageName) throws IOException {
-		if (imageName == null || imageName.isEmpty() || imageName.equals(defaultBanner))
-			throw new DeleteDefaultException();
-		Path imagePath = Paths.get(uploadDir).resolve(imageName).normalize();
-		if (!imagePath.startsWith(Paths.get(uploadDir).toAbsolutePath())) {
-			throw new SecurityException();
+		Path path = Paths.get(envVariables.getUploadDir());
+		if (imageName == null
+				|| imageName.isEmpty()
+				|| imageName.equals(envVariables.getDefaultBanner()))
+			throw new DeleteDefaultException("No image specified or can not delete default image");
+		Path imagePath = path.resolve(imageName).normalize();
+		if (!imagePath.startsWith(path.toAbsolutePath())) {
+			throw new SecurityException("Are you trying something funny?");
 		}
 		Files.deleteIfExists(imagePath);
 	}

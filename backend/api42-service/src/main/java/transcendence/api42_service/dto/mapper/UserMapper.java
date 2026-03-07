@@ -1,6 +1,6 @@
 package transcendence.api42_service.dto.mapper;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 import transcendence.api42_service.definition.project.UserCommonCore;
@@ -9,14 +9,10 @@ import transcendence.api42_service.entities.Campus;
 import transcendence.api42_service.entities.User;
 import transcendence.api42_service.exception.NoCommonCoreException;
 
+@RequiredArgsConstructor
 @Component
 public final class UserMapper {
-
-	@Value("${api42.default-banner}")
-	private String defaultBanner;
-
-	@Value("${api42.image-domain}")
-	private String imageDomain;
+	private final EnvVariables envVariables;
 
 	public UserSimpleResponseDto mapToSimpleDto(User user) {
 		if (user == null) {
@@ -89,7 +85,7 @@ public final class UserMapper {
 		user.setLastName(dto.last_name());
 		setIntraURl(user, dto.login());
 		user.setCustomAvatarUrl(null);
-		user.setCustomBannerUrl(defaultBanner);
+		user.setCustomBannerUrl(envVariables.getDefaultBanner());
 		user.setPoolMonth(dto.pool_month());
 		user.setPoolYear(dto.pool_year());
 		user.setCreatedAt(dto.created_at());
@@ -148,11 +144,11 @@ public final class UserMapper {
 	}
 
 	private String createCustomBannerUrl(User user) {
-		return imageDomain + user.getCustomBannerUrl();
+		return envVariables.getImageDomain() + user.getCustomBannerUrl();
 	}
 
 	private String createCustomAvatarUrl(User user) {
 		String customAvatar = user.getCustomAvatarUrl();
-		return customAvatar != null ? imageDomain + customAvatar : null;
+		return customAvatar != null ? envVariables.getImageDomain() + customAvatar : null;
 	}
 }

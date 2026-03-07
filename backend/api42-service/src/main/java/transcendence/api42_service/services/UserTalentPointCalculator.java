@@ -33,8 +33,8 @@ public class UserTalentPointCalculator  {
         try (ProgressBar pb = new ProgressBar("Calculating user Talent point", totalActiveUser)) {
             for (User user : activeUsers) {
                 pb.step();
-                populatePoolResult(user, activeUsersProjectsUsers);
-                int poolScore = (calculatePoolCriteria(user) * 20) / 100;
+                PoolResult poolResult = populatePoolResult(user, activeUsersProjectsUsers);
+                int poolScore = (calculatePoolCriteria(poolResult) * 20) / 100;
                 int paceScore = (calculatePaceCriteria(user) * 50) / 100;
                 int perfectionismScore = (calculatePerfectionismCriteria(user, activeUsersProjectsUsers) * 30) / 100;
                 user.setPerformanceScore(poolScore + paceScore + perfectionismScore);
@@ -43,7 +43,7 @@ public class UserTalentPointCalculator  {
         userRepository.saveAll(activeUsers);
     }
 
-    private void populatePoolResult(User user, List<ProjectsUsers> activeUsersProjectsUsers) {
+    private PoolResult populatePoolResult(User user, List<ProjectsUsers> activeUsersProjectsUsers) {
         getLastedProjectsUsersBySlug(user, activeUsersProjectsUsers);
         Map<String, ProjectsUsers> lastedProjectsUsersBySlug = getLastedProjectsUsersBySlug(user, activeUsersProjectsUsers);
         PoolResult poolResult = poolResultRepository.findByUser(user)
@@ -66,6 +66,7 @@ public class UserTalentPointCalculator  {
         poolResult.setExam2Score(getProjectMaxScore("c-piscine-exam-02", lastedProjectsUsersBySlug));
         poolResult.setExam3Score(getProjectMaxScore("c-piscine-final-exam", lastedProjectsUsersBySlug));
         poolResultRepository.save(poolResult);
+        return poolResult;
     }
 
     public static Map<String, ProjectsUsers> getLastedProjectsUsersBySlug(User user, List<ProjectsUsers> activeUsersProjectsUsers) {
@@ -88,8 +89,7 @@ public class UserTalentPointCalculator  {
         return 0;
     }
 
-    private int calculatePoolCriteria(User user) {
-        PoolResult poolResult = user.getPoolResult();
+    private int calculatePoolCriteria(PoolResult poolResult) {
         return calculatePoolExamScore(poolResult)
                         + calculatePoolProjectPassedScore(poolResult)
                         + calculatePoolProjectMaxScore(poolResult);

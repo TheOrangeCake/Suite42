@@ -10,8 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import transcendence.api42_service.dto.EnvVariables;
 import transcendence.api42_service.exception.WrongExtensionException;
-import transcendence.api42_service.services.FileUploadService;
 
 import java.net.MalformedURLException;
 import java.nio.file.InvalidPathException;
@@ -24,13 +24,13 @@ import static org.springframework.http.MediaType.parseMediaType;
 @RestController
 public class ImageController {
 
-	private final FileUploadService fileUploadService;
+	private final EnvVariables envVariables;
 
 	@GetMapping("/images42/{fileName}")
 	public ResponseEntity<?> getImage(@PathVariable String fileName) {
 		try {
-			Path imagePath = Paths.get(fileUploadService.getUploadDir()).resolve(fileName).normalize();
-			if (!imagePath.startsWith(Paths.get(fileUploadService.getUploadDir()).toAbsolutePath())) {
+			Path imagePath = Paths.get(envVariables.getUploadDir()).resolve(fileName).normalize();
+			if (!imagePath.startsWith(Paths.get(envVariables.getUploadDir()).toAbsolutePath())) {
 				return ResponseEntity.status(403).body("Access denied");
 			}
 			Resource resource = new UrlResource(imagePath.toUri());

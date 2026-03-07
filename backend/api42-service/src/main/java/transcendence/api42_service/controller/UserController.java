@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import transcendence.api42_service.dto.EnvVariables;
 import transcendence.api42_service.dto.UserDetailedResponseDto;
 import transcendence.api42_service.dto.UserSimpleResponseDto;
 import transcendence.api42_service.exception.DeleteDefaultException;
@@ -34,6 +35,7 @@ public class UserController {
 	private final UserRepository userRepository;
 	private final FileUploadService fileUploadService;
 	private final UserMapper userMapper;
+	private final EnvVariables envVariables;
 
 	private static final Set<String> ALL_USERS_ALLOWED_SORTS = Set.of(
 			"rank",
@@ -83,7 +85,7 @@ public class UserController {
 
 	@GetMapping("/{id}/profile")
 	public UserDetailedResponseDto getUserById(@PathVariable Long id) {
-		User user = this.userRepository.findDetailedById(id)
+		User user = this.userRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 		return userMapper.mapToDetailedDto(user);
 	}
@@ -118,21 +120,20 @@ public class UserController {
 
 	// TODO: Validate user with JWT
 	@PatchMapping("/{id}/lfg")
-	@Transactional
 	public ResponseEntity<?> modifyLFG(@PathVariable Long id, @RequestParam String lfg) {
 		User user = this.userRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 		if (lfg.equals("none")) {
 			user.setLfg(lfg);
 			userRepository.save(user);
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.ok(userMapper.mapToDetailedDto(user));
 		}
 		Set<String> eligibleProjects= user.getEligibleProjects();
 		boolean validateLFG = eligibleProjects.stream().anyMatch(s -> s.equals(lfg));
 		if (validateLFG) {
 			user.setLfg(lfg);
 			userRepository.save(user);
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.ok(userMapper.mapToDetailedDto(user));
 		}
 		return ResponseEntity.status(400).body("Invalid lfg project. Only eligible projects or none are accepted.");
 	}
@@ -170,7 +171,7 @@ public class UserController {
 				}
 				user.setCustomAvatarUrl(fileName);
 			} else if (type.equals("banner")) {
-				if (!user.getCustomBannerUrl().equals(fileUploadService.getDefaultBanner())) {
+				if (!user.getCustomBannerUrl().equals(envVariables.getDefaultBanner())) {
 					fileUploadService.deleteImage(user.getCustomBannerUrl());
 				}
 				user.setCustomBannerUrl(fileName);
@@ -178,7 +179,7 @@ public class UserController {
 				return ResponseEntity.status(500).body("Fail to upload file, something went wrong in the server.");
 			}
 			userRepository.save(user);
-			return ResponseEntity.ok().body("Successfully modified " + type);
+			return ResponseEntity.ok(userMapper.mapToDetailedDto(user));
 		} catch(IOException | RuntimeException e) {
 			System.err.println("Fail to upload file. " + e.getMessage());
 			return ResponseEntity.status(500).body("Fail to upload file. Something went wrong in the server.");
@@ -203,14 +204,14 @@ public class UserController {
 		try {
 			if (type.equals("banner")) {
 				fileUploadService.deleteImage(user.getCustomBannerUrl());
-				user.setCustomBannerUrl(fileUploadService.getDefaultBanner());
+				user.setCustomBannerUrl(envVariables.getDefaultBanner());
 			} else if (type.equals("avatar")) {
 				fileUploadService.deleteImage(user.getCustomAvatarUrl());
 				user.setCustomAvatarUrl(null);
 			} else
 				return ResponseEntity.status(500).body("Image deletion failed. Something went wrong in the server");
 			userRepository.save(user);
-			return ResponseEntity.ok("Successfully deleted " + type);
+			return ResponseEntity.ok(userMapper.mapToDetailedDto(user));
 		} catch(IOException e) {
 			return ResponseEntity.status(500).body("Image deletion failed. Something went wrong in the server");
 		} catch(SecurityException e) {

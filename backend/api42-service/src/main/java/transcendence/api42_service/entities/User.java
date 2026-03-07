@@ -16,7 +16,7 @@ public class User {
     @Id
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name="campus_user", nullable = false)
     private Campus campus;
 
@@ -96,14 +96,14 @@ public class User {
     @NonNull
     private String lfg = "none";
 
-    @ElementCollection(fetch=FetchType.LAZY)
+    @ElementCollection(fetch=FetchType.EAGER)
     @CollectionTable(
             name="user_finished_projects",
             joinColumns = @JoinColumn(name="user_id"))
     @Column(name="project")
     private Set<String> finishedProjects;
 
-    @ElementCollection(fetch=FetchType.LAZY)
+    @ElementCollection(fetch=FetchType.EAGER)
     @CollectionTable(
             name="user_eligible_projects",
             joinColumns = @JoinColumn(name="user_id"))
