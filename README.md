@@ -1,8 +1,3 @@
-
-### Design
-
-* [design documentation](./design/README.md)
-
 # Transcendence – Project Overview
 
 This repository is organized as a small microservices project.
@@ -39,7 +34,7 @@ Another Spring Boot service (separate folder, not inside `backend/` (maybe we go
 Frontend app (Vue/Vite) built into static files and served by Nginx.
 - `frontend/containers/Dockerfile` (build frontend + run nginx)
 - `frontend/ressources/nginx.conf` (nginx config for SPA routing)
-- `frontend/design`  ==> `[design documentation](./design/README.md)`
+- `frontend/design` ==> [design documentation](./frontend/design/README.md)
 
 Each service folder usually contains:
 - `pom.xml` (Java dependencies)
