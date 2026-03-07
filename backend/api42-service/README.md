@@ -54,7 +54,7 @@ Currently only support Lausanne campus
     <details>
       <summary><code>GET /v1/42users</code></summary>
       <ul>
-        <li>Description: Get all active and non alumni users.<br>Note: Rank 7 mean user has done all rank 6 projects.</li>
+        <li>Description: Get all users active, non alumni and rank between 0 and 6.</li>
         <li>Filter:
           <ul>
             <li><code>campusName</code> (mandatory, Lausanne only)</li>
@@ -70,6 +70,7 @@ Currently only support Lausanne campus
           <ul>
             <li><code>poolYear</code></li>
             <li><code>rank</code></li>
+            <li><code>performanceScore</code></li>
             <li><code>rankProgressPercent</code></li>
           </ul>
         </li>
@@ -115,6 +116,7 @@ Currently only support Lausanne campus
                         "pool_year": "2024",
                         "rank": 7,
                         "rank_progress_percent": 0,
+                        "performance_score" : 42,
                         "lfg": "none"
                       },
                       {
@@ -138,6 +140,7 @@ Currently only support Lausanne campus
                         "pool_year": "2023",
                         "rank": 6,
                         "rank_progress_percent": 34,
+                        "performance_score" : 42,
                         "lfg": "ft_transcendence"
                       }
                     ],
@@ -192,6 +195,7 @@ Currently only support Lausanne campus
                     "active": true,
                     "rank": 6,
                     "rank_progress_percent": 0,
+                    "performance_score" : 42,
                     "lfg": "42_collaborative_resume",
                     "finished_projects": [
                       "cpp-module-00",
@@ -288,7 +292,8 @@ Currently only support Lausanne campus
 					    },
 					    "rank": null,
 					    "rank_progress_percent": null,
-                        "lfg": "none"
+              "performance_score" : 42,
+              "lfg": "none"
 					  },
 					  {
 					    "id": 222222,
@@ -309,7 +314,8 @@ Currently only support Lausanne campus
 					    },
 					    "rank": 4,
 					    "rank_progress_percent": 75,
-                        "lfg": "none"
+              "performance_score" : 42,
+              "lfg": "none"
 					  }
                   	],
 					"page": {
@@ -366,7 +372,8 @@ Currently only support Lausanne campus
 					    },
 					    "rank": null,
 					    "rank_progress_percent": null,
-                        "lfg": "none"
+              "performance_score" : 42,
+              "lfg": "none"
 					  },
 					  {
 					    "id": 222222,
@@ -385,7 +392,8 @@ Currently only support Lausanne campus
 					    },
 					    "rank": 4,
 					    "rank_progress_percent": 75,
-                        "lfg": "none"
+              "performance_score" : 42,
+              "lfg": "none"
 					  }
                   	],
 					"page": {
@@ -803,6 +811,65 @@ Currently only support Lausanne campus
 
 <br>
 
+# Performance Score Algorithm
+
+* **Pool performance:** 20/100<br>
+  *Evaluate pool performance based on exam score, C project advancement and its score.*
+  * Exam Pool: 50/100
+    * How: ((Sum of valid exam score / total exam taken) * 50) / 100
+    * Valid exam: score greater than 0.
+  * Pool max C project passed: 30/100
+    * How: (Sum of passed project weight * 30) / 100
+    * Project weight:
+      * C02: 5
+      * C03: 5
+      * C04: 5
+      * C05: 5
+      * C06: 10
+      * c07: 15
+      * c08: 15
+      * c09: 20
+      * c10: 20
+  * Individual C project score: 20/100
+    * How: ((Sum of passed project score weight / total passed project) * 20) / 100
+    * Individual project score weight:
+      * Less than 50: 0
+      * 50 - 59: 50
+      * 60 - 69: 55
+      * 70 - 79: 60
+      * 80 - 89: 70
+      * 90 - 99 : 80
+      * 100 or more: 100
+<br><br>
+* **Cursus rhythm:** 50/100<br>
+  *Evaluate cursus speed based on cursus starting date, current rank and current rank progression.*
+  * How:
+    * Calculate the elapsed days since cursus starting date, which is the actual days to reach current rank.
+    * Calculate expected days to reach current rank, accounting for current rank progression and freeze days.
+    * Compare elapsed time and expected time. The score is 50 if user is exactly on timeline. The score is higher if user elapsed time is faster and vice versa.<br>
+    Cap at 0 for 50% slower (pace to finish cursus in 36 months) and 100 for 50% faster (pace to finish cursus in 12 months).
+  * Base Rank completion estimation since start date:
+    * Rank 0: 30 days
+    * Rank 1: 90 days
+    * Rank 2: 180 days
+    * Rank 3: 300 days
+    * Rank 4: 420 days
+    * Rank 5: 570 days
+    * Rank 6: 720 days
+    * Freeze: 6 days per rank
+<br><br>
+* **Perfectionism:** 30/100<br>
+  *Take in account project bonus.*
+  * How:
+    * Scores between 101 and 124 included count 1 point each.
+    * Scores 125 count 2 points each.
+    * Cpp projects are edge cases. Their bonuses don't count because they are relatively simple. They are not counted in total project done neither.
+    * Perfectionism score = (actual score / max score) * 100.<br>
+      Actual score: points from each bonus project.<br>
+      Max score = number of projects done * 2 points.<br>
+
+<br>
+
 # Folder Structure
 <details>
 <summary>Expand to show folder structure</summary>
@@ -894,12 +961,15 @@ erDiagram
         Boolean public
     }
     STUDENT ||--o{ PROJECTS_USERS : participates
+    STUDENT ||--|| POOL_RESULT : has
     STUDENT {
         Long id PK
         String email
         String login
         String first_name
         String last_name
+        String custom_avatar_url
+        String custom_banner_url
         String url "Intranet profile url"
         String image_link "intranet avatar"
         String pool_month
@@ -907,6 +977,8 @@ erDiagram
         Boolean active
         Integer current_rank "derived attribute"
         Integer rank_progress_percent "derived attribute"
+        Integer performance_score "derived attribute"
+        String lfg
         String detailed_profile_json "user common core in json, derived attribute"
     }
     PROJECTS_USERS {
@@ -914,6 +986,22 @@ erDiagram
         Integer occurrence "Number of try, start at 0"
         Integer final_mark
         Boolean validated
+    }
+    POOL_RESULT {
+        Long id PK
+        Integer c02Score
+        Integer c03Score
+        Integer c04Score
+        Integer c05Score
+        Integer c06Score
+        Integer c07Score
+        Integer c08Score
+        Integer c09Score
+        Integer c10Score
+        Integer exam0Score
+        Integer exam1Score
+        Integer exam2Score
+        Integer exam3Score
     }
     PROJECT ||--o{ PROJECTS_USERS : referenced_by
     PROJECT {

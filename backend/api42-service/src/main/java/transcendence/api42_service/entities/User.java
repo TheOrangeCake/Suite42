@@ -83,8 +83,14 @@ public class User {
     @Column(name="current_rank")
     private Integer rank;
 
+    @Column(name = "freeze_days")
+    private Integer freezeDays;
+
     @Column(name="rank_progress_percent")
     private Integer rankProgressPercent;
+
+    @Column(name = "performance_score")
+    private Integer performanceScore;
 
     @Column(name="lfg")
     @NonNull
@@ -106,4 +112,10 @@ public class User {
 
     @Column(columnDefinition="TEXT")
     private String detailedProfileJson;
+
+    @OneToOne(
+            mappedBy = "user",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private PoolResult poolResult;
+
 }

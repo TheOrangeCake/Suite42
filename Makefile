@@ -3,10 +3,13 @@ COMPOSE = docker compose -f infra/docker-compose.yml --env-file .env
 certs:
 	@bash infra/scripts/setup-certs.sh
 
-.PHONY: up down restart logs ps build clean setup-certs
+.PHONY: rebuild up down restart logs ps build clean setup-certs
 
-up: certs
+rebuild: certs
 	$(COMPOSE) up -d --build
+
+up:
+	$(COMPOSE) up -d
 
 down:
 	$(COMPOSE) down

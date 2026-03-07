@@ -38,6 +38,7 @@ public class UserController {
 	private static final Set<String> ALL_USERS_ALLOWED_SORTS = Set.of(
 			"rank",
 			"poolYear",
+			"performanceScore",
 			"rankProgressPercent"
 	);
 
@@ -68,6 +69,7 @@ public class UserController {
 				sort);
 		Specification<User> spec = Specification
 				.where(UserSpecifications.isActive())
+				.and(UserSpecifications.betweenRank(0, 6))
 				.and(UserSpecifications.hasCampusName(campusName))
 				.and(UserSpecifications.hasPoolMonth(poolMonth))
 				.and(UserSpecifications.hasPoolYear(poolYear))

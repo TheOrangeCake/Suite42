@@ -21,6 +21,7 @@ public record UserDetailedResponseDto(
         Boolean active,
 		Integer rank,
 		Integer rank_progress_percent,
+		Integer performance_score,
 		String lfg,
 		Set<String> finished_projects,
 		Set<String> eligible_projects,

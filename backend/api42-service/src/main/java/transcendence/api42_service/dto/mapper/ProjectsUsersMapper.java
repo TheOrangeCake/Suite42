@@ -33,6 +33,7 @@ public final class ProjectsUsersMapper {
 	}
 
 	// TODO: move Project repo save() outside of mapper for clearer role separation
+	// TODO: move PoolResult repo outside of mapper for clearer role separation
 	public ProjectsUsers mapToProjectsUsers(
 			ProjectsUsersRequestDto projectsUsersDto,
 			User user,

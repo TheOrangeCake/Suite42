@@ -16,6 +16,11 @@ public final class UserSpecifications {
 		return (table, query, criteria) -> criteria.isTrue(table.get("active"));
 	}
 
+	public static Specification<User> betweenRank(int minRank, int maxRank) {
+		return (table, query, criteria) ->
+				criteria.between(table.get("rank"), minRank, maxRank);
+	}
+
 	public static Specification<User> hasPoolMonth(String poolMonth) {
 		return (table, query, criteria) ->
 				poolMonth == null ? null : criteria.equal(table.get("poolMonth"), poolMonth);

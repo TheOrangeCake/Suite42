@@ -12,6 +12,7 @@ public record UserSimpleResponseDto(
 		String pool_year,
 		Integer rank,
 		Integer rank_progress_percent,
+		Integer performance_score,
 		String lfg
 ) {
 }

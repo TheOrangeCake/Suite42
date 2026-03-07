@@ -19,6 +19,7 @@ import transcendence.api42_service.data_import.ProjectsUsersImport;
 import transcendence.api42_service.data_import.oauth.OauthTokenGetter;
 import transcendence.api42_service.services.UserProgressScoreCalculator;
 import transcendence.api42_service.services.UserRankCalculator;
+import transcendence.api42_service.services.UserTalentPointCalculator;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,7 @@ public class StartupRunner implements CommandLineRunner {
     private final DatabaseImport databaseImport;
     private final UserRankCalculator userRankCalculator;
     private final UserProgressScoreCalculator userProgressScoreCalculator;
+    private final UserTalentPointCalculator userTalentPointCalculator;
     private final UserMapper userMapper;
     private final CampusMapper campusMapper;
 
@@ -71,6 +73,7 @@ public class StartupRunner implements CommandLineRunner {
         if (userRepository.count() > 0 && projectsUsersRepository.count() > 0)  {
             userRankCalculator.calculateUserRank();
             userProgressScoreCalculator.calculateUserScore();
+            userTalentPointCalculator.calculateUserTalentPoint();
         }
         System.out.println("Database initialization completed");
     }

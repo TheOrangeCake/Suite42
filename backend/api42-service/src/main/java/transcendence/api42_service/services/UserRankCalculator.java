@@ -17,7 +17,6 @@ import transcendence.api42_service.repositories.ProjectsUsersRepository;
 import transcendence.api42_service.repositories.UserRepository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Transactional
@@ -32,19 +31,11 @@ public class UserRankCalculator {
 		List<ProjectsUsers> activeUsersProjectsUsers = projectsUsersRepository.findByUserIn(activeUsers);
 		int totalActiveUser = activeUsers.size();
 
-		try (ProgressBar pb = new ProgressBar("Updating user data", totalActiveUser)) {
+		try (ProgressBar pb = new ProgressBar("Calculating user current rank", totalActiveUser)) {
 			for (User user : activeUsers) {
 				pb.step();
-				List<ProjectsUsers> usersProjectsUsers = activeUsersProjectsUsers
-						.stream()
-						.filter(pu -> pu.getUser().equals(user))
-						.toList();
-				Map<String, ProjectsUsers> lastedProjectsUsersBySlug = usersProjectsUsers.stream()
-						.collect(Collectors.toMap(
-								projectsUsers -> projectsUsers.getProject().getSlug(),
-								projectsUsers -> projectsUsers,
-								(a, b) -> a.getMarkedAt().isAfter(b.getMarkedAt()) ? a : b));
-				UserCommonCore userCommonCore = calculateUserCommonCore(user, lastedProjectsUsersBySlug);
+                Map<String, ProjectsUsers> lastedProjectsUsersBySlug = UserTalentPointCalculator.getLastedProjectsUsersBySlug(user, activeUsersProjectsUsers);
+                UserCommonCore userCommonCore = calculateUserCommonCore(user, lastedProjectsUsersBySlug);
 				try {
 					user.setDetailedProfileJson(toJson(userCommonCore));
 				} catch (RuntimeException e) {
@@ -118,6 +109,7 @@ public class UserRankCalculator {
 			}
 		}
 		user.setRank(currentRank);
+		user.setFreezeDays(currentRank * 6);
 		user.setFinishedProjects(finishedProjects);
 		user.setEligibleProjects(eligibleProjects(currentRank, finishedProjects));
 		return new UserCommonCore(ranks);

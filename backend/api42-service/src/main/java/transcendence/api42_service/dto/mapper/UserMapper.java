@@ -34,6 +34,7 @@ public final class UserMapper {
 				user.getPoolYear(),
 				user.getRank(),
 				user.getRankProgressPercent(),
+				user.getPerformanceScore(),
 				user.getLfg()
 		);
 	}
@@ -66,6 +67,7 @@ public final class UserMapper {
 				user.getActive(),
 				user.getRank(),
 				user.getRankProgressPercent(),
+				user.getPerformanceScore(),
 				user.getLfg(),
 				user.getFinishedProjects(),
 				user.getEligibleProjects(),
@@ -95,10 +97,13 @@ public final class UserMapper {
 		user.setAlumni(dto.alumni());
 		user.setActive(dto.active());
 		user.setRank(null);
+		user.setFreezeDays(null);
 		user.setRankProgressPercent(null);
+		user.setPerformanceScore(null);
 		user.setFinishedProjects(null);
 		user.setEligibleProjects(null);
 		user.setDetailedProfileJson(null);
+		user.setPoolResult(null);
 
 		if (dto.image() != null) {
 			user.setImageLink(dto.image().link());

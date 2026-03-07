@@ -12,6 +12,7 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 	List<User> findByActiveTrue();
+	List<User> findByActiveTrueAndRankBetween(int minRank, int maxRank);
 	Page<User> findByLastName(String lastName, Pageable pageable);
 	Page<User> findByFirstName(String firstName, Pageable pageable);
 	@Query("""
