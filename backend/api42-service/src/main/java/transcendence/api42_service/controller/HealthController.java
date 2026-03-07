@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import transcendence.api42_service.bootstrap.StartupRunner;
 import transcendence.api42_service.data_import.oauth.OauthTokenGetter;
 import transcendence.api42_service.exception.ApiCallFailException;
 import transcendence.api42_service.repositories.CampusRepository;
@@ -21,11 +22,15 @@ public class HealthController {
 	private final UserRepository userRepository;
 	private final ProjectsUsersRepository projectsUsersRepository;
 	private final ProjectRepository projectRepository;
+	private final StartupRunner startupRunner;
 
 	@GetMapping
 	public ResponseEntity<String> healthCheck() {
 		try {
 			oauthTokenGetter.retrieveToken();
+			if (!startupRunner.isStartupComplete()) {
+				return ResponseEntity.status(500).body("Loading initial database");
+			}
 			if (!(campusRepository.count() > 0
 				&& userRepository.count() > 0
 				&& projectsUsersRepository.count() > 0

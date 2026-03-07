@@ -1,6 +1,7 @@
 package transcendence.api42_service.data_import.oauth;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -10,6 +11,7 @@ import transcendence.api42_service.exception.ApiCallFailException;
 import transcendence.api42_service.exception.InvalidTokenException;
 
 @Getter
+@RequiredArgsConstructor
 @Service
 public class OauthTokenGetter {
     private volatile String token;
@@ -27,11 +29,6 @@ public class OauthTokenGetter {
 
     @Value("${api42.uid}")
     private String apiUID;
-
-    public OauthTokenGetter(RestClient restClient, OauthToken oauthToken) {
-        this.restClient = restClient;
-	    this.oauthToken = oauthToken;
-    }
 
     public synchronized void retrieveToken() {
         oauthToken = restClient.post()

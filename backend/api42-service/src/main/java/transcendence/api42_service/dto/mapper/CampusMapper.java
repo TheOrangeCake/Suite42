@@ -1,11 +1,18 @@
 package transcendence.api42_service.dto.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import transcendence.api42_service.dto.CampusDto;
 import transcendence.api42_service.entities.Campus;
+import transcendence.api42_service.repositories.CampusRepository;
 
+import java.util.Optional;
+
+@RequiredArgsConstructor
 @Component
 public final class CampusMapper {
+	private final CampusRepository campusRepository;
+
 	public CampusDto mapToDto(Campus campus) {
 		if (campus == null) {
 			return null;
@@ -32,8 +39,19 @@ public final class CampusMapper {
 		if (dto == null) {
 			return null;
 		}
+		Campus campus;
+		Optional<Campus> existingCampus = campusRepository.findByName(dto.name());
+		if (existingCampus.isPresent()) {
+			campus = populateCampus(existingCampus.get(), dto);
+		} else {
+			campus = new Campus();
+            populateCampus(campus, dto);
+        }
 
-		Campus campus = new Campus();
+		return campus;
+	}
+
+	private Campus populateCampus(Campus campus, CampusDto dto) {
 		campus.setId(dto.id());
 		campus.setName(dto.name());
 		campus.setTimeZone(dto.time_zone());
@@ -48,8 +66,6 @@ public final class CampusMapper {
 		campus.setActive(dto.active());
 		campus.setPublicCampus(dto.publicCampus());
 		campus.setEmailExtension(dto.email_extension());
-
 		return campus;
 	}
-
 }

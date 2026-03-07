@@ -8,11 +8,15 @@ import transcendence.api42_service.dto.*;
 import transcendence.api42_service.entities.Campus;
 import transcendence.api42_service.entities.User;
 import transcendence.api42_service.exception.NoCommonCoreException;
+import transcendence.api42_service.repositories.UserRepository;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
 public final class UserMapper {
 	private final EnvVariables envVariables;
+	private final UserRepository userRepository;
 
 	public UserSimpleResponseDto mapToSimpleDto(User user) {
 		if (user == null) {
@@ -71,36 +75,46 @@ public final class UserMapper {
 		);
 	}
 
-	public User mapBootStrapRequestToUser(UserRequestDto dto, Campus campus) {
+	public User mapRequestToUser(UserRequestDto dto, Campus campus) {
 		if (dto == null) {
 			return null;
 		}
+		User user;
+		Optional<User> existingUser = userRepository.findById(dto.id());
+		if (existingUser.isPresent()) {
+            user = populateUser(existingUser.get(), dto, campus);
+        } else {
+			user = new User();
+			populateUser(user, dto, campus);
+			user.setId(dto.id());
+			user.setEmail(dto.email());
+			user.setLogin(dto.login());
+			setIntraURl(user, dto.login());
+			user.setCustomAvatarUrl(null);
+			user.setCustomBannerUrl(envVariables.getDefaultBanner());
+			user.setCreatedAt(dto.created_at());
+			user.setRank(null);
+			user.setFreezeDays(null);
+			user.setRankProgressPercent(null);
+			user.setPerformanceScore(null);
+			user.setFinishedProjects(null);
+			user.setEligibleProjects(null);
+			user.setDetailedProfileJson(null);
+			user.setPoolResult(null);
+		}
 
-		User user = new User();
-		user.setId(dto.id());
+		return user;
+	}
+
+	private User populateUser(User user, UserRequestDto dto, Campus campus) {
 		user.setCampus(campus);
-		user.setEmail(dto.email());
-		user.setLogin(dto.login());
 		user.setFirstName(dto.first_name());
 		user.setLastName(dto.last_name());
-		setIntraURl(user, dto.login());
-		user.setCustomAvatarUrl(null);
-		user.setCustomBannerUrl(envVariables.getDefaultBanner());
 		user.setPoolMonth(dto.pool_month());
 		user.setPoolYear(dto.pool_year());
-		user.setCreatedAt(dto.created_at());
 		user.setUpdatedAt(dto.updated_at());
 		user.setAlumni(dto.alumni());
 		user.setActive(dto.active());
-		user.setRank(null);
-		user.setFreezeDays(null);
-		user.setRankProgressPercent(null);
-		user.setPerformanceScore(null);
-		user.setFinishedProjects(null);
-		user.setEligibleProjects(null);
-		user.setDetailedProfileJson(null);
-		user.setPoolResult(null);
-
 		if (dto.image() != null) {
 			user.setImageLink(dto.image().link());
 
@@ -111,7 +125,6 @@ public final class UserMapper {
 				user.setImageMicro(dto.image().versions().micro());
 			}
 		}
-
 		return user;
 	}
 
