@@ -1,16 +1,15 @@
 server:
-  port: 8083
+  port: 8082
   servlet:
-    context-path: /api/group
+    context-path: /api/chat
 
 spring:
   application:
-    name: group-service
+    name: chat-service
 
 app:
   jwt:
     secret: ${JWT_SECRET}
-    cookie-name: access_token
 
 management:
   endpoints:

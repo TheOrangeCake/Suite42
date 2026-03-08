@@ -72,6 +72,23 @@ services:
     networks:
       - app_net
 
+  chat-service:
+    build:
+      context: ../backend/chat-service
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app_net
 
   api-gateway:
     build:
@@ -82,6 +99,7 @@ services:
     depends_on:
       - auth-service
       - group-service
+      - chat-service
     networks:
       - app_net
 
@@ -123,7 +141,7 @@ services:
       dockerfile: Dockerfile
     container_name: api42-service
     ports:
-      - "4444:4444"
+      - "8084:8084"
     environment:
       SPRING_PROFILES_ACTIVE: prod
       POSTGRES_HOST: api42-postgresql
@@ -168,7 +186,7 @@ services:
       dockerfile: Dockerfile
     container_name: regular-user-service
     ports:
-      - "4445:4445"
+      - "8085:8085"
     environment:
       SPRING_PROFILES_ACTIVE: prod
       POSTGRES_HOST: regular-user-postgresql

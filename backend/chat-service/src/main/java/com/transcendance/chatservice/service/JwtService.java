@@ -3,6 +3,7 @@ package com.transcendance.chatservice.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.HashMap;
@@ -13,7 +14,8 @@ import java.util.function.Function;
 public class JwtService {
 
     // CETTE CLÉ DOIT ÊTRE LA MÊME QUE DANS TON MICROSERVICE AUTH
-    private static final String SECRET_KEY = "MaSuperCleSecreteDePlusDe32CaracteresPourLeProjetTranscendance2026!";
+    @Value("${app.jwt.secret}")
+    private String secretKey;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -33,7 +35,7 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
 	public String generateTokenForTest(String username) {

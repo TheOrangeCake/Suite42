@@ -11,25 +11,38 @@ spring:
         webmvc:
           routes:
             - id: auth-service
-              uri: http://auth-service:8080
+              uri: http://auth-service:8081
               predicates:
                 - Path=/api/auth/**
               filters:
                 - StripPrefix=2
 
             - id: group-service
-              uri: http://group-service:8080
+              uri: http://group-service:8083
               predicates:
                 - Path=/api/group/**
               filters:
                 - StripPrefix=2
 
             - id: api42-service
-              uri: http://api42-service:4444
+              uri: http://api42-service:8084
               predicates:
                 - Path=/api/api42/**
               filters:
                 - StripPrefix=2
+
+            - id: chat-service
+              uri: http://chat-service:8082
+              predicates:
+                - Path=/api/chat/**
+              filters:
+                - StripPrefix=2
+
+            - id: chat-socket
+              uri: http://chat-service:8082
+              predicates:
+                - Path=/ws-chat/**
+              filters: []
 
 management:
   endpoints:
