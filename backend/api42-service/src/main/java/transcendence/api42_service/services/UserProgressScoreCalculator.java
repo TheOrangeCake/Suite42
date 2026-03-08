@@ -11,15 +11,18 @@ import transcendence.api42_service.repositories.UserRepository;
 
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 @AllArgsConstructor
 @Transactional
 @Service
 public class UserProgressScoreCalculator {
 	private final UserRepository userRepository;
+	private final Logger logger;
 
 	@SuppressWarnings("ReassignedVariable")
 	public void calculateUserScore() {
+		logger.info("Calculate user current rank progress");
 		List<User> activeUsers = userRepository.findByActiveTrue();
 		int totalActiveUsers = activeUsers.size();
 		try (ProgressBar pb = new ProgressBar("Calculating user current rank progress", totalActiveUsers)) {

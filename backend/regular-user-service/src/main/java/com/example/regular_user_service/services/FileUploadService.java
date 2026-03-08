@@ -45,7 +45,7 @@ public class FileUploadService {
 			throw new DeleteDefaultException("No image specified or can not delete default image");
 		Path imagePath = path.resolve(imageName).normalize();
 		if (!imagePath.startsWith(path.toAbsolutePath())) {
-			throw new SecurityException("Are you trying something funny?");
+			throw new SecurityException("No");
 		}
 		Files.deleteIfExists(imagePath);
 	}

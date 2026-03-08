@@ -17,6 +17,7 @@ import transcendence.api42_service.repositories.ProjectsUsersRepository;
 import transcendence.api42_service.repositories.UserRepository;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 @AllArgsConstructor
 @Transactional
@@ -25,8 +26,10 @@ public class UserRankCalculator {
 	private final UserRepository userRepository;
 	private final ProjectsUsersRepository projectsUsersRepository;
 	private final ObjectMapper objectMapper;
+	private final Logger logger;
 
 	public void calculateUserRank() {
+		logger.info("Calculate user current rank");
 		List<User> activeUsers= userRepository.findByActiveTrue();
 		List<ProjectsUsers> activeUsersProjectsUsers = projectsUsersRepository.findByUserIn(activeUsers);
 		int totalActiveUser = activeUsers.size();
@@ -39,7 +42,7 @@ public class UserRankCalculator {
 				try {
 					user.setDetailedProfileJson(toJson(userCommonCore));
 				} catch (RuntimeException e) {
-					System.err.printf("Failed to serialize UserCommonCore and calculate rank for user %s. %s", user.getId().toString(), e);
+					logger.severe("Failed to serialize UserCommonCore and calculate rank for user " + user.getId().toString() + ": " + e);
 					user.setDetailedProfileJson(null);
 				}
 			}

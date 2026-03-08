@@ -15,6 +15,7 @@ import transcendence.api42_service.repositories.UserRepository;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -24,13 +25,15 @@ public class UserTalentPointCalculator  {
     private final UserRepository userRepository;
     private final ProjectsUsersRepository projectsUsersRepository;
     private final PoolResultRepository poolResultRepository;
+    private final Logger logger;
 
     public void calculateUserTalentPoint() {
+        logger.info("Calculate user performance point");
         List<User> activeUsers = userRepository.findByActiveTrueAndRankBetween(0, 6);
         List<ProjectsUsers> activeUsersProjectsUsers = projectsUsersRepository.findByUserIn(activeUsers);
         int totalActiveUser = activeUsers.size();
 
-        try (ProgressBar pb = new ProgressBar("Calculating user Talent point", totalActiveUser)) {
+        try (ProgressBar pb = new ProgressBar("Calculating user Performance point", totalActiveUser)) {
             for (User user : activeUsers) {
                 pb.step();
                 PoolResult poolResult = populatePoolResult(user, activeUsersProjectsUsers);

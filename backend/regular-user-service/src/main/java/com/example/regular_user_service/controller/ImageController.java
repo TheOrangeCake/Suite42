@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Logger;
 
 import static org.springframework.http.MediaType.parseMediaType;
 
@@ -24,13 +25,15 @@ import static org.springframework.http.MediaType.parseMediaType;
 @RestController
 public class ImageController {
 	private final EnvVariables envVariables;
+	private final Logger logger;
 
 	@GetMapping("/images-regular/{fileName}")
 	public ResponseEntity<?> getImage(@PathVariable String fileName) {
 		try {
 			Path imagePath = Paths.get(envVariables.getUploadDir()).resolve(fileName).normalize();
 			if (!imagePath.startsWith(Paths.get(envVariables.getUploadDir()).toAbsolutePath())) {
-				return ResponseEntity.status(403).body("Eh, what are you trying to do?");
+				logger.warning("Someone is trying to access files outside of upload directory");
+				return ResponseEntity.status(403).body("No");
 			}
 			Resource resource = new UrlResource(imagePath.toUri());
 			if (!resource.exists() || !resource.isReadable()) {
@@ -39,10 +42,8 @@ public class ImageController {
 			return ResponseEntity.ok().contentType(getMediaType(fileName)).body(resource);
 		} catch(InvalidPathException | MalformedURLException e) {
 			return ResponseEntity.status(404).body("Image not found");
-		} catch(WrongExtensionException e) {
+		} catch(WrongExtensionException | InvalidMediaTypeException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
-		} catch (InvalidMediaTypeException e) {
-				return ResponseEntity.internalServerError().body(e.getMessage());
 		}
 	}
 

@@ -2,7 +2,6 @@ package transcendence.api42_service.services;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import transcendence.api42_service.dto.EnvVariables;

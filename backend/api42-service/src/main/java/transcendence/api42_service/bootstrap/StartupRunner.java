@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import transcendence.api42_service.data_import.ProjectsUsersImport;
 import transcendence.api42_service.exception.ApiCallFailException;
 import transcendence.api42_service.exception.InvalidTokenException;
 import transcendence.api42_service.repositories.CampusRepository;
@@ -16,6 +17,8 @@ import transcendence.api42_service.services.UserProgressScoreCalculator;
 import transcendence.api42_service.services.UserRankCalculator;
 import transcendence.api42_service.services.UserTalentPointCalculator;
 
+import java.util.logging.Logger;
+
 @RequiredArgsConstructor
 @Component
 public class StartupRunner implements CommandLineRunner {
@@ -24,42 +27,52 @@ public class StartupRunner implements CommandLineRunner {
     private final CampusRepository campusRepository;
     private final ProjectsUsersRepository projectsUsersRepository;
     private final DatabaseImport databaseImport;
+    private final ProjectsUsersImport projectsUsersImport;
     private final UserRankCalculator userRankCalculator;
     private final UserProgressScoreCalculator userProgressScoreCalculator;
     private final UserTalentPointCalculator userTalentPointCalculator;
+    private final Logger logger;
 
     @Getter
     private boolean startupComplete = false;
 
-    // Hard coded Campus Lausanne id for now due to excess api call per hour for all campus
     @Override
     public void run(String @NonNull ... args) {
-        System.out.println("\nHello!");
+        System.out.println("""
+                                                                   \s
+                 _____     _ ___ ___    _____             _        \s
+                |  _  |___|_| | |_  |  |   __|___ ___ _ _|_|___ ___\s
+                |     | . | |_  |  _|  |__   | -_|  _| | | |  _| -_|
+                |__|__|  _|_| |_|___|  |_____|___|_|  \\_/|_|___|___|
+                      |_|                                          \s
+                """);
+        logger.info("Service is used to manage users data from 42. By Nguyen NGUYEN (hoannguy).");
         try {
-            System.out.println("Getting Oauth token.");
+            logger.info("Getting Oauth token.");
             oauthTokenGetter.retrieveToken();
         } catch (ApiCallFailException e) {
-            System.err.println("API error during Oauth Token request: " + e.getMessage());
+            logger.severe("API error during Oauth Token request: " + e.getMessage());
             return;
         } catch (InvalidTokenException e) {
-            System.err.println("Invalid Oauth token for api call, check uid, secret or token refresh");
+            logger.severe("Invalid Oauth token for api call, check uid, secret or token refresh");
             return;
         }
         String token = oauthTokenGetter.getToken();
+        logger.info("Fetching only Lausanne campus due to API rate limit");
         if (campusRepository.count() > 0) {
-            System.out.println("Campus database already initialized. Skip API fetch for Campus.");
+            logger.info("Campus database already initialized. Skip API fetch for Campus.");
         } else {
             databaseImport.campusDbPopulate(token);
         }
         if (userRepository.count() > 0) {
-            System.out.println("User database already initialized. Skip API fetch for User.");
+            logger.info("User database already initialized. Skip API fetch for User.");
         } else {
             databaseImport.userDbPopulate(token);
         }
         if (projectsUsersRepository.count() > 0) {
-            System.out.println("ProjectsUsers database already initialized. Skip API fetch for ProjectsUsers.");
+            logger.info("ProjectsUsers database already initialized. Skip API fetch for ProjectsUsers.");
         } else {
-            databaseImport.projectsUsersDbPopulate(token);
+            projectsUsersImport.projectsUsersDbPopulate(token);
         }
         if (userRepository.count() > 0 && projectsUsersRepository.count() > 0)  {
             userRankCalculator.calculateUserRank();
@@ -67,6 +80,6 @@ public class StartupRunner implements CommandLineRunner {
             userTalentPointCalculator.calculateUserTalentPoint();
         }
         this.startupComplete = true;
-        System.out.println("Database initialization completed");
+        logger.info("Database initialization completed");
     }
 }

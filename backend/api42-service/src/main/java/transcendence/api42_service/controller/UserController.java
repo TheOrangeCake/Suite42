@@ -10,7 +10,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,6 +25,7 @@ import transcendence.api42_service.services.FileUploadService;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @RequestMapping("v1/42users")
@@ -36,6 +36,7 @@ public class UserController {
 	private final FileUploadService fileUploadService;
 	private final UserMapper userMapper;
 	private final EnvVariables envVariables;
+	private final Logger logger;
 
 	private static final Set<String> ALL_USERS_ALLOWED_SORTS = Set.of(
 			"rank",
@@ -176,12 +177,13 @@ public class UserController {
 				}
 				user.setCustomBannerUrl(fileName);
 			} else {
+				logger.severe("Fail to upload file, something went wrong in the server.");
 				return ResponseEntity.status(500).body("Fail to upload file, something went wrong in the server.");
 			}
 			userRepository.save(user);
 			return ResponseEntity.ok(userMapper.mapToDetailedDto(user));
 		} catch(IOException | RuntimeException e) {
-			System.err.println("Fail to upload file. " + e.getMessage());
+			logger.severe("Fail to upload file. " + e.getMessage());
 			return ResponseEntity.status(500).body("Fail to upload file. Something went wrong in the server.");
 		}
 	}
@@ -213,6 +215,7 @@ public class UserController {
 			userRepository.save(user);
 			return ResponseEntity.ok(userMapper.mapToDetailedDto(user));
 		} catch(IOException e) {
+			logger.severe("Fail to delete file, something went wrong in the server.");
 			return ResponseEntity.status(500).body("Image deletion failed. Something went wrong in the server");
 		} catch(SecurityException e) {
 			return ResponseEntity.status(403).body("Access denied");

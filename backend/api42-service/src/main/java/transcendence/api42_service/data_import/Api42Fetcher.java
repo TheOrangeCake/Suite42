@@ -51,8 +51,7 @@ public class Api42Fetcher {
                 .queryParam("filter[public]", "true")
                 .build()
                 .toUri();
-        return fetch(token, uri, new ParameterizedTypeReference<>() {
-        });
+        return fetch(token, uri, new ParameterizedTypeReference<>() {});
     }
 
     public PageResult<UserRequestDto> fetchUserDtoData(String token, int page, int perPage, Long id) {
@@ -75,7 +74,6 @@ public class Api42Fetcher {
                 .queryParam("filter[campus]", campusId)
                 .build(id);
         return fetch(token, uri, new ParameterizedTypeReference<>() {});
-
     }
 
     private boolean hasNextPage(HttpHeaders headers) {

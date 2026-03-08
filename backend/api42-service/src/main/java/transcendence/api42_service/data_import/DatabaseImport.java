@@ -7,15 +7,14 @@ import transcendence.api42_service.dto.PageResult;
 import transcendence.api42_service.dto.mapper.CampusMapper;
 import transcendence.api42_service.dto.mapper.UserMapper;
 import transcendence.api42_service.entities.Campus;
-import transcendence.api42_service.entities.User;
 import transcendence.api42_service.exception.ApiCallFailException;
 import transcendence.api42_service.data_import.interfaces.EntitySaverInterface;
 import transcendence.api42_service.data_import.interfaces.PageFetcherInterface;
 import transcendence.api42_service.repositories.CampusRepository;
 import transcendence.api42_service.repositories.UserRepository;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 @Service
@@ -25,7 +24,7 @@ public class DatabaseImport {
 	private final CampusRepository campusRepository;
 	private final UserMapper userMapper;
 	private final UserRepository userRepository;
-	private final ProjectsUsersImport projectsUsersImport;
+	private final Logger logger;
 
 	public void campusDbPopulate(String token) {
 		String entityName = "CAMPUSES";
@@ -38,7 +37,7 @@ public class DatabaseImport {
 		);
 	}
 
-	private Campus getLausanneCampus() {
+	public Campus getLausanneCampus() {
 		Optional<Campus> lausanneCampusOptional = campusRepository.findByName("Lausanne");
 		return lausanneCampusOptional.orElse(null);
 	}
@@ -59,22 +58,7 @@ public class DatabaseImport {
 					userRepository::saveAll
 			);
 		} else {
-			System.out.println("There is no Lausanne campus in database, USERS database will be empty");
-		}
-	}
-
-	public void projectsUsersDbPopulate(String token) {
-		String entityName = "PROJECTS_USERS";
-
-		// Hardcoded
-		Campus lausanneCampus = getLausanneCampus();
-
-		if (userRepository.count() > 0 && lausanneCampus != null) {
-			Long lausanneCampusId = lausanneCampus.getId();
-			List<User> activeUsers = userRepository.findByActiveTrue();
-			projectsUsersImport.initialize(activeUsers, token, lausanneCampusId, entityName);
-		} else {
-			System.out.println("There is no user in the user database, PROJECTS_USERS database will be empty");
+			logger.warning("There is no Lausanne campus in database, USERS database will be empty");
 		}
 	}
 
@@ -105,7 +89,7 @@ public class DatabaseImport {
 					if (e.getStatus().value() == 429) {
 						handleRateLimit();
 					} else if (e.getStatus().value() == 401) {
-						System.err.println("Token expired, need a new token. Handle outside this method.");
+						logger.severe("Token expired, need a new token.");
 						break;
 					} else {
 						logAndStop(entityName, e);
@@ -120,20 +104,21 @@ public class DatabaseImport {
 		}
 	}
 
-	public static void handleRateLimit() {
+	public void handleRateLimit() {
 		try {
+			logger.warning("Rate limit reached, retrying after 600ms");
 			Thread.sleep(6000);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			System.err.println("Sleep interrupted, stopping initialization.");
+			logger.severe("Sleep interrupted, stopping initialization.");
 		}
 	}
 
-	public static void logAndStop(String entityName, ApiCallFailException e) {
-		System.err.printf("API error while initializing %s: %s. Stopping initialization.%n", entityName, e.getMessage());
+	public void logAndStop(String entityName, ApiCallFailException e) {
+		logger.severe("API error while initializing " + entityName + ": " + e.getMessage() + ". Initialization stopped.");
 	}
 
-	public static void logInterrupted(String entityName) {
-		System.err.printf("Initialization of %s interrupted. Stopping.%n", entityName);
+	public void logInterrupted(String entityName) {
+		logger.severe("Initialization of " + entityName + " interrupted. Stopping.");
 	}
 }

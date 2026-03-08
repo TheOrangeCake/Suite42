@@ -11,12 +11,14 @@ import transcendence.api42_service.exception.NoCommonCoreException;
 import transcendence.api42_service.repositories.UserRepository;
 
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 @Component
 public final class UserMapper {
 	private final EnvVariables envVariables;
 	private final UserRepository userRepository;
+	private final Logger logger;
 
 	public UserSimpleResponseDto mapToSimpleDto(User user) {
 		if (user == null) {
@@ -48,7 +50,7 @@ public final class UserMapper {
 		try {
 			userCommonCore = fromJson(user.getDetailedProfileJson());
 		} catch (NoCommonCoreException e) {
-			System.err.println("Invalid UserCommonCore JSON. " + e);
+			logger.warning("Invalid UserCommonCore JSON. " + e);
 		}
 		return new UserDetailedResponseDto(
 				user.getId(),

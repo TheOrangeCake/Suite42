@@ -21,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.logging.Logger;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/v1/regular-user/auth")
@@ -29,6 +31,7 @@ public class AuthController {
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
 	private final EnvVariables envVariables;
+	private final Logger logger;
 
 	@PostMapping("/signup")
 	public ResponseEntity<?> createUser(@Valid @RequestBody SignupDto signupDto) {
@@ -39,11 +42,14 @@ public class AuthController {
 			newUser.setPassword(passwordEncoder.encode(signupDto.password()));
 			newUser.setCustomAvatarUrl(envVariables.getDefaultAvatar());
 			newUser.setCustomBannerUrl(envVariables.getDefaultBanner());
-			UserDto createdUser = UserMapper.mapToResponseDto(userRepository.save(newUser), envVariables.getImageDomain());
+			userRepository.save(newUser);
+			logger.info("A new user is created. User id: " + newUser.getId());
+			UserDto createdUser = UserMapper.mapToResponseDto(newUser, envVariables.getImageDomain());
 			return ResponseEntity.ok().body(createdUser);
 		} catch (DataIntegrityViolationException e) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body("Username or Email already existed");
 		} catch (RuntimeException e) {
+			logger.severe("User creation failed: " + e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error, user creation failed. " + e.getMessage());
 		}
 	}
@@ -57,6 +63,7 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Wrong username, email or password");
 		}
 		Long userId = user.getId();
+		logger.info("User " + userId + " logged in");
 		return generateResponse(user, userId);
 	}
 
@@ -73,6 +80,7 @@ public class AuthController {
 			String currentAccessToken = jwtService.extractAccessToken(request);
 			jwtService.revokeToken(currentAccessToken, "access token");
 
+			logger.info("User " + userId + " has generated new refresh and access tokens");
 			return generateResponse(user, userId);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token: please sign in again");

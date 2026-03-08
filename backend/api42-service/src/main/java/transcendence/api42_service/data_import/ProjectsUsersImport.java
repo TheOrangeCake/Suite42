@@ -8,19 +8,41 @@ import transcendence.api42_service.data_import.interfaces.EntitySaverInterface;
 import transcendence.api42_service.data_import.interfaces.PageFetcherInterface;
 import transcendence.api42_service.dto.PageResult;
 import transcendence.api42_service.dto.mapper.ProjectsUsersMapper;
+import transcendence.api42_service.entities.Campus;
 import transcendence.api42_service.entities.User;
 import transcendence.api42_service.exception.ApiCallFailException;
 import transcendence.api42_service.repositories.ProjectsUsersRepository;
+import transcendence.api42_service.repositories.UserRepository;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 @AllArgsConstructor
 @Service
 public class ProjectsUsersImport {
 	private final ProjectsUsersRepository projectsUsersRepository;
+	private final UserRepository userRepository;
 	private final Api42Fetcher api42Fetcher;
 	private final ProjectsUsersMapper projectsUsersMapper;
+	private final DatabaseImport databaseImport;
+	private final Logger logger;
 
+
+	@Transactional
+	public void projectsUsersDbPopulate(String token) {
+		String entityName = "PROJECTS_USERS";
+
+		// Hardcoded
+		Campus lausanneCampus = databaseImport.getLausanneCampus();
+
+		if (userRepository.count() > 0 && lausanneCampus != null) {
+			Long lausanneCampusId = lausanneCampus.getId();
+			List<User> activeUsers = userRepository.findByActiveTrue();
+			initialize(activeUsers, token, lausanneCampusId, entityName);
+		} else {
+			logger.warning("There is no user in the user database, PROJECTS_USERS database will be empty");
+		}
+	}
 	@Transactional
 	public void initialize(List<User> users, String token, Long lausanneCampusId, String entityName) {
 		try (ProgressBar pb = new ProgressBar("Fetching " + entityName, users.size())) {
@@ -30,7 +52,7 @@ public class ProjectsUsersImport {
 				try {
 					initializeUserProjects(user, token, lausanneCampusId, entityName);
 				} catch (Exception e) {
-					System.err.printf("Failed to initialize projects for user %d: %s%n", userId, e.getMessage());
+					logger.severe("Failed to initialize projects for user " + userId + ": " + e.getMessage());
 				}
 			}
 		}
@@ -73,17 +95,17 @@ public class ProjectsUsersImport {
 				Thread.sleep(600);
 			} catch (ApiCallFailException e) {
 				if (e.getStatus().value() == 429) {
-					DatabaseImport.handleRateLimit();
+					databaseImport.handleRateLimit();
 				} else if (e.getStatus().value() == 401) {
-					System.err.println("Token expired, need a new token. Handle outside this method.");
+					logger.severe("Token expired, need a new token.");
 					break;
 				} else {
-					DatabaseImport.logAndStop(entityName, e);
+					databaseImport.logAndStop(entityName, e);
 					break;
 				}
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				DatabaseImport.logInterrupted(entityName);
+				databaseImport.logInterrupted(entityName);
 				break;
 			}
 		}

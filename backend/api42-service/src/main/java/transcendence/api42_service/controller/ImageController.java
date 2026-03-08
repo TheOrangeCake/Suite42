@@ -23,7 +23,6 @@ import static org.springframework.http.MediaType.parseMediaType;
 @AllArgsConstructor
 @RestController
 public class ImageController {
-
 	private final EnvVariables envVariables;
 
 	@GetMapping("/images42/{fileName}")
@@ -40,12 +39,10 @@ public class ImageController {
 			return ResponseEntity.ok().contentType(getMediaType(fileName)).body(resource);
 		} catch(InvalidPathException | MalformedURLException e) {
 			return ResponseEntity.status(404).body("Image not found");
-		} catch(WrongExtensionException e) {
+		} catch(WrongExtensionException | InvalidMediaTypeException e) {
 			return ResponseEntity.status(400).body("Bad file extension");
-		} catch (InvalidMediaTypeException e) {
-				return ResponseEntity.status(500).body("Internal server error");
 		}
-	}
+    }
 
 	private MediaType getMediaType(String fileName) {
 		String extension = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();

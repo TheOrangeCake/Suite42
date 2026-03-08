@@ -1,4 +1,4 @@
-package com.example.regular_user_service.configurations;
+package com.example.regular_user_service.config;
 
 import com.example.regular_user_service.exception.BadTokenException;
 import com.example.regular_user_service.services.JwtService;

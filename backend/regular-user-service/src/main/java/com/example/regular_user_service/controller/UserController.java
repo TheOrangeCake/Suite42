@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 @RestController
@@ -37,6 +38,7 @@ public class UserController {
 	private final PasswordEncoder passwordEncoder;
 	private final FileUploadService fileUploadService;
 	private final JwtService jwtService;
+	private final Logger logger;
 
 	@GetMapping("/profile/{id}")
 	public ResponseEntity<?> getUser(@PathVariable Long id) {
@@ -144,12 +146,13 @@ public class UserController {
 				}
 				user.setCustomBannerUrl(fileName);
 			} else {
+				logger.severe("Fail to upload file, something went wrong in the server");
 				return ResponseEntity.internalServerError().body("Fail to upload file, something went wrong in the server.");
 			}
 			userRepository.save(user);
 			return ResponseEntity.ok(UserMapper.mapToResponseDto(user, envVariables.getImageDomain()));
 		} catch (IOException | RuntimeException e) {
-			System.err.println("Fail to upload file. " + e.getMessage());
+			logger.severe("Fail to upload file. " + e.getMessage());
 			return ResponseEntity.internalServerError().body("Fail to upload file. Something went wrong in the server.");
 		}
 	}
@@ -184,11 +187,14 @@ public class UserController {
 			} else if (type.equals("avatar")) {
 				fileUploadService.deleteImage(user.getCustomAvatarUrl());
 				user.setCustomAvatarUrl(envVariables.getDefaultAvatar());
-			} else
+			} else {
+				logger.severe("Image deletion failed. Something went wrong in the server");
 				return ResponseEntity.internalServerError().body("Image deletion failed. Something went wrong in the server");
+			}
 			userRepository.save(user);
 			return ResponseEntity.ok(UserMapper.mapToResponseDto(user, envVariables.getImageDomain()));
 		} catch(IOException e) {
+			logger.severe("Image deletion failed. Error: " + e.getMessage());
 			return ResponseEntity.internalServerError().body("Image deletion failed. Something went wrong in the server");
 		} catch(SecurityException e) {
 			return ResponseEntity.status(403).body(e.getMessage());
@@ -205,6 +211,7 @@ public class UserController {
 			jwtService.validateJwtToken(currentAccessToken, "access token");
 			jwtService.revokeToken(currentAccessToken, "access token");
 			jwtService.validateJwtToken(currentRefreshToken, "refresh token");
+			long userId = Long.parseLong(jwtService.getUserId(currentRefreshToken, "refresh token"));
 			jwtService.revokeToken(currentRefreshToken, "refresh token");
 			ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "")
 					.httpOnly(true)
@@ -213,6 +220,7 @@ public class UserController {
 					.path("/")
 					.maxAge(0)
 					.build();
+			logger.info("User " + userId + " has logged out");
 			return ResponseEntity.ok()
 					.header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
 					.body("Sign out successfully");
