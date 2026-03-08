@@ -1,11 +1,24 @@
 server:
   port: 8080
+  servlet:
+    context-path: /api/auth
+    session:
+      cookie:
+        path: /
   forward-headers-strategy: framework
 
-spring:
-  application:
-    name: auth-service
+app:
+  allowed-campus-ids: [47]
 
+
+  jwt:
+    secret: ${JWT_SECRET}
+    cookie-name: access_token
+    ttl-minutes: 120
+  frontend:
+    base-url: ${FRONTEND_BASE_URL:http://localhost:8080}
+
+spring:
   security:
     oauth2:
       client:
@@ -14,17 +27,12 @@ spring:
             client-id: ${FORTYTWO_CLIENT_ID}
             client-secret: ${FORTYTWO_CLIENT_SECRET}
             authorization-grant-type: authorization_code
-            redirect-uri: ${FORTYTWO_REDIRECT_URI}
-            scope: public
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - public
         provider:
           42:
             authorization-uri: https://api.intra.42.fr/oauth/authorize
             token-uri: https://api.intra.42.fr/oauth/token
             user-info-uri: https://api.intra.42.fr/v2/me
             user-name-attribute: login
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info

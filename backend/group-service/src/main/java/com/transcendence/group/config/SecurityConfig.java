@@ -1,24 +1,10 @@
 package com.transcendence.group.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+// ✅ @Configuration supprimé pour éviter le conflit avec com.transcendence.auth.security.SecurityConfig
+// import org.springframework.context.annotation.Configuration;
 
-@Configuration
+// @Configuration
 public class SecurityConfig {
-
-  @Bean
-  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-      .csrf(csrf -> csrf.disable())
-      .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/actuator/health", "/public/**").permitAll()
-        .anyRequest().authenticated()
-      )
-      // For now: basic default security (will switch to JWT bearer next)
-      .httpBasic(basic -> {});
-
-    return http.build();
-  }
+  // Ce fichier est volontairement désactivé car on utilise
+  // com.transcendence.auth.security.SecurityConfig comme config unique.
 }
