@@ -1,5 +1,20 @@
 <script setup lang="ts">
 import logo from '/design/assets/logo/logo_full.svg'
+import { useAuthStore } from '../stores/auth'
+import { useRouter } from 'vue-router'
+import { signout } from '../api/auth'
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+async function handleLogout() {
+  try {
+    await signout()
+  } catch {
+  }
+  authStore.clearSession()
+  router.push('/login')
+}
 </script>
 
 <template>
@@ -10,7 +25,15 @@ import logo from '/design/assets/logo/logo_full.svg'
 
     <div class="menu">
       <RouterLink to="/campuses" class="campuses">Campuses</RouterLink>
-      <RouterLink to="/login" class="signin">Sign in</RouterLink>
+
+      <!-- Si connecté : affiche username + logout -->
+      <template v-if="authStore.isLoggedIn">
+        <span class="username">{{ authStore.user?.username }}</span>
+        <button class="btnLogout" @click="handleLogout">Log out</button>
+      </template>
+
+      <!-- Si pas connecté : affiche Sign in -->
+      <RouterLink v-else to="/login" class="signin">Sign in</RouterLink>
     </div>
   </div>
 </template>
@@ -23,20 +46,15 @@ import logo from '/design/assets/logo/logo_full.svg'
 .nav {
   display: flex;
   align-items: center;
-
   padding-left: 5%;
   padding-top: 3%;
   padding-right: 5%;
 }
-
-
 .campuses {
   font-family: monda;
   color: #111;
   font-size: 15px;
-
 }
-
 .menu {
   margin-left: auto;
   display: flex;
@@ -55,5 +73,21 @@ import logo from '/design/assets/logo/logo_full.svg'
   text-decoration: none;
   font-weight: 500;
 }
+.username {
+  font-family: monda;
+  color: #111;
+  font-size: 15px;
+  font-weight: 600;
+}
+.btnLogout {
+  padding: 10px 10px;
+  background-color: #202020;
+  border: none;
+  border-radius: 3px;
+  font-family: monda;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+}
+.btnLogout:hover { opacity: 0.8; }
 </style>
-

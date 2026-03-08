@@ -1,20 +1,36 @@
 <template>
   <v-app class="app-root">
+    <Navbar v-if="!isDashboardRoute" />
     <router-view/>
+    <AppFooter v-if="!isDashboardRoute" />
   </v-app>
 </template>
 
-<style>
-.app-root {
-  background: white !important;
-  color: black;
-  min-height: 100vh;
-  overflow-x: hidden; /* empêche le scroll horizontal */
-}
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { onMounted } from 'vue'
+import { refreshToken } from './api/auth'
+import { useAuthStore } from './stores/auth'
 
-.v-application__wrap {
-  min-height: unset !important;
-  padding: 0 !important;
-}
-</style>
+const authStore = useAuthStore()
+const route = useRoute()
 
+const dashboardRoutes = ['/profile', '/finder', '/home', '/chat', '/tasks', '/projects']
+
+const isDashboardRoute = computed(() =>
+  dashboardRoutes.includes(route.path)
+)
+
+onMounted(async () => {
+  try {
+    authStore.loadFromStorage()
+    const user = await refreshToken()
+    authStore.setSession(user, authStore.accessToken!)
+  } catch {
+    authStore.clearSession()
+  } finally {
+    authStore.setAuthReady()
+  }
+})
+</script>

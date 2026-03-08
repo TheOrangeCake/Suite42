@@ -1,51 +1,46 @@
 import { defineStore } from 'pinia'
-import * as authApi from '@/api/auth'
-import { UnauthenticatedError } from '@/api/errors'
+
+export interface User {
+  id: number
+  username: string
+  email: string
+  custom_avatar_url: string
+  custom_banner_url: string
+  first_name: string | null
+  last_name: string | null
+}
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null as null | authApi.User,
-    loading: false,
+    user: null as User | null,
+    accessToken: null as string | null,
+    authReady: false,
   }),
 
   getters: {
-    isAuthenticated: (state) => state.user !== null,
+    isLoggedIn: (state) => !!state.user && !!state.accessToken,
   },
 
   actions: {
-async fetchUser() {
-    this.loading = true
-    try {
-      this.user = await authApi.me()
-    } catch (err) {
-      if (err instanceof UnauthenticatedError) {
-        this.user = null
-      } else {
-        throw err
-      }
-    } finally {
-      this.loading = false
-    }
-  },
+    setSession(user: User, token: string) {
+      this.user = user
+      this.accessToken = token
+      sessionStorage.setItem('access_token', token)
+    },
 
-  async login(username: string, password: string) {
-    this.loading = true
-    try {
-      await authApi.login(username, password)
-      await this.fetchUser()
-    } finally {
-      this.loading = false
-    }
+  setAuthReady() {
+    this.authReady = true
   },
-
-    async logout() {
-    try {
-      await authApi.logout()
-    } finally {
+    clearSession() {
       this.user = null
-    }
-  }
+      this.accessToken = null
+      sessionStorage.removeItem('access_token')
+    },
 
+    loadFromStorage() {
+      const token = sessionStorage.getItem('access_token')
+      if (token) this.accessToken = token
+        console.log('loadFromStorage')
+    },
   },
 })
-

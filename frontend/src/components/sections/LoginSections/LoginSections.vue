@@ -1,18 +1,23 @@
 <script setup lang="ts">
 import Corner from '../../ui/Corner.vue'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const emit = defineEmits(['login42', 'loginPublic', 'signup'])
-
+const emit = defineEmits(['login', 'login42'])
 const username = ref('')
 const password = ref('')
 
-function handlePublicLogin() {
-  emit('loginPublic', { username: username.value, password: password.value })
+const props = defineProps<{
+  isLoading?: boolean
+  errorMessage?: string
+}>()
+
+
+function handleLogin() {
+  emit('login', { username: username.value, password: password.value })
 }
 
 
-import { useRouter } from 'vue-router'
 
 const router = useRouter();
 </script>
@@ -20,17 +25,14 @@ const router = useRouter();
 <template>
   <section class="container2">
 
-    <!-- Titre principal -->
     <h1 class="headline">Let's get productive !</h1>
 
     <div class="body">
 
-      <!-- Colonne gauche : formulaires -->
       <div class="leftCol">
 
           <div class="sections">
 
-            <!-- 42 Student login -->
             <div class="loginBlock">
               <div class="blockTitle">
                 <Corner :vSize="64" :hSize="26" :thickness="5" color="var(--color-coral, #FF5959)" />
@@ -44,7 +46,6 @@ const router = useRouter();
                 </button>
               </div>
 
-            <!-- Public login -->
             <div class="loginBlock">
               <div class="blockTitle">
 
@@ -75,9 +76,15 @@ const router = useRouter();
                     />
                   </div>
 
-                  <button class="btnLogin" @click="handlePublicLogin">
-                    Log in
-                  </button>
+              <p v-if="errorMessage" class="errorMsg">{{ errorMessage }}</p>
+
+            <button
+              class="btnLogin"
+              @click="handleLogin"
+              :disabled="isLoading"
+              >
+              {{ isLoading ? 'Connexion...' : 'Log in' }}
+            </button>
                 </div>
               </div>
             </div>
@@ -85,7 +92,6 @@ const router = useRouter();
           </div>
         </div>
 
-        <!-- Sign up en dehors de la ligne rouge -->
         <div class="signupRow">
           <p class="signupText">
             No account ?
@@ -95,7 +101,6 @@ const router = useRouter();
 
       </div>
 
-      <!-- Colonne droite : illustration -->
       <div class="rightCol">
         <img
           src="/design/assets/images/sign_in_illustration.png"
@@ -109,6 +114,18 @@ const router = useRouter();
 </template>
 
 <style scoped>
+
+.errorMsg {
+  color: #FF5959;
+  font-size: 0.8rem;
+  font-family: Monda, system-ui, sans-serif;
+  margin: 0;
+}
+
+.btnLogin:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 * { box-sizing: border-box; }
 
 .container2 {
