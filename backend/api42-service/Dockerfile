@@ -17,5 +17,5 @@ RUN mkdir -p /app/uploads && \
 COPY --from=build /app/target/*.jar /opt/app/app.jar
 COPY --chown=spring:spring src/main/resources/static/default_images /opt/app/default_images
 USER spring
-EXPOSE 4444
+EXPOSE 8084
 ENTRYPOINT ["java", "-jar", "/opt/app/app.jar"]
