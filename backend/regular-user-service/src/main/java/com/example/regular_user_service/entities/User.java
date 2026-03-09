@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -45,4 +47,13 @@ public class User {
 
 	@Column(name = "last_name")
 	private String lastName;
+
+	@Column(name = "login_attempt")
+	private int loginAttempt = 0;
+
+	@Column(name = "2FA")
+	private boolean doubleAuth = false;
+
+	@Column(name = "created_at")
+	private Date createdAt;
 }

@@ -7,6 +7,7 @@ public record UserDto(
 	String custom_avatar_url,
 	String custom_banner_url,
 	String first_name,
-	String last_name
+	String last_name,
+	boolean double_authentication
 ) {
 }

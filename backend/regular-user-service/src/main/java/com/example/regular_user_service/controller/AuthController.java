@@ -1,14 +1,13 @@
 package com.example.regular_user_service.controller;
 
-import com.example.regular_user_service.dto.SignInDto;
-import com.example.regular_user_service.dto.SignupDto;
-import com.example.regular_user_service.dto.UserDto;
+import com.example.regular_user_service.dto.*;
 import com.example.regular_user_service.dto.mapper.UserMapper;
 import com.example.regular_user_service.entities.User;
 import com.example.regular_user_service.exception.BadTokenException;
 import com.example.regular_user_service.repositories.UserRepository;
+import com.example.regular_user_service.services.EmailService;
 import com.example.regular_user_service.services.JwtService;
-import com.example.regular_user_service.dto.EnvVariables;
+import com.google.common.cache.LoadingCache;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +20,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Date;
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 @RequiredArgsConstructor
@@ -32,6 +35,8 @@ public class AuthController {
 	private final JwtService jwtService;
 	private final EnvVariables envVariables;
 	private final Logger logger;
+	private final LoadingCache<String, Integer> otpCache;
+	private final EmailService emailService;
 
 	@PostMapping("/signup")
 	public ResponseEntity<?> createUser(@Valid @RequestBody SignupDto signupDto) {
@@ -42,6 +47,8 @@ public class AuthController {
 			newUser.setPassword(passwordEncoder.encode(signupDto.password()));
 			newUser.setCustomAvatarUrl(envVariables.getDefaultAvatar());
 			newUser.setCustomBannerUrl(envVariables.getDefaultBanner());
+			newUser.setDoubleAuth(false);
+			newUser.setCreatedAt(new Date());
 			userRepository.save(newUser);
 			logger.info("A new user is created. User id: " + newUser.getId());
 			UserDto createdUser = UserMapper.mapToResponseDto(newUser, envVariables.getImageDomain());
@@ -63,8 +70,66 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Wrong username, email or password");
 		}
 		Long userId = user.getId();
-		logger.info("User " + userId + " logged in");
-		return generateResponse(user, userId);
+		user.setLoginAttempt(0);
+		userRepository.save(user);
+		if (user.isDoubleAuth()) {
+			sendOtp(user);
+			return ResponseEntity.accepted().body("2FA email sent to user. Call /v1/regular-user/auth/verify-otp with email and otp to login.");
+		} else {
+			logger.info("User " + userId + " logged in");
+			return generateResponse(user, userId);
+		}
+	}
+
+	private void sendOtp(User user) {
+		otpCache.invalidate(user.getEmail());
+		int otp = new Random().nextInt(900000) + 100000;
+		otpCache.put(user.getEmail(), otp);
+		CompletableFuture.supplyAsync(() -> {
+			try {
+				emailService.sendEmail(user.getEmail(), "2FA: Request to log in to your account", "One Time Password (valid 5 minutes): " + otp);
+				return HttpStatus.OK;
+			} catch (Exception e) {
+				logger.severe("Failed to send OTP email to " + user.getEmail() + ": " + e.getMessage());
+				return HttpStatus.INTERNAL_SERVER_ERROR;
+			}
+		}).thenAccept(status -> {
+			if (status == HttpStatus.OK) {
+				logger.info("2FA email sent to user " + user.getId());
+			} else {
+				logger.severe("Failed to send OTP email to " + user.getEmail());
+			}
+		});
+	}
+
+	@PostMapping("/verify-otp")
+	public ResponseEntity<?> verifyOtp(@Valid @RequestBody OtpDto otpDto) {
+		User user = userRepository.findUserByEmail(otpDto.email())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email not existed."));
+		long userId = user.getId();
+		Integer storedOtp;
+		try {
+			storedOtp = otpCache.get(user.getEmail());
+		} catch (ExecutionException e) {
+			logger.severe("Failed to retrieve OTP from cache for email: " + user.getEmail() + ". Error: " + e.getMessage());
+			return ResponseEntity.internalServerError().body("Something wrong with the server, please try again later.");
+		}
+		if (storedOtp.equals(otpDto.otp())) {
+			otpCache.invalidate(user.getEmail());
+			logger.info("User " + userId + " logged in");
+			user.setLoginAttempt(0);
+			userRepository.save(user);
+			return generateResponse(user, userId);
+		} else {
+			int loginAttempts = user.getLoginAttempt();
+			if (loginAttempts > 5) {
+				otpCache.invalidate(user.getEmail());
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Max 5 attempts reached. Please log in again.");
+			}
+			user.setLoginAttempt(loginAttempts + 1);
+			userRepository.save(user);
+			return ResponseEntity.badRequest().body("Invalid or expired OTP.");
+		}
 	}
 
 	@GetMapping("/refresh-token")

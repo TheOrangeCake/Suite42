@@ -50,6 +50,12 @@ docker run --env-file .env -p 4445:4445 regular-user-service</pre>
               <li>email</li>
               <li>password</li>
             </ul></li>
+        <li>Response code:
+          <ul>
+            <li>200: New user created.</li>
+            <li>409: Username or email already existed.</li>
+            <li>500: Something wrong in the server.</li>
+          </ul></li>
         <li>Examples:
           <ul>
             <li><pre>/v1/regular-user/auth/signup</pre></li>
@@ -74,7 +80,8 @@ Body:
     "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
     "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
     "first_name": null,
-    "last_name": null
+    "last_name": null,
+    "double_authentication": false
 }</code></pre>
               </li>
             </ul>
@@ -86,10 +93,17 @@ Body:
       <summary><code>POST /v1/regular-user/auth/signin</code></summary>
       <ul>
         <li>Description: Sign in using either username or email.</li>
+        <li>2FA: if 2FA is enabled, an email with One Time Password (OTP) will be sent to user. Response code 202.</li>
         <li>Payload: 
             <ul>
               <li>login</li>
               <li>password</li>
+            </ul></li>
+        <li>Response code:
+            <ul>
+              <li>200: Signed in ok.</li>
+              <li>202: Need 2FA.</li>
+              <li>401: Wrong credentials.</li>
             </ul></li>
         <li>Examples:
           <ul>
@@ -106,7 +120,7 @@ Body:
     "login": "test@gmail.com",
     "password": "Test1234"
 }</pre></li>
-              <li>Response:
+              <li>Response without 2FA (code 200):
                 <pre><code class="language-json">{
     "id": 1,
     "username": "test",
@@ -114,8 +128,12 @@ Body:
     "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
     "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
     "first_name": null,
-    "last_name": null
+    "last_name": null,
+    "double_authentication": false
 }</code></pre>
+              </li>
+              <li>Response with 2FA (code 202):
+                <pre>2FA email sent to user. Call /v1/regular-user/auth/verify-otp with email and otp to login.</pre>
               </li>
             </ul>
           </details>
@@ -129,6 +147,11 @@ Body:
         <li>How this work: User needs to have a valid refresh token and an access token (can be expired).
             <br>Access token is short-lived token (15min) used to verify user identity. It is verified for every request. Once access token expired, call this end point to get another access token.
             <br>Refresh token is long-lived token (7days) used to manage user session and renew access token. If refresh token is invalid (expired or tampered), refresh request will be rejected and user will need to sign in again.
+        <li>Response code:
+          <ul>
+            <li>200: Ok.</li>
+            <li>401: Bad tokens.</li>
+          </ul></li>
         <li>Examples:
           <ul>
             <li><pre>/v1/regular-user/auth/refresh-token</pre></li>
@@ -147,7 +170,56 @@ Body:
     "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
     "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
     "first_name": null,
-    "last_name": null
+    "last_name": null,
+    "double_authentication": false
+}</code></pre>
+              </li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+    </details>
+    <details>
+      <summary><code>GET /v1/regular-user/auth/verify-otp</code></summary>
+      <ul>
+        <li>Description: Verify OTP if 2FA enabled.</li>
+        <li>How this work: When user signed in with 2FA enabled (code 202 when sign in). An email will be sent to user with OTP code (6 numbers). This code is valid for 5 minutes.
+            <br>Frontend should check if response code is 202, if it is the case, then prompt user to enter the OTP code received by email.
+            <br>The code should be sent to <code>/v1/regular-user/auth/verify-otp</code>
+            <br>Max 5 tries (401 when try 6th times), frontend should prompt user to sign in again.
+        <li>Payload:
+            <ul>
+              <li>email</li>
+              <li>otp</li>
+            </ul>
+        </li>
+        <li>Response code:
+            <ul>
+              <li>200: Ok. User is now logged in.</li>
+              <li>401: Email not exist or max attempts reached.</li>
+              <li>400: Bad or expired OTP.</li>
+              <li>500: Server error, try again later.</li>
+            </ul></li>
+        <li>Examples:
+          <ul>
+            <li><pre>/v1/regular-user/auth/verify-otp</pre></li>
+          </ul>
+        </li>
+        <li>
+          <details>
+            <summary>Json response example:</summary>
+            <ul>
+              <li>Request:<pre>/v1/regular-user/auth/verify-otp</pre></li>
+              <li>Response:
+                <pre><code class="language-json">{
+    "id": 1,
+    "username": "test",
+    "email": "test@gmail.com",
+    "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
+    "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
+    "first_name": null,
+    "last_name": null,
+    "double_authentication": true
 }</code></pre>
               </li>
             </ul>
@@ -181,7 +253,8 @@ Body:
   "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
   "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
   "first_name": null,
-  "last_name": null
+  "last_name": null,
+  "double_authentication": false
 } </code></pre>
               </li>
             </ul>
@@ -211,7 +284,8 @@ Body:
   "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
   "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
   "first_name": null,
-  "last_name": null
+  "last_name": null,
+  "double_authentication": false
 } </code></pre>
               </li>
             </ul>
@@ -228,6 +302,7 @@ Body:
               <li>Email</li>
               <li>first_name</li>
               <li>last_name</li>
+              <li>double_authentication</li>
               <li>confirm_password</li>
             </ul></li>
         <li>Examples:
@@ -245,6 +320,7 @@ Body:
     "email": "test@gmail.com",
     "first_name": "Nguyen",
     "last_name": "NGUYEN",
+    "double_authentication": true,
     "confirm_password": "Test1234"
 }</pre></li>
               <li>Response:
@@ -255,7 +331,8 @@ Body:
     "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
     "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
     "first_name": "Nguyen",
-    "last_name": "NGUYEN"
+    "last_name": "NGUYEN",
+    "double_authentication": true
 } </code></pre>
               </li>
             </ul>
@@ -483,6 +560,8 @@ erDiagram
         String custom_banner
         String first_name
         String last_name
+        int login_attempt
+        boolean 2FA
   }
      
     REVOKED_TOKEN {
@@ -498,6 +577,7 @@ erDiagram
 * [Learn Spring boot](https://www.codecademy.com/learn/paths/create-rest-apis-with-spring-and-java)
 * [Spring annotation cheat sheets](https://github.com/Elma-dev/Spring_Boot_Annotations_Cheat_sheet?tab=readme-ov-file)
 * [JJWT for Java JWT library](https://github.com/jwtk/jjwt)
+* [2FA guide](https://howtodoinjava.com/spring-security/2fa-auth-with-jwt-token/)
 * [Mermaids ERD tool](https://www.mermaidchart.com/)
 * [Java language resources](https://www.baeldung.com/)
 * [Mistral - Used as learning tool and occasional debug](https://mistral.ai/)

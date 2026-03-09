@@ -68,8 +68,13 @@ public class UserController {
 		} else if (!info.email().equals(user.getEmail())) {
 			user.setEmail(info.email());
 		}
-		user.setFirstName(info.first_name());
-		user.setLastName(info.last_name());
+		if (info.first_name() != null) {
+			user.setFirstName(info.first_name());
+		}
+		if (info.last_name() != null) {
+			user.setLastName(info.last_name());
+		}
+		user.setDoubleAuth(info.double_authentication());
 		userRepository.save(user);
 		return ResponseEntity.ok(UserMapper.mapToResponseDto(user, envVariables.getImageDomain()));
 	}
@@ -220,7 +225,7 @@ public class UserController {
 					.path("/")
 					.maxAge(0)
 					.build();
-			logger.info("User " + userId + " has logged out");
+			logger.info("User " + userId + " logged out");
 			return ResponseEntity.ok()
 					.header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
 					.body("Sign out successfully");

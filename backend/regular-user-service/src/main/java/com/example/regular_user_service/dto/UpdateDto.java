@@ -9,6 +9,7 @@ public record UpdateDto(
 		String email,
 		String first_name,
 		String last_name,
+		boolean double_authentication,
 		@NotBlank(message="Password can not be blank")
 		String confirm_password
 ) {

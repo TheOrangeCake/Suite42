@@ -12,7 +12,8 @@ public class UserMapper {
 				imageDomain + user.getCustomAvatarUrl(),
 				imageDomain + user.getCustomBannerUrl(),
 				user.getFirstName(),
-				user.getLastName()
+				user.getLastName(),
+				user.isDoubleAuth()
 		);
 	}
 }

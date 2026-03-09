@@ -3,3 +3,5 @@ infra/nginx/*.pem
 frontend/src/megasync-x86_64.pkg.tar.zst
 frontend/src/pages/save.txt
 frontend/src/pages/around
+.idea
+.vscode
