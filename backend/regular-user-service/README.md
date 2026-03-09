@@ -564,7 +564,7 @@ erDiagram
         String first_name
         String last_name
         int login_attempt
-        boolean 2FA
+        boolean twoFA
   }
      
     REVOKED_TOKEN {
