@@ -41,7 +41,7 @@ public class JwtService {
 	public String generateTokenForTest(String username) {
     return Jwts.builder()
             .setClaims(new HashMap<>())
-            .setSubject(username) // C'est ici qu'on met "Alice" ou "Bob"
+            .setSubject(username) 
             .setIssuedAt(new Date(System.currentTimeMillis()))
             .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // Valide 10 heures
             .signWith(getSignInKey(), io.jsonwebtoken.SignatureAlgorithm.HS256)
