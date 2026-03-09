@@ -2,14 +2,18 @@
 import logo from '/design/assets/logo/logo_full.svg'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
-import { signout } from '../api/auth'
+import { signout, logout42 } from '../api/auth'
 
 const authStore = useAuthStore()
 const router = useRouter()
 
 async function handleLogout() {
   try {
-    await signout()
+    if (authStore.user42) {
+      await logout42()
+    } else {
+      await signout()
+    }
   } catch {
   }
   authStore.clearSession()
@@ -28,7 +32,7 @@ async function handleLogout() {
 
       <!-- Si connecté : affiche username + logout -->
       <template v-if="authStore.isLoggedIn">
-        <span class="username">{{ authStore.user?.username }}</span>
+        <span class="username">{{ authStore.displayName }}</span>
         <button class="btnLogout" @click="handleLogout">Log out</button>
       </template>
 

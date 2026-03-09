@@ -50,6 +50,7 @@ services:
       FORTYTWO_CLIENT_SECRET: ${FORTYTWO_CLIENT_SECRET}
       FORTYTWO_REDIRECT_URI: ${FORTYTWO_REDIRECT_URI}
       JWT_SECRET: ${JWT_SECRET}
+      FRONTEND_BASE_URL: ${FRONTEND_BASE_URL}
     depends_on:
       postgres:
         condition: service_healthy

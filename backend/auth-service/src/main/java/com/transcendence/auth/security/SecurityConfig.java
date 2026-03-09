@@ -20,11 +20,13 @@ public class SecurityConfig {
     http
       .csrf(csrf -> csrf.disable())
       .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/public/**", "/oauth2/**", "/login/**", "/debug/**", "/me").permitAll()
+        .requestMatchers("/public/**", "/oauth2/**", "/login/**", "/debug/**", "/me", "/callback").permitAll()
         .anyRequest().authenticated()
       )
-      // ✅ IMPORTANT: on force l'utilisation de TON handler
-      .oauth2Login(oauth -> oauth.successHandler(fortyTwoSuccessHandler))
+      .oauth2Login(oauth -> oauth
+        .successHandler(fortyTwoSuccessHandler)
+        .redirectionEndpoint(endpoint -> endpoint.baseUri("/callback"))
+      )
       .logout(logout -> logout.logoutUrl("/logout"));
 
     return http.build();

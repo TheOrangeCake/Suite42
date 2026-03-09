@@ -8,13 +8,14 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { onMounted } from 'vue'
-import { refreshToken } from './api/auth'
+import { refreshToken, getMe42 } from './api/auth'
 import { useAuthStore } from './stores/auth'
 
 const authStore = useAuthStore()
 const route = useRoute()
+const router = useRouter()
 
 const dashboardRoutes = ['/profile', '/finder', '/home', '/chat', '/tasks', '/projects']
 
@@ -28,7 +29,19 @@ onMounted(async () => {
     const user = await refreshToken()
     authStore.setSession(user, authStore.accessToken!)
   } catch {
-    authStore.clearSession()
+    try {
+      const me = await getMe42()
+      if (me.authenticated) {
+        authStore.setSession42({ login: me.sub })
+        if (router.currentRoute.value.path === '/') {
+          router.push('/profile')
+        }
+      } else {
+        authStore.clearSession()
+      }
+    } catch {
+      authStore.clearSession()
+    }
   } finally {
     authStore.setAuthReady()
   }

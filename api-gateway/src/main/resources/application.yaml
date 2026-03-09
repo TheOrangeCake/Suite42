@@ -21,8 +21,7 @@ spring:
               uri: http://auth-service:8081
               predicates:
                 - Path=/api/auth/**
-              filters:
-                - StripPrefix=2
+              filters: []
 
             - id: group-service
               uri: http://group-service:8083
