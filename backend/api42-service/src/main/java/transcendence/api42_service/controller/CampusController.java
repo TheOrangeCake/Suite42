@@ -19,7 +19,7 @@ import transcendence.api42_service.repositories.CampusRepository;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@RequestMapping("v1/campuses")
+@RequestMapping("v1/api42/campuses")
 @AllArgsConstructor
 @RestController
 public class CampusController {

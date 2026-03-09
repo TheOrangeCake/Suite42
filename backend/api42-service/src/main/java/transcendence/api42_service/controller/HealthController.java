@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 @Slf4j
 @RestController
-@RequestMapping("/v1/health")
+@RequestMapping("/v1/api42/health")
 @AllArgsConstructor
 public class HealthController {
 	private final OauthTokenGetter oauthTokenGetter;

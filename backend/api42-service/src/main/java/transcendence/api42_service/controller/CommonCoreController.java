@@ -10,7 +10,7 @@ import transcendence.api42_service.dto.mapper.CommonCoreMapper;
 import transcendence.api42_service.repositories.ProjectRepository;
 
 
-@RequestMapping("v1/commoncore")
+@RequestMapping("v1/api42/commoncore")
 @AllArgsConstructor
 @RestController
 public class CommonCoreController {

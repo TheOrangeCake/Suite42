@@ -154,6 +154,7 @@ services:
       API42_UID: ${API42_UID}
       API42_SECRET: ${API42_SECRET}
       API42_NEXT_SECRET: ${API42_NEXT_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
     volumes:
       - api42-images:/app/uploads
     depends_on:

@@ -10,12 +10,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import transcendence.api42_service.dto.EnvVariables;
 import transcendence.api42_service.dto.UserDetailedResponseDto;
 import transcendence.api42_service.dto.UserSimpleResponseDto;
+import transcendence.api42_service.exception.BadTokenException;
 import transcendence.api42_service.exception.DeleteDefaultException;
 import transcendence.api42_service.repositories.specification.UserSpecifications;
 import transcendence.api42_service.dto.mapper.UserMapper;
@@ -63,7 +66,7 @@ public class UserController {
 				.collect(Collectors.collectingAndThen(
 						Collectors.toList(),
 						orders -> orders.isEmpty()
-								? Sort.by("rank")
+								? Sort.by("performanceScore")
 								: Sort.by(orders)
 				));
 		Pageable safePageable = PageRequest.of(
@@ -84,7 +87,7 @@ public class UserController {
 				.map(userMapper::mapToSimpleDto);
 	}
 
-	@GetMapping("/{id}/profile")
+	@GetMapping("/profile/{id}")
 	public UserDetailedResponseDto getUserById(@PathVariable Long id) {
 		User user = this.userRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -119,10 +122,37 @@ public class UserController {
 		return usersPage.map(userMapper::mapToSimpleDto);
 	}
 
-	// TODO: Validate user with JWT
-	@PatchMapping("/{id}/lfg")
-	public ResponseEntity<?> modifyLFG(@PathVariable Long id, @RequestParam String lfg) {
-		User user = this.userRepository.findById(id)
+	private Long getUserId() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || authentication.getPrincipal() == null) {
+			throw new BadTokenException("Invalid access token: User Id not found");
+		}
+		return Long.parseLong(authentication.getPrincipal().toString());
+	}
+
+	@GetMapping("/profile")
+	public ResponseEntity<?> getUserProfile() {
+		Long userId;
+		try {
+			userId = getUserId();
+		} catch (BadTokenException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		return ResponseEntity.ok(userMapper.mapToDetailedDto(user));
+	}
+
+
+	@PatchMapping("/lfg")
+	public ResponseEntity<?> modifyLFG(@RequestParam String lfg) {
+		Long userId;
+		try {
+			userId = getUserId();
+		} catch (BadTokenException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 		if (lfg.equals("none")) {
 			user.setLfg(lfg);
@@ -139,23 +169,27 @@ public class UserController {
 		return ResponseEntity.status(400).body("Invalid lfg project. Only eligible projects or none are accepted.");
 	}
 
-	// TODO: Validate user with JWT
-	@PatchMapping("/{id}/avatar")
-	public ResponseEntity<?> modifyAvatar(@PathVariable Long id, @RequestParam("avatar") MultipartFile avatar, HttpServletRequest request) {
-			return modifyImage(id, avatar, request, "avatar");
+	@PatchMapping("/avatar")
+	public ResponseEntity<?> modifyAvatar(@RequestParam("avatar") MultipartFile avatar, HttpServletRequest request) {
+			return modifyImage(avatar, request, "avatar");
 	}
 
-	// TODO: Validate user with JWT
-	@PatchMapping("/{id}/banner")
-	public ResponseEntity<?> modifyBanner(@PathVariable Long id, @RequestParam("banner") MultipartFile banner, HttpServletRequest request) {
-		return modifyImage(id, banner, request, "banner");
+	@PatchMapping("/banner")
+	public ResponseEntity<?> modifyBanner(@RequestParam("banner") MultipartFile banner, HttpServletRequest request) {
+		return modifyImage(banner, request, "banner");
 	}
 
-	private ResponseEntity<?> modifyImage(Long id, MultipartFile image, HttpServletRequest request, String type) {
+	private ResponseEntity<?> modifyImage(MultipartFile image, HttpServletRequest request, String type) {
 		if (!request.getContentType().startsWith("multipart/form-data")) {
 			return ResponseEntity.status(400).body("Request must be multipart/form-data");
 		}
-		User user = this.userRepository.findById(id)
+		Long userId;
+		try {
+			userId = getUserId();
+		} catch (BadTokenException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 		if (image.isEmpty() || !fileUploadService.isImage(image)) {
 			return ResponseEntity.status(400).body("Invalid file or no Content-Type header");
@@ -188,20 +222,24 @@ public class UserController {
 		}
 	}
 
-	// TODO: Validate user with JWT
-	@DeleteMapping("/{id}/avatar")
-	public ResponseEntity<?> deleteAvatar(@PathVariable Long id) {
-		return deleteImage(id, "avatar");
+	@DeleteMapping("/avatar")
+	public ResponseEntity<?> deleteAvatar() {
+		return deleteImage("avatar");
 	}
 
-	// TODO: Validate user with JWT
-	@DeleteMapping("/{id}/banner")
-	public ResponseEntity<?> deleteBanner(@PathVariable Long id) {
-		return deleteImage(id, "banner");
+	@DeleteMapping("/banner")
+	public ResponseEntity<?> deleteBanner() {
+		return deleteImage("banner");
 	}
 
-	private ResponseEntity<?> deleteImage(Long id, String type) {
-		User user = this.userRepository.findById(id)
+	private ResponseEntity<?> deleteImage(String type) {
+		Long userId;
+		try {
+			userId = getUserId();
+		} catch (BadTokenException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 		try {
 			if (type.equals("banner")) {

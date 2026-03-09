@@ -54,7 +54,7 @@ Currently only support Lausanne campus
     <details>
       <summary><code>GET /v1/42users</code></summary>
       <ul>
-        <li>Description: Get all users active, non alumni and rank between 0 and 6.</li>
+        <li>Description: Get all users active, non alumni and rank between 0 and 6.<br>Require authenticated.</li>
         <li>Filter:
           <ul>
             <li><code>campusName</code> (mandatory, Lausanne only)</li>
@@ -70,7 +70,7 @@ Currently only support Lausanne campus
           <ul>
             <li><code>poolYear</code></li>
             <li><code>rank</code></li>
-            <li><code>performanceScore</code></li>
+            <li><code>performanceScore</code> <i>(default)</i></li>
             <li><code>rankProgressPercent</code></li>
           </ul>
         </li>
@@ -159,15 +159,15 @@ Currently only support Lausanne campus
       </ul>
     </details>
     <details>
-      <summary><code>GET /v1/42users/{id}/profile</code></summary>
+      <summary><code>GET /v1/42users/profile/{id}</code></summary>
       <ul>
-        <li>Description: Get a user by id.</li>
-        <li>Example<pre>/v1/42users/111111/profile</pre></li>
+        <li>Description: Get a user by id.<br>Require authenticated.</li>
+        <li>Example<pre>/v1/42users/profile/111111</pre></li>
         <li>
           <details>
             <summary>Json response example</summary>
             <ul>
-              <li>Request:<pre>/v1/42users/111111/profile</pre></li>
+              <li>Request:<pre>/v1/42users/profile/111111</pre></li>
               <li>Response:
                 <pre><code class="language-json">
                   {
@@ -255,7 +255,7 @@ Currently only support Lausanne campus
     <details>
       <summary><code>GET /v1/42users/last_name/{lastName}</code></summary>
       <ul>
-        <li>Description: Get all users by last name. Name is case-sensitive.</li>
+        <li>Description: Get all users by last name. Name is case-sensitive.<br>Require authenticated.</li>
         <li>No filter and no sorting.</li>
 		<li>Paging:
           <ul>
@@ -335,7 +335,7 @@ Currently only support Lausanne campus
     <details>
       <summary><code>GET /v1/42users/first_name/{firstName}</code></summary>
       <ul>
-        <li>Description: Get all users by first name. Name is case-sensitive.</li>
+        <li>Description: Get all users by first name. Name is case-sensitive.<br>Require authenticated.</li>
         <li>No filter and not sorting.</li>
 		<li>Paging:
           <ul>
@@ -411,9 +411,103 @@ Currently only support Lausanne campus
       </ul>
     </details>
     <details>
-      <summary><code>PATCH v1/42users/{id}/lfg?lfg={eligibleProject}</code> Attention: {id} will be deleted and user will be validated with JWT instead.</summary>
+      <summary><code>GET /v1/42users/profile</code></summary>
       <ul>
-        <li>Description: Update user LFG project.<br>Note: query lfg={eligibleProject] is mandatory.</li>
+        <li>Description: Get current user profile.<br>Require authenticated.</li>
+        <li>Example<pre>/v1/42users/profile</pre></li>
+        <li>
+          <details>
+            <summary>Json response example</summary>
+            <ul>
+              <li>Request:<pre>/v1/42users/profile</pre></li>
+              <li>Response:
+                <pre><code class="language-json">
+                  {
+                    "id": 111111,
+                    "campus": "Lausanne",
+                    "email": "email@student.42lausanne.ch",
+                    "login": "userLogin",
+                    "first_name": "User First Name",
+                    "last_name": "User Last Name",
+                    "intra_url": "https://intra.42.fr/users/userLogin",
+					"custom_avatar_url": null,
+					"custom_banner_url": "http://localhost:4444/images42/default_profile_banner.jpg",
+                    "image": {
+                      "link": "url to original user photo",
+                      "versions": {
+                        "large": "url to large user photo",
+                        "medium": "url to medium user photo",
+                        "small": "url to small user photo",
+                        "micro": "url to micro user photo"
+                      }
+                    },
+                    "pool_month": "june",
+                    "pool_year": "2024",
+                    "alumni": false,
+                    "active": true,
+                    "rank": 6,
+                    "rank_progress_percent": 0,
+                    "performance_score" : 42,
+                    "lfg": "42_collaborative_resume",
+                    "finished_projects": [
+                      "cpp-module-00",
+                      // ... list of finished projects
+                      "42cursus-push_swap"
+                    ],
+                    "eligible_projects": [
+                      "exam-rank-06",
+                      // ... list of eligible projects
+                      "42_collaborative_resume"
+                    ],
+                    "common_core": {
+                      "rank": [
+                        {
+                          "rank": 0,
+                          "projects": [
+                            {
+                              "cursus_project_id": 1314,
+                              "name": "Libft",
+                              "slug": "42cursus-libft",
+                              "projects_users": {
+                                "occurrence": 0,
+                                "final_mark": 124,
+                                "status": "finished",
+                                "validated": true
+                              }
+                            }
+                          ]
+                        },
+                        // ... other ranks
+                        {
+                          "rank": 6,
+                          "projects": [
+                            {
+                              "cursus_project_id": 2623,
+                              "name": "42_Collaborative_resume",
+                              "slug": "42_collaborative_resume",
+                              "projects_users": {
+                                "occurrence": 0,
+                                "final_mark": null,
+                                "status": "creating_group",
+                                "validated": null
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                </code></pre>
+              </li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+    </details>
+    <details>
+      <summary><code>PATCH v1/42users/lfg?lfg={eligibleProject}</code></summary>
+      <ul>
+        <li>Description: Update user LFG project.<br>Require authenticated.<br>Note: query lfg={eligibleProject] is mandatory.</li>
         <li>Query option: An eligible project (slug) of user or "none"</li>
         <li>Response code:
           <ul>
@@ -422,13 +516,13 @@ Currently only support Lausanne campus
             <li>400: Invalid lfg project. Only eligible projects or none are accepted.</li>
           </ul>
         </li>
-        <li>Example<pre>/v1/42users/188455/lfg?lfg=none</pre></li>
+        <li>Example<pre>/v1/42users/lfg?lfg=none</pre></li>
       </ul>
     </details>
     <details>
-      <summary><code>PATCH v1/42users/{id}/avatar</code> Attention: {id} will be deleted and user will be validated with JWT instead.</summary>
+      <summary><code>PATCH v1/42users/avatar</code></summary>
       <ul>
-        <li>Description: Update user avatar.</li>
+        <li>Description: Update user avatar.<br>Require authenticated.</li>
         <li>Require: 
           <ul>
             <li>Header: <code>Content-Type: multipart/form-data</code></li>
@@ -445,13 +539,13 @@ Currently only support Lausanne campus
             <li>500: IO runtime error in server</li>
           </ul>
         </li>
-        <li>Example<pre>/v1/42users/188455/avatar</pre></li>
+        <li>Example<pre>/v1/42users/avatar</pre></li>
       </ul>
     </details>
     <details>
-      <summary><code>DELETE v1/42users/{id}/avatar</code> Attention: {id} will be deleted and user will be validated with JWT instead.</summary>
+      <summary><code>DELETE v1/42users/avatar</code></summary>
       <ul>
-        <li>Description: Delete user avatar.</li>
+        <li>Description: Delete user avatar.<br>Require authenticated.</li>
         <li>Response code:
           <ul>
             <li>200: Ok, user object returned</li>
@@ -459,13 +553,13 @@ Currently only support Lausanne campus
             <li>500: IO runtime error in server</li>
           </ul>
         </li>
-        <li>Example<pre>/v1/42users/188455/avatar</pre></li>
+        <li>Example<pre>/v1/42users/avatar</pre></li>
       </ul>
     </details>
     <details>
-      <summary><code>PATCH v1/42users/{id}/banner</code> Attention: {id} will be deleted and user will be validated with JWT instead.</summary>
+      <summary><code>PATCH v1/42users/banner</code></summary>
       <ul>
-        <li>Description: Update user banner.</li>
+        <li>Description: Update user banner.<br>Require authenticated.</li>
         <li>Require: 
           <ul>
             <li>Header: <code>Content-Type: multipart/form-data</code></li>
@@ -482,13 +576,13 @@ Currently only support Lausanne campus
             <li>500: IO runtime error in server</li>
           </ul>
         </li>
-        <li>Example<pre>/v1/42users/188455/banner</pre></li>
+        <li>Example<pre>/v1/42users/banner</pre></li>
       </ul>
     </details>
     <details>
-      <summary><code>DELETE v1/42users/{id}/banner</code> Attention: {id} will be deleted and user will be validated with JWT instead.</summary>
+      <summary><code>DELETE v1/42users/banner</code></summary>
       <ul>
-        <li>Description: Delete user banner.</li>
+        <li>Description: Delete user banner.<br>Require authenticated.</li>
         <li>Response code:
           <ul>
             <li>200: Ok, user object returned</li>
@@ -496,7 +590,7 @@ Currently only support Lausanne campus
             <li>500: IO runtime error in server</li>
           </ul>
         </li>
-        <li>Example<pre>/v1/42users/188455/banner</pre></li>
+        <li>Example<pre>/v1/42users/banner</pre></li>
       </ul>
     </details>
 
@@ -506,7 +600,7 @@ Currently only support Lausanne campus
 <details>
 	<summary style="font-size:1.2em; font-weight:bold;">Campus API</summary>
 	<details>
-    <summary><code>GET /v1/campuses</code></summary>
+    <summary><code>GET /v1/api42/campuses</code></summary>
     <ul>
       <li>Description: Get all active and public campuses.</li>
       <li>Filter list:
@@ -532,7 +626,7 @@ Currently only support Lausanne campus
 	  </li>
 	  <li>Example:
 		<ul>
-		  <li><pre>/v1/campuses?page=0&sort=name,asc&country=Spain</pre></li>
+		  <li><pre>/v1/api42/campuses?page=0&sort=name,asc&country=Spain</pre></li>
 		</ul>
 	  </li>
 	  <li>
@@ -540,68 +634,68 @@ Currently only support Lausanne campus
 			<summary>response example</summary>
 			<ul>
 			  <li>Request:
-				<pre>/v1/campuses?page=0&sort=name,asc&country=Spain</pre>
+				<pre>/v1/api42/campuses?page=0&sort=name,asc&country=Spain</pre>
 			  </li>
 			  <li>Response:
 				<pre><code class="language-json">
-				  {
-					  "content": [
-						{
-						  "id": 51,
-						  "name": "Berlin",
-						  "time_zone": "Europe/Berlin",
-						  "users_count": 3047,
-						  "country": "Germany",
-						  "address": "Harzer Strasse 39",
-						  "zip": "12059",
-						  "city": "Berlin",
-						  "website": "https://42berlin.de/",
-						  "facebook": "",
-						  "twitter": "",
-						  "active": true,
-						  "public": true,
-						  "email_extension": "42berlin.de"
-						},
-						{
-						  "id": 39,
-						  "name": "Heilbronn",
-						  "time_zone": "Europe/Berlin",
-						  "users_count": 3097,
-						  "country": "Germany",
-						  "address": "Weipertstr 8 - 10",
-						  "zip": "74076",
-						  "city": "Heilbronn",
-						  "website": "https://42heilbronn.de/",
-						  "facebook": "https://www.facebook.com/42heilbronn",
-						  "twitter": "https://twitter.com/42Heilbronn",
-						  "active": true,
-						  "public": true,
-						  "email_extension": "42heilbronn.de"
-						},
-						{
-						  "id": 44,
-						  "name": "Wolfsburg",
-						  "time_zone": "Europe/Berlin",
-						  "users_count": 3660,
-						  "country": "Germany",
-						  "address": "Porschestraße 2c",
-						  "zip": "38440",
-						  "city": "Wolfsburg",
-						  "website": "https://42wolfsburg.de/",
-						  "facebook": "",
-						  "twitter": "",
-						  "active": true,
-						  "public": true,
-						  "email_extension": "42wolfsburg.de"
-						}
-					  ],
-					  "page": {
-						"size": 25,
-						"number": 0,
-						"totalElements": 3,
-						"totalPages": 1
-					  }
-					}
+{
+  "content": [
+  {
+    "id": 51,
+    "name": "Berlin",
+    "time_zone": "Europe/Berlin",
+    "users_count": 3047,
+    "country": "Germany",
+    "address": "Harzer Strasse 39",
+    "zip": "12059",
+    "city": "Berlin",
+    "website": "https://42berlin.de/",
+    "facebook": "",
+    "twitter": "",
+    "active": true,
+    "public": true,
+    "email_extension": "42berlin.de"
+  },
+  {
+    "id": 39,
+    "name": "Heilbronn",
+    "time_zone": "Europe/Berlin",
+    "users_count": 3097,
+    "country": "Germany",
+    "address": "Weipertstr 8 - 10",
+    "zip": "74076",
+    "city": "Heilbronn",
+    "website": "https://42heilbronn.de/",
+    "facebook": "https://www.facebook.com/42heilbronn",
+    "twitter": "https://twitter.com/42Heilbronn",
+    "active": true,
+    "public": true,
+    "email_extension": "42heilbronn.de"
+  },
+  {
+    "id": 44,
+    "name": "Wolfsburg",
+    "time_zone": "Europe/Berlin",
+    "users_count": 3660,
+    "country": "Germany",
+    "address": "Porschestraße 2c",
+    "zip": "38440",
+    "city": "Wolfsburg",
+    "website": "https://42wolfsburg.de/",
+    "facebook": "",
+    "twitter": "",
+    "active": true,
+    "public": true,
+    "email_extension": "42wolfsburg.de"
+  }
+  ],
+  "page": {
+  "size": 25,
+  "number": 0,
+  "totalElements": 3,
+  "totalPages": 1
+  }
+}
 				</code></pre>
 			  </li>
 			</ul>
@@ -610,13 +704,13 @@ Currently only support Lausanne campus
     </ul>
   </details>
 	<details>
-    <summary><code>GET /v1/campuses/id/{id}</code></summary>
+    <summary><code>GET /v1/api42/campuses/id/{id}</code></summary>
     <ul>
       <li>Description: Get a campus by id.</li>
       <li>No filter, no sorting and no paging.</li>
 	  <li>Example:
 		<ul>
-		  <li><pre>/v1/campuses/id/51</pre></li>
+		  <li><pre>/v1/api42/campuses/id/51</pre></li>
 		</ul>
 	  </li>
 	  <li>
@@ -624,26 +718,26 @@ Currently only support Lausanne campus
 			<summary>response example</summary>
 			<ul>
 			  <li>Request:
-				<pre>/v1/campuses/id/51</pre>
+				<pre>/v1/api42/campuses/id/51</pre>
 			  </li>
 			  <li>Response:
 				<pre><code class="language-json">
-				  {
-					  "id": 51,
-					  "name": "Berlin",
-					  "time_zone": "Europe/Berlin",
-					  "users_count": 3047,
-					  "country": "Germany",
-					  "address": "Harzer Strasse 39",
-					  "zip": "12059",
-					  "city": "Berlin",
-					  "website": "https://42berlin.de/",
-					  "facebook": "",
-					  "twitter": "",
-					  "active": true,
-					  "public": true,
-					  "email_extension": "42berlin.de"
-				  }
+{
+  "id": 51,
+  "name": "Berlin",
+  "time_zone": "Europe/Berlin",
+  "users_count": 3047,
+  "country": "Germany",
+  "address": "Harzer Strasse 39",
+  "zip": "12059",
+  "city": "Berlin",
+  "website": "https://42berlin.de/",
+  "facebook": "",
+  "twitter": "",
+  "active": true,
+  "public": true,
+  "email_extension": "42berlin.de"
+}
 				</code></pre>
 			  </li>
 			</ul>
@@ -652,7 +746,7 @@ Currently only support Lausanne campus
     </ul>
   </details>
 	<details>
-    <summary><code>GET /v1/campuses/name/{name}</code></summary>
+    <summary><code>GET /v1/api42/campuses/name/{name}</code></summary>
     <ul>
       <li>Description: Get all active and public campuses by campus name. Name is case-sensitive.</li>
       <li>No filter and no sorting.
@@ -665,7 +759,7 @@ Currently only support Lausanne campus
 	  </li>
 	  <li>Example:
 		<ul>
-		  <li><pre>/v1/campuses/name/Lausanne</pre></li>
+		  <li><pre>/v1/api42/campuses/name/Lausanne</pre></li>
 		</ul>
 	  </li>
 	  <li>
@@ -673,36 +767,36 @@ Currently only support Lausanne campus
 			<summary>response example</summary>
 			<ul>
 			  <li>Request:
-				<pre>/v1/campuses/name/Lausanne</pre>
+				<pre>/v1/api42/campuses/name/Lausanne</pre>
 			  </li>
 			  <li>Response:
 				<pre><code class="language-json">
-				  {
-					  "content": [
-					    {
-					      "id": 47,
-					      "name": "Lausanne",
-					      "time_zone": "Europe/Zurich",
-					      "users_count": 2251,
-					      "country": "Switzerland",
-					      "address": "64 Rue de Lausanne",
-					      "zip": "1020",
-					      "city": "Renens",
-					      "website": "https://42lausanne.ch/",
-					      "facebook": "https://www.facebook.com/42Lausanne",
-					      "twitter": "https://twitter.com/42lausanne",
-					      "active": true,
-					      "public": true,
-					      "email_extension": "42lausanne.ch"
-					    }
-					  ],
-					  "page": {
-					    "size": 25,
-					    "number": 0,
-					    "totalElements": 1,
-					    "totalPages": 1
-					  }
-					}
+  {
+    "content": [
+      {
+        "id": 47,
+        "name": "Lausanne",
+        "time_zone": "Europe/Zurich",
+        "users_count": 2251,
+        "country": "Switzerland",
+        "address": "64 Rue de Lausanne",
+        "zip": "1020",
+        "city": "Renens",
+        "website": "https://42lausanne.ch/",
+        "facebook": "https://www.facebook.com/42Lausanne",
+        "twitter": "https://twitter.com/42lausanne",
+        "active": true,
+        "public": true,
+        "email_extension": "42lausanne.ch"
+      }
+    ],
+    "page": {
+      "size": 25,
+      "number": 0,
+      "totalElements": 1,
+      "totalPages": 1
+    }
+  }
 				</code></pre>
 			  </li>
 			</ul>
@@ -715,13 +809,12 @@ Currently only support Lausanne campus
 <details>
 	<summary style="font-size:1.2em; font-weight:bold;">Common Core API</summary>
 	<details>
-    <summary><code>GET /v1/commoncore</code></summary>
+    <summary><code>GET /v1/api42/commoncore</code></summary>
     <ul>
       <li>Description: Get the current Common Core projects.</li>
-      <li>No filter, no sorting and no paging.</li>
 	  <li>Example:
 		<ul>
-		  <li><pre>/v1/commoncore</pre></li>
+		  <li><pre>/v1/api42/commoncore</pre></li>
 		</ul>
 	  </li>
 	  <li>
@@ -729,58 +822,58 @@ Currently only support Lausanne campus
 			<summary>response example</summary>
 			<ul>
 			  <li>Request:
-				<pre>/v1/commoncore</pre>
+				<pre>/v1/api42/commoncore</pre>
 			  </li>
 			  <li>Response:
 				<pre><code class="language-json">
-				  {
-					  "projects": [
-					    {
-					      "id": 1314,
-					      "name": "Libft",
-					      "slug": "42cursus-libft",
-					      "rank": 0
-					    },
-					        // ... More projects
-					    {
-					      "id": 2309,
-					      "name": "CPP Module 09",
-					      "slug": "cpp-module-09",
-					      "rank": 5
-					    },
-					    {
-					      "id": 2623,
-					      "name": "42_Collaborative_resume",
-					      "slug": "42_collaborative_resume",
-					      "rank": 6
-					    }
-					  ],
-					  "ranks": {
-					    "0": {
-					      "mandatory": [
-					        "42cursus-libft"
-					      ],
-					      "choices": []
-					    },
-					    "1": {
-					      "mandatory": [
-					        "42cursus-get_next_line",
-					        "42cursus-ft_printf",
-					        "born2beroot"
-					      ],
-					      "choices": []
-					    },
-						// ... More ranks
-					    "6": {
-					      "mandatory": [
-					        "exam-rank-06",
-					        "ft_transcendence",
-					        "42_collaborative_resume"
-					      ],
-					      "choices": []
-					    }
-					  }
-					}
+  {
+  "projects": [
+    {
+      "id": 1314,
+      "name": "Libft",
+      "slug": "42cursus-libft",
+      "rank": 0
+    },
+        // ... More projects
+    {
+      "id": 2309,
+      "name": "CPP Module 09",
+      "slug": "cpp-module-09",
+      "rank": 5
+    },
+    {
+      "id": 2623,
+      "name": "42_Collaborative_resume",
+      "slug": "42_collaborative_resume",
+      "rank": 6
+    }
+  ],
+  "ranks": {
+    "0": {
+      "mandatory": [
+        "42cursus-libft"
+      ],
+      "choices": []
+    },
+    "1": {
+      "mandatory": [
+        "42cursus-get_next_line",
+        "42cursus-ft_printf",
+        "born2beroot"
+      ],
+      "choices": []
+    },
+  // ... More ranks
+    "6": {
+      "mandatory": [
+        "exam-rank-06",
+        "ft_transcendence",
+        "42_collaborative_resume"
+      ],
+      "choices": []
+    }
+  }
+}
 				</code></pre>
 			  </li>
 			</ul>
@@ -793,7 +886,7 @@ Currently only support Lausanne campus
 <details>
 	<summary style="font-size:1.2em; font-weight:bold;">Heath check API</summary>
 	<details>
-    <summary><code>GET /v1/health</code></summary>
+    <summary><code>GET /v1/api42/health</code></summary>
     <ul>
       <li>Description: Check if the service is healthy.<br></li>
 	  <li>Response code:
