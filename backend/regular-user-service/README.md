@@ -8,6 +8,7 @@
     <li>Mandatory user management with user signup and login using email and encrypted password</li>
     <li>Allow users to interact with other users. (part - user profile)</li>
     <li>Standard user management and authentication. (part - update profile, upload avatar, profile)</li>
+    <li>Implement a complete 2FA (Two-Factor Authentication) system for the users</li>
     <li>Backend as microservice. (part)</li>
   </ul>
 <p>Member worked on: Nguyen NGUYEN (hoannguy).</p> 
@@ -27,6 +28,8 @@
         <br>REGULAR_USER_POSTGRES_USER=
         <br>REGULAR_USER_POSTGRES_PASSWORD=
         <br>REGULAR_USER_JWT_KEY=
+        <br>REGULAR_USER_EMAIL=
+        <br>REGULAR_USER_APP_PASSWORD=
         </pre></details>
 
 ### Start as individual service
@@ -77,8 +80,8 @@ Body:
     "id": 1,
     "username": "test",
     "email": "test@gmail.com",
-    "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
-    "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
+    "custom_avatar_url": "http://localhost:8085/images-regular/default_profile_avatar.jpg",
+    "custom_banner_url": "http://localhost:8085/images-regular/default_profile_banner.jpg",
     "first_name": null,
     "last_name": null,
     "double_authentication": false
@@ -125,8 +128,8 @@ Body:
     "id": 1,
     "username": "test",
     "email": "test@gmail.com",
-    "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
-    "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
+    "custom_avatar_url": "http://localhost:8085/images-regular/default_profile_avatar.jpg",
+    "custom_banner_url": "http://localhost:8085/images-regular/default_profile_banner.jpg",
     "first_name": null,
     "last_name": null,
     "double_authentication": false
@@ -167,8 +170,8 @@ Body:
     "id": 1,
     "username": "test",
     "email": "test@gmail.com",
-    "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
-    "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
+    "custom_avatar_url": "http://localhost:8085/images-regular/default_profile_avatar.jpg",
+    "custom_banner_url": "http://localhost:8085/images-regular/default_profile_banner.jpg",
     "first_name": null,
     "last_name": null,
     "double_authentication": false
@@ -215,8 +218,8 @@ Body:
     "id": 1,
     "username": "test",
     "email": "test@gmail.com",
-    "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
-    "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
+    "custom_avatar_url": "http://localhost:8085/images-regular/default_profile_avatar.jpg",
+    "custom_banner_url": "http://localhost:8085/images-regular/default_profile_banner.jpg",
     "first_name": null,
     "last_name": null,
     "double_authentication": true
@@ -250,8 +253,8 @@ Body:
   "id": 1,
   "username": "test",
   "email": "test@gmail.com",
-  "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
-  "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
+  "custom_avatar_url": "http://localhost:8085/images-regular/default_profile_avatar.jpg",
+  "custom_banner_url": "http://localhost:8085/images-regular/default_profile_banner.jpg",
   "first_name": null,
   "last_name": null,
   "double_authentication": false
@@ -281,8 +284,8 @@ Body:
   "id": 1,
   "username": "test",
   "email": "test@gmail.com",
-  "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
-  "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
+  "custom_avatar_url": "http://localhost:8085/images-regular/default_profile_avatar.jpg",
+  "custom_banner_url": "http://localhost:8085/images-regular/default_profile_banner.jpg",
   "first_name": null,
   "last_name": null,
   "double_authentication": false
@@ -328,8 +331,8 @@ Body:
     "id": 1,
     "username": "test",
     "email": "test@gmail.com",
-    "custom_avatar_url": "http://localhost:4445/images-regular/default_profile_avatar.jpg",
-    "custom_banner_url": "http://localhost:4445/images-regular/default_profile_banner.jpg",
+    "custom_avatar_url": "http://localhost:8085/images-regular/default_profile_avatar.jpg",
+    "custom_banner_url": "http://localhost:8085/images-regular/default_profile_banner.jpg",
     "first_name": "Nguyen",
     "last_name": "NGUYEN",
     "double_authentication": true
