@@ -1,7 +1,3 @@
-# IMPORTANT TODO
-- JWT access token validation for all API endpoints.
-- JWT validation for PATCH and DELETE endpoints for stateless session. As result, user validation will be through JWT instead of {id} for security reason.
-
 # Description
 **Api 42 service** is a microservice to manage students from 42.
 <br>This service fetches, transforms and stores data from official 42 API to update students profile. Students can also upload their own avatar, banner and LFG status.
