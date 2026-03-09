@@ -43,7 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 	private boolean isPublicEndpoint(HttpServletRequest request) {
 		String path = request.getRequestURI();
-		return path.startsWith("v1/api42/commoncore") ||
+		return path.startsWith("/v1/api42/commoncore") ||
 				path.startsWith("/error") ||
 				path.startsWith("/images42/") ||
 				path.equals("/v1/api42/health") ||
