@@ -36,3 +36,9 @@ spring:
             token-uri: https://api.intra.42.fr/oauth/token
             user-info-uri: https://api.intra.42.fr/v2/me
             user-name-attribute: login
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
