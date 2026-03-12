@@ -52,14 +52,17 @@ public class JwtService {
 	}
 
 	public void validateJwtToken(String jwtToken, String type) {
+		if (jwtToken == null || jwtToken.isEmpty()) {
+			throw new BadTokenException("Invalid access token: JWT token is null or empty");
+		}
 		try {
-			if (!Jwts.parser()
+			Object issuer = Jwts.parser()
 					.verifyWith(secretKey)
 					.build()
 					.parseSignedClaims(jwtToken)
 					.getPayload()
-					.getIssuer()
-					.equals("Regular User Service"))
+					.getIssuer();
+			if (issuer == null || !issuer.equals("Regular User Service"))
 				throw new BadTokenException("Invalid " + type + ": wrong issuer");
 			if(revokeTokenRepository.findById(jwtToken).isPresent())
 				throw new BadTokenException("Invalid " + type + ": revoked token");
@@ -74,6 +77,9 @@ public class JwtService {
 	}
 
 	public String getUserId(String jwtToken, String type) {
+		if (jwtToken == null || jwtToken.isEmpty()) {
+			throw new BadTokenException("Invalid access token: JWT token is null or empty");
+		}
 		String userId = Jwts.parser()
 					.verifyWith(secretKey)
 					.build()
@@ -99,8 +105,13 @@ public class JwtService {
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals("refreshToken"))
-					return cookie.getValue();
+				if (cookie.getName().equals("refreshToken")) {
+					String token = cookie.getValue();
+					if (token == null || token.isEmpty()) {
+						throw new BadTokenException("Refresh token cookie is empty");
+					}
+					return token;
+				}
 			}
 		}
 		throw new BadTokenException("Invalid Refresh Cookie");

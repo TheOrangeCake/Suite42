@@ -29,24 +29,43 @@ public class UserTalentPointCalculator  {
 
     public void calculateUserTalentPoint() {
         logger.info("Calculate user performance point");
-        List<User> activeUsers = userRepository.findByActiveTrueAndRankBetween(0, 6);
-        List<ProjectsUsers> activeUsersProjectsUsers = projectsUsersRepository.findByUserIn(activeUsers);
-        int totalActiveUser = activeUsers.size();
+        List<User> activeUsers = Optional.ofNullable(userRepository.findByActiveTrueAndRankBetween(0, 6))
+                .orElse(Collections.emptyList());
+        List<ProjectsUsers> activeUsersProjectsUsers = Optional.ofNullable(projectsUsersRepository.findByUserIn(activeUsers))
+                .orElse(Collections.emptyList());
+        if (activeUsers.isEmpty()) {
+            logger.warning("No active users between rank 0 and 6 found.");
+            return;
+        }
 
-        try (ProgressBar pb = new ProgressBar("Calculating user Performance point", totalActiveUser)) {
+        try (ProgressBar pb = new ProgressBar("Calculating user Performance point", activeUsers.size())) {
             for (User user : activeUsers) {
                 pb.step();
-                PoolResult poolResult = populatePoolResult(user, activeUsersProjectsUsers);
-                int poolScore = (calculatePoolCriteria(poolResult) * 20) / 100;
-                int paceScore = (calculatePaceCriteria(user) * 50) / 100;
-                int perfectionismScore = (calculatePerfectionismCriteria(user, activeUsersProjectsUsers) * 30) / 100;
-                user.setPerformanceScore(poolScore + paceScore + perfectionismScore);
+                try {
+                    PoolResult poolResult = populatePoolResult(user, activeUsersProjectsUsers);
+                    int poolScore = (calculatePoolCriteria(poolResult) * 20) / 100;
+                    int paceScore = (calculatePaceCriteria(user) * 50) / 100;
+                    int perfectionismScore = (calculatePerfectionismCriteria(user, activeUsersProjectsUsers) * 30) / 100;
+                    user.setPerformanceScore(poolScore + paceScore + perfectionismScore);
+                } catch (Exception e) {
+                    logger.severe("Failed to calculate performance score for user " + user.getId() + ": " + e.getMessage());
+                }
             }
+        } catch (Exception e) {
+            logger.severe("Failed to initialize progress bar: " + e.getMessage());
+            return;
         }
-        userRepository.saveAll(activeUsers);
+        try {
+            userRepository.saveAll(activeUsers);
+        } catch (Exception e) {
+            logger.severe("Failed to save user performance scores: " + e.getMessage());
+        }
     }
 
     private PoolResult populatePoolResult(User user, List<ProjectsUsers> activeUsersProjectsUsers) {
+        if (user == null || activeUsersProjectsUsers == null) {
+            throw new IllegalArgumentException("User and activeUsersProjectsUsers cannot be null");
+        }
         getLastedProjectsUsersBySlug(user, activeUsersProjectsUsers);
         Map<String, ProjectsUsers> lastedProjectsUsersBySlug = getLastedProjectsUsersBySlug(user, activeUsersProjectsUsers);
         PoolResult poolResult = poolResultRepository.findByUser(user)
@@ -68,16 +87,23 @@ public class UserTalentPointCalculator  {
         poolResult.setExam1Score(getProjectMaxScore("c-piscine-exam-01", lastedProjectsUsersBySlug));
         poolResult.setExam2Score(getProjectMaxScore("c-piscine-exam-02", lastedProjectsUsersBySlug));
         poolResult.setExam3Score(getProjectMaxScore("c-piscine-final-exam", lastedProjectsUsersBySlug));
-        poolResultRepository.save(poolResult);
+        try {
+            poolResultRepository.save(poolResult);
+        } catch (Exception e) {
+            logger.severe("Failed to save PoolResult for user " + user.getId() + ": " + e.getMessage());
+        }
         return poolResult;
     }
 
     public static Map<String, ProjectsUsers> getLastedProjectsUsersBySlug(User user, List<ProjectsUsers> activeUsersProjectsUsers) {
-        List<ProjectsUsers> usersProjectsUsers = activeUsersProjectsUsers
-                .stream()
-                .filter(pu -> pu.getUser().equals(user))
+        if (user == null || activeUsersProjectsUsers == null) {
+            return Collections.emptyMap();
+        }
+        List<ProjectsUsers> usersProjectsUsers = activeUsersProjectsUsers.stream()
+                .filter(pu -> pu != null && pu.getUser() != null && pu.getUser().equals(user))
                 .toList();
         return usersProjectsUsers.stream()
+                .filter(pu -> pu.getProject() != null && pu.getProject().getSlug() != null)
                 .collect(Collectors.toMap(
                         projectsUsers -> projectsUsers.getProject().getSlug(),
                         projectsUsers -> projectsUsers,
@@ -85,8 +111,11 @@ public class UserTalentPointCalculator  {
     }
 
     private int getProjectMaxScore(String project, Map<String, ProjectsUsers> lastedProjectsUsersBySlug) {
+        if (lastedProjectsUsersBySlug == null || project == null) {
+            return 0;
+        }
         ProjectsUsers projectsUsers = lastedProjectsUsersBySlug.get(project);
-        if (projectsUsers != null) {
+        if (projectsUsers != null && projectsUsers.getFinalMark() != null) {
             return projectsUsers.getFinalMark();
         }
         return 0;
@@ -117,6 +146,9 @@ public class UserTalentPointCalculator  {
     }
 
     private int calculatePoolProjectPassedScore(PoolResult poolResult) {
+        if (poolResult == null) {
+            return 0;
+        }
         List<AbstractMap.SimpleEntry<Integer, Integer>> poolProjectScores = new ArrayList<>();
         poolProjectScores.add(new AbstractMap.SimpleEntry<>(5, poolResult.getC02Score()));
         poolProjectScores.add(new AbstractMap.SimpleEntry<>(5, poolResult.getC03Score()));
@@ -137,6 +169,9 @@ public class UserTalentPointCalculator  {
     }
 
     private int calculatePoolProjectMaxScore(PoolResult poolResult) {
+        if (poolResult == null) {
+            return 0;
+        }
         int[] projectScore = {
                 poolResult.getC02Score(),
                 poolResult.getC03Score(),
@@ -171,36 +206,47 @@ public class UserTalentPointCalculator  {
     }
 
     private int calculatePaceCriteria(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
         int userRank = user.getRank();
         long daysExpectedToReachCurrentProgress = calculateDaysExpectedToReachCurrentProgress(user, userRank);
 
-        LocalDate startDate = LocalDate.of(Integer.parseInt(user.getPoolYear()), 10, 1);
-        LocalDate currentDate = LocalDate.now();
-        long daysActualToReachCurrentProgress = ChronoUnit.DAYS.between(startDate, currentDate) - user.getFreezeDays();
-        int baseScore;
-        if (daysActualToReachCurrentProgress > daysExpectedToReachCurrentProgress) {
-            long daysBehind = daysActualToReachCurrentProgress - daysExpectedToReachCurrentProgress;
-            long maxAllowedDaysBehind = daysExpectedToReachCurrentProgress / 2;
-            if (daysBehind >= maxAllowedDaysBehind) {
-                baseScore = 0;
+        try {
+            LocalDate startDate = LocalDate.of(Integer.parseInt(user.getPoolYear()), 10, 1);
+            LocalDate currentDate = LocalDate.now();
+            long daysActualToReachCurrentProgress = ChronoUnit.DAYS.between(startDate, currentDate) - user.getFreezeDays();
+            int baseScore;
+            if (daysActualToReachCurrentProgress > daysExpectedToReachCurrentProgress) {
+                long daysBehind = daysActualToReachCurrentProgress - daysExpectedToReachCurrentProgress;
+                long maxAllowedDaysBehind = daysExpectedToReachCurrentProgress / 2;
+                if (daysBehind >= maxAllowedDaysBehind) {
+                    baseScore = 0;
+                } else {
+                    baseScore = 50 - (int) (((double) daysBehind / maxAllowedDaysBehind) * 50);
+                }
+            } else if (daysActualToReachCurrentProgress < daysExpectedToReachCurrentProgress) {
+                long daysAhead = daysExpectedToReachCurrentProgress - daysActualToReachCurrentProgress;
+                long maxAllowedDaysAhead = daysExpectedToReachCurrentProgress / 2;
+                if (daysAhead >= maxAllowedDaysAhead) {
+                    baseScore = 100;
+                } else {
+                    baseScore = 50 + (int) (((double) daysAhead / maxAllowedDaysAhead) * 50);
+                }
             } else {
-                baseScore = 50 - (int) (((double) daysBehind / maxAllowedDaysBehind) * 50);
+                baseScore = 50;
             }
-        } else if (daysActualToReachCurrentProgress < daysExpectedToReachCurrentProgress) {
-            long daysAhead = daysExpectedToReachCurrentProgress - daysActualToReachCurrentProgress;
-            long maxAllowedDaysAhead = daysExpectedToReachCurrentProgress / 2;
-            if (daysAhead >= maxAllowedDaysAhead) {
-                baseScore = 100;
-            } else {
-                baseScore = 50 + (int) (((double) daysAhead / maxAllowedDaysAhead) * 50);
-            }
-        } else {
-            baseScore = 50;
+            return baseScore;
+        } catch (Exception e) {
+            logger.severe("Failed to calculate pace criteria for user " + user.getId() + ": " + e.getMessage());
+            return 0;
         }
-        return baseScore;
     }
 
     private long calculateDaysExpectedToReachCurrentProgress(User user, int userRank) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
         int userRankScore =  user.getRankProgressPercent();
         long daysExpectedFinishPreviousRank = 0;
         if (userRank > 0) {
@@ -236,8 +282,12 @@ public class UserTalentPointCalculator  {
     );
 
     public int calculatePerfectionismCriteria(User user, List<ProjectsUsers> activeUsersProjectsUsers) {
+        if (user == null || activeUsersProjectsUsers == null) {
+            return 0;
+        }
         Map<String, ProjectsUsers> lastedProjectsUsersBySlug = getLastedProjectsUsersBySlug(user, activeUsersProjectsUsers);
-        List<String> finishedProjects = user.getFinishedProjects().stream().toList();
+        Set<String> finishedProjects = Optional.ofNullable(user.getFinishedProjects())
+                .orElse(Collections.emptySet());
         int actualBonusScore = 0;
         int maxBonusScore = 0;
         for (String project : finishedProjects) {

@@ -16,24 +16,8 @@ import java.util.Optional;
 @AllArgsConstructor
 @Component
 public final class ProjectsUsersMapper {
-	private final ProjectMapper projectMapper;
 	private final ProjectRepository projectRepository;
 	private final ProjectsUsersRepository projectsUsersRepository;
-
-	public ProjectsUsersResponseDto mapToProjectsUsersResponseDto(ProjectsUsers projectsUsers) {
-		if (projectsUsers == null) {
-			return null;
-		}
-		return new ProjectsUsersResponseDto(
-				projectsUsers.getId(),
-				projectsUsers.getOccurrence(),
-				projectsUsers.getFinalMark(),
-				projectsUsers.getStatus(),
-				projectsUsers.getValidated(),
-				projectsUsers.getMarkedAt(),
-				projectMapper.mapToResponseDto(projectsUsers.getProject())
-		);
-	}
 
 	public ProjectsUsers mapToProjectsUsers(
 			ProjectsUsersRequestDto projectsUsersDto,

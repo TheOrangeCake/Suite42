@@ -24,14 +24,17 @@ public class JwtService {
 	}
 
 	public void validateJwtToken(String jwtToken) {
+		if (jwtToken == null || jwtToken.isEmpty()) {
+			throw new BadTokenException("Invalid access token: JWT token is null or empty");
+		}
 		try {
-			if (!Jwts.parser()
+			Object provider = Jwts.parser()
 					.verifyWith(secretKey)
 					.build()
 					.parseSignedClaims(jwtToken)
 					.getPayload()
-					.get("provider")
-					.equals("42"))
+					.get("provider");
+			if (provider == null || !provider.equals("42"))
 				throw new BadTokenException("Invalid access token: wrong provider");
 		} catch (ExpiredJwtException e) {
 				throw new BadTokenException("Invalid access token: expired");
@@ -41,25 +44,32 @@ public class JwtService {
 	}
 
 	public String getUserId(String jwtToken) {
-		String userId = Jwts.parser()
+		if (jwtToken == null || jwtToken.isEmpty()) {
+			throw new BadTokenException("Invalid access token: JWT token is null or empty");
+		}
+		Object userId = Jwts.parser()
 					.verifyWith(secretKey)
 					.build()
 					.parseSignedClaims(jwtToken)
 					.getPayload()
-					.get("uid")
-					.toString();
-		if (userId == null || userId.isEmpty()) {
+					.get("uid");
+		if (userId == null) {
 			throw new BadTokenException("Invalid access token: user ID not found");
 		}
-		return userId;
+		return userId.toString();
 	}
 
 	public String extractAccessToken(HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals("access_token"))
-					return cookie.getValue();
+				if (cookie.getName().equals("access_token")) {
+					String token = cookie.getValue();
+					if (token == null || token.isEmpty()) {
+						throw new BadTokenException("Access token cookie is empty");
+					}
+					return token;
+				}
 			}
 		}
 		throw new BadTokenException("Invalid Access Token Cookie");

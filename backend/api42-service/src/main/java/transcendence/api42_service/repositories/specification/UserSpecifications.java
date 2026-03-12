@@ -21,6 +21,18 @@ public final class UserSpecifications {
 				criteria.between(table.get("rank"), minRank, maxRank);
 	}
 
+	public static Specification<User> searchByNameOrLogin(String search) {
+		return (table, query, criteria) -> {
+			if (search == null || search.isBlank() || search.trim().isEmpty()) {
+				return null;
+			}
+			Predicate firstNamePredicate = criteria.like(criteria.lower(table.get("firstName")), "%" + search.toLowerCase() + "%");
+			Predicate lastNamePredicate = criteria.like(criteria.lower(table.get("lastName")), "%" + search.toLowerCase() + "%");
+			Predicate loginPredicate = criteria.like(criteria.lower(table.get("login")), "%" + search.toLowerCase() + "%");
+			return criteria.or(firstNamePredicate, lastNamePredicate, loginPredicate);
+		};
+	}
+
 	public static Specification<User> hasPoolMonth(String poolMonth) {
 		return (table, query, criteria) ->
 				poolMonth == null ? null : criteria.equal(table.get("poolMonth"), poolMonth);

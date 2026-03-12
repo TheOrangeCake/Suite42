@@ -10,6 +10,9 @@ public class EnvVariables {
     @Value("${api42.default-banner}")
     private String defaultBanner;
 
+    @Value("${api42.default-avatar}")
+    private String defaultAvatar;
+
     @Value("${api42.image-domain}")
     private String imageDomain;
 

@@ -51,6 +51,7 @@ public class UserController {
 	@GetMapping()
 	public Page<UserSimpleResponseDto> getUsers(
 			@RequestParam String campusName,
+			@RequestParam(required = false) String search,
 			@RequestParam(required = false) String poolMonth,
 			@RequestParam(required = false) String poolYear,
 			@RequestParam(required = false) Integer rank,
@@ -76,6 +77,7 @@ public class UserController {
 		Specification<User> spec = Specification
 				.where(UserSpecifications.isActive())
 				.and(UserSpecifications.betweenRank(0, 6))
+				.and(UserSpecifications.searchByNameOrLogin(search))
 				.and(UserSpecifications.hasCampusName(campusName))
 				.and(UserSpecifications.hasPoolMonth(poolMonth))
 				.and(UserSpecifications.hasPoolYear(poolYear))
@@ -89,6 +91,9 @@ public class UserController {
 
 	@GetMapping("/profile/{id}")
 	public UserDetailedResponseDto getUserById(@PathVariable Long id) {
+		if (id == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User ID cannot be null");
+		}
 		User user = this.userRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 		return userMapper.mapToDetailedDto(user);
@@ -99,6 +104,9 @@ public class UserController {
 	public Page<UserSimpleResponseDto> getUserByLastName(
 			@PathVariable String lastName,
 			@PageableDefault(size = 25) Pageable pageable) {
+		if (lastName == null || lastName.trim().isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Last name cannot be null or empty");
+		}
 		int maxSize = 50;
 		Pageable noSortPageable = PageRequest.of(
 				pageable.getPageNumber(),
@@ -113,6 +121,9 @@ public class UserController {
 	public Page<UserSimpleResponseDto> getUserByFirstName(
 			@PathVariable String firstName,
 			@PageableDefault(size = 25) Pageable pageable) {
+		if (firstName == null || firstName.trim().isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "First name cannot be null or empty");
+		}
 		int maxSize = 50;
 		Pageable noSortPageable = PageRequest.of(
 				pageable.getPageNumber(),
@@ -146,6 +157,9 @@ public class UserController {
 
 	@PatchMapping("/lfg")
 	public ResponseEntity<?> modifyLFG(@RequestParam String lfg) {
+		if (lfg == null || lfg.trim().isEmpty()) {
+			return ResponseEntity.badRequest().body("LFG project cannot be null or empty");
+		}
 		Long userId;
 		try {
 			userId = getUserId();
@@ -153,14 +167,14 @@ public class UserController {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 		User user = this.userRepository.findById(userId)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 		if (lfg.equals("none")) {
 			user.setLfg(lfg);
 			userRepository.save(user);
 			return ResponseEntity.ok(userMapper.mapToDetailedDto(user));
 		}
 		Set<String> eligibleProjects= user.getEligibleProjects();
-		boolean validateLFG = eligibleProjects.stream().anyMatch(s -> s.equals(lfg));
+		boolean validateLFG = eligibleProjects != null && eligibleProjects.stream().anyMatch(lfg::equals);
 		if (validateLFG) {
 			user.setLfg(lfg);
 			userRepository.save(user);
@@ -180,6 +194,9 @@ public class UserController {
 	}
 
 	private ResponseEntity<?> modifyImage(MultipartFile image, HttpServletRequest request, String type) {
+		if (image == null || image.isEmpty()) {
+			return ResponseEntity.badRequest().body("No file provided or file is empty");
+		}
 		if (!request.getContentType().startsWith("multipart/form-data")) {
 			return ResponseEntity.status(400).body("Request must be multipart/form-data");
 		}

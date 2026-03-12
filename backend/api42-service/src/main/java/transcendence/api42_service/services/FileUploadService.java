@@ -21,9 +21,12 @@ public class FileUploadService {
 	private final EnvVariables envVariables;
 
 	public String uploadImage(String userId, MultipartFile image, String fileExtension) throws IOException {
+		if (userId == null || userId.isEmpty() || image == null || image.isEmpty() || fileExtension == null || fileExtension.isEmpty()) {
+			throw new IllegalArgumentException("User ID, image, and file extension cannot be null or empty");
+		}
 		String uploadDir = envVariables.getUploadDir();
 		if (uploadDir.isEmpty())
-			throw new RuntimeException("No upload location or domain specified");
+			throw new RuntimeException("No upload location specified");
 		Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
 		if(!Files.exists(uploadPath)) {
 			Files.createDirectories(uploadPath);
@@ -41,12 +44,15 @@ public class FileUploadService {
 			throw new DeleteDefaultException("No image specified or can not delete default image");
 		Path imagePath = path.resolve(imageName).normalize();
 		if (!imagePath.startsWith(path.toAbsolutePath())) {
-			throw new SecurityException("Are you trying something funny?");
+			throw new SecurityException("No");
 		}
 		Files.deleteIfExists(imagePath);
 	}
 
 	public boolean isImage(MultipartFile file) {
+		if (file == null || file.isEmpty()) {
+			return false;
+		}
 		String[] allowedType = {"image/gif", "image/jpeg", "image/png", "image/webp"};
 		String contentType = file.getContentType();
 		if (contentType == null || !contentType.startsWith("image/")) {
@@ -70,6 +76,9 @@ public class FileUploadService {
 	}
 
 	public String getFileExtension(MultipartFile file) {
+		if (file == null || file.isEmpty()) {
+			return null;
+		}
 		String[] allowedExtension = {".gif", ".jpeg", ".jpg", ".png", ".webp"};
 		String fileName = file.getOriginalFilename();
 		if (fileName == null || !fileName.contains(".")) {
