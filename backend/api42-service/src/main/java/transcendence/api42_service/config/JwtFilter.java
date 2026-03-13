@@ -51,6 +51,7 @@ public class JwtFilter extends OncePerRequestFilter {
 				path.startsWith("/images42/") ||
 				path.equals("/v1/api42/health") ||
 				path.equals("/v1/api42/campuses") ||
+				path.equals("/v1/42users/friends/check-internal") ||
 				path.equals(("/h2-console"));
 	}
 }

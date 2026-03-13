@@ -110,6 +110,9 @@ public class User {
     @Column(name="project")
     private Set<String> eligibleProjects;
 
+    @Column(name="last_seen")
+    private OffsetDateTime lastSeen;
+
     @Column(columnDefinition="TEXT")
     private String detailedProfileJson;
 

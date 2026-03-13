@@ -17,7 +17,7 @@ const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
 
-const dashboardRoutes = ['/profile', '/finder', '/home', '/chat', '/tasks', '/projects']
+const dashboardRoutes = ['/profile', '/finder', '/home', '/chat', '/tasks', '/projects', '/friends']
 
 const isDashboardRoute = computed(() =>
   dashboardRoutes.includes(route.path)
@@ -33,7 +33,7 @@ onMounted(async () => {
       const me = await getMe42()
       if (me.authenticated) {
         authStore.setSession42({ login: me.sub })
-        if (router.currentRoute.value.path === '/') {
+        if (window.location.pathname === '/') {
           router.push('/profile')
         }
       } else {

@@ -1,6 +1,6 @@
 <template>
   <div class="profile-page">
-    <h1 class="greeting">Hello, {{ authStore.user?.username }}</h1>
+    <h1 class="greeting">Hello, {{ authStore.displayName }}</h1>
 
     <div class="body">
       <Corner :vSize="200" :hSize="16" :thickness="5" color="var(--color-turquoise)" />
@@ -8,7 +8,7 @@
       <div class="content">
         <div class="block">
           <Corner :vSize="60" :hSize="16" :thickness="5" color="var(--color-turquoise)" />
-          <p class="text">You still haven't done project <strong>${oneRandomEligibleProject}</strong> yet.</p>
+          <p class="text">You still have projects waiting for you!</p>
         </div>
 
         <div class="block">

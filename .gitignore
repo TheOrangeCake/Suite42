@@ -5,3 +5,6 @@ frontend/src/pages/save.txt
 frontend/src/pages/around
 .idea
 .vscode
+
+# Maven build output
+**/target/
