@@ -25,6 +25,7 @@ public class SecurityConfig {
 						.requestMatchers("/images42/**").permitAll()
 						.requestMatchers("/v1/api42/health").permitAll()
 						.requestMatchers("/v1/api42/campuses").permitAll()
+						.requestMatchers("/v1/42users/friends/check-internal").permitAll()
 						.requestMatchers("/h2-console").permitAll()
 						.anyRequest().authenticated())
 				.sessionManagement(session -> session

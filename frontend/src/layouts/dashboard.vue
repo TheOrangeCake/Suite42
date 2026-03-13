@@ -38,6 +38,11 @@
           <img src="/design/assets/icons/chat.png" alt="" class="nav-icon" />
           <span class="nav-label">Chat</span>
         </RouterLink>
+
+        <RouterLink to="/friends" class="nav-item">
+          <img src="/design/assets/icons/group.png" alt="" class="nav-icon" />
+          <span class="nav-label">Friends</span>
+        </RouterLink>
       </nav>
 
       <button class="logout-btn" @click="handleLogout">

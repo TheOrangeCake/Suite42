@@ -13,4 +13,5 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 	List<User> findByActiveTrueAndRankBetween(int minRank, int maxRank);
 	Page<User> findByLastName(String lastName, Pageable pageable);
 	Page<User> findByFirstName(String firstName, Pageable pageable);
+	List<User> findByLoginContainingIgnoreCase(String login);
 }

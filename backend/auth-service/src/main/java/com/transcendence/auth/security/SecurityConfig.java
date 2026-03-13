@@ -25,7 +25,6 @@ public class SecurityConfig {
       )
       .oauth2Login(oauth -> oauth
         .successHandler(fortyTwoSuccessHandler)
-        .redirectionEndpoint(endpoint -> endpoint.baseUri("/callback"))
       )
       .logout(logout -> logout.logoutUrl("/logout"));
 
