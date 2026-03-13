@@ -30,15 +30,20 @@ public class UserRankCalculator {
 
 	public void calculateUserRank() {
 		logger.info("Calculate user current rank");
-		List<User> activeUsers= userRepository.findByActiveTrue();
-		List<ProjectsUsers> activeUsersProjectsUsers = projectsUsersRepository.findByUserIn(activeUsers);
-		int totalActiveUser = activeUsers.size();
+		List<User> activeUsers = Optional.ofNullable(userRepository.findByActiveTrue())
+				.orElse(Collections.emptyList());
+		List<ProjectsUsers> activeUsersProjectsUsers = Optional.ofNullable(projectsUsersRepository.findByUserIn(activeUsers))
+				.orElse(Collections.emptyList());
+		if (activeUsers.isEmpty()) {
+			logger.warning("No active users found.");
+			return;
+		}
 
-		try (ProgressBar pb = new ProgressBar("Calculating user current rank", totalActiveUser)) {
+		try (ProgressBar pb = new ProgressBar("Calculating user current rank", activeUsers.size())) {
 			for (User user : activeUsers) {
 				pb.step();
-                Map<String, ProjectsUsers> lastedProjectsUsersBySlug = UserTalentPointCalculator.getLastedProjectsUsersBySlug(user, activeUsersProjectsUsers);
-                UserCommonCore userCommonCore = calculateUserCommonCore(user, lastedProjectsUsersBySlug);
+				Map<String, ProjectsUsers> lastedProjectsUsersBySlug = UserTalentPointCalculator.getLastedProjectsUsersBySlug(user, activeUsersProjectsUsers);
+				UserCommonCore userCommonCore = calculateUserCommonCore(user, lastedProjectsUsersBySlug);
 				try {
 					user.setDetailedProfileJson(toJson(userCommonCore));
 				} catch (RuntimeException e) {
@@ -46,11 +51,21 @@ public class UserRankCalculator {
 					user.setDetailedProfileJson(null);
 				}
 			}
+		} catch (Exception e) {
+			logger.severe("Failed to initialize progress bar: " + e.getMessage());
+			return;
 		}
-		userRepository.saveAll(activeUsers);
+		try {
+			userRepository.saveAll(activeUsers);
+		} catch (Exception e) {
+			logger.severe("Failed to save user ranks: " + e.getMessage());
+		}
 	}
 
 	private IndividualProject setIndividualProject(ProjectsUsers projectsUsers) {
+		if (projectsUsers == null || projectsUsers.getProject() == null) {
+			throw new IllegalArgumentException("ProjectsUsers and its project cannot be null");
+		}
 		LastProjectsUsers lastProjectsUsers = new LastProjectsUsers(
 				projectsUsers.getOccurrence(),
 				projectsUsers.getFinalMark(),
@@ -65,11 +80,17 @@ public class UserRankCalculator {
 
 	@SuppressWarnings("ReassignedVariable")
 	public UserCommonCore calculateUserCommonCore(User user, Map<String, ProjectsUsers> lastedProjectsUsersBySlug) {
+		if (user == null || lastedProjectsUsersBySlug == null) {
+			throw new IllegalArgumentException("User and lastedProjectsUsersBySlug cannot be null");
+		}
 		Integer currentRank = 0;
 		List<IndividualRank> ranks = new ArrayList<>();
 		Set<String> finishedProjects = new HashSet<>();
 
 		for (Map.Entry<Integer, RankDefinition> entry : CommonCoreCurriculum.RANKS.entrySet()) {
+			if (entry.getValue() == null) {
+				continue;
+			}
 			boolean rankCompleted = true;
 			List<IndividualProject> projects = new ArrayList<>();
 			for (String projectSlug : entry.getValue().mandatory()) {
@@ -87,6 +108,9 @@ public class UserRankCalculator {
 				}
 			}
 			for (Set<String> choiceGroups : entry.getValue().choices()) {
+				if (choiceGroups == null) {
+					continue;
+				}
 				boolean choicesCompleted = false;
 				for (String projectSlug : choiceGroups) {
 					ProjectsUsers projectsUsers = lastedProjectsUsersBySlug.get(projectSlug);
@@ -119,6 +143,9 @@ public class UserRankCalculator {
 	}
 
 	private boolean isProjectFinished(IndividualProject project) {
+		if (project == null || project.lastProjectsUsers() == null) {
+			return false;
+		}
 		Boolean validated = project.lastProjectsUsers().validated();
 		return validated != null && validated;
 	}
@@ -135,26 +162,35 @@ public class UserRankCalculator {
 				}
 			}
 			for (Set<String> choiceGroup : current.choices()) {
-				boolean anyFinished = choiceGroup.stream().anyMatch(finishedProjects::contains);
-				if (anyFinished) {
-					eligibleProjects.addAll(choiceGroup);
+				if (choiceGroup != null) {
+					boolean anyFinished = choiceGroup.stream().anyMatch(finishedProjects::contains);
+					if (anyFinished) {
+						eligibleProjects.addAll(choiceGroup);
+					}
 				}
 			}
 		}
 		if (next != null) {
 			eligibleProjects.addAll(next.mandatory());
 			for (Set<String> choiceGroup : next.choices()) {
-				eligibleProjects.addAll(choiceGroup);
+				if (choiceGroup != null) {
+					eligibleProjects.addAll(choiceGroup);
+				}
 			}
 		}
 		return eligibleProjects;
 	}
 
 	private String toJson(UserCommonCore userCommonCore) {
+		if (userCommonCore == null) {
+			throw new IllegalArgumentException("UserCommonCore cannot be null");
+		}
+
 		try {
 			return objectMapper.writeValueAsString(userCommonCore);
 		} catch (Exception e) {
-			throw new RuntimeException();
+			logger.severe("Failed to serialize UserCommonCore: " + e.getMessage());
+			throw new RuntimeException("Failed to serialize UserCommonCore", e);
 		}
 	}
 

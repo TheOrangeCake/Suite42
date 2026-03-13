@@ -59,27 +59,35 @@ public class StartupRunner implements CommandLineRunner {
         }
         String token = oauthTokenGetter.getToken();
         logger.info("Fetching only Lausanne campus due to API rate limit");
+        boolean needRecalculate = false;
         if (campusRepository.count() > 0) {
             logger.info("Campus database already initialized. Skip API fetch for Campus.");
         } else {
             databaseImport.campusDbPopulate(token);
+            needRecalculate = true;
         }
         if (userRepository.count() > 0) {
             logger.info("User database already initialized. Skip API fetch for User.");
         } else {
             databaseImport.userDbPopulate(token);
+            needRecalculate = true;
         }
         if (projectsUsersRepository.count() > 0) {
             logger.info("ProjectsUsers database already initialized. Skip API fetch for ProjectsUsers.");
         } else {
             projectsUsersImport.projectsUsersDbPopulate(token);
         }
-        if (userRepository.count() > 0 && projectsUsersRepository.count() > 0)  {
+        if (userRepository.count() > 0 && projectsUsersRepository.count() > 0 && needRecalculate)  {
             userRankCalculator.calculateUserRank();
             userProgressScoreCalculator.calculateUserScore();
             userTalentPointCalculator.calculateUserTalentPoint();
+        } else if (userRepository.count() <= 0 && projectsUsersRepository.count() <= 0) {
+            logger.severe("Databases user and projects users initialization failed");
+            return;
+        } else if (!needRecalculate) {
+            logger.info("Data already calculated. Skip data calculation.");
         }
         this.startupComplete = true;
-        logger.info("Database initialization completed");
+        logger.info("Database initialization completed.");
     }
 }

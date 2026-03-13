@@ -125,7 +125,18 @@ public final class UserMapper {
 				user.setImageMedium(dto.image().versions().medium());
 				user.setImageSmall(dto.image().versions().small());
 				user.setImageMicro(dto.image().versions().micro());
+			} else {
+				user.setImageLarge(dto.image().link());
+				user.setImageMedium(dto.image().link());
+				user.setImageSmall(dto.image().link());
+				user.setImageMicro(dto.image().link());
 			}
+		} else {
+			user.setImageLink(envVariables.getImageDomain() + envVariables.getDefaultAvatar());
+			user.setImageLarge(envVariables.getImageDomain() + envVariables.getDefaultAvatar());
+			user.setImageMedium(envVariables.getImageDomain() + envVariables.getDefaultAvatar());
+			user.setImageSmall(envVariables.getImageDomain() + envVariables.getDefaultAvatar());
+			user.setImageMicro(envVariables.getImageDomain() + envVariables.getDefaultAvatar());
 		}
 		return user;
 	}

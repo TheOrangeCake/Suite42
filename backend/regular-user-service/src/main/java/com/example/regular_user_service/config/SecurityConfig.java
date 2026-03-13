@@ -22,6 +22,7 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) {
 		http.csrf(AbstractHttpConfigurer::disable)
 				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/actuator/**").permitAll()
 						.requestMatchers("/v1/regular-user/auth/**").permitAll()
 						.requestMatchers("/error").permitAll()
 						.requestMatchers("/images-regular/**").permitAll()

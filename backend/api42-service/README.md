@@ -51,6 +51,10 @@ Currently only support Lausanne campus
       <summary><code>GET /v1/42users</code></summary>
       <ul>
         <li>Description: Get all users active, non alumni and rank between 0 and 6.<br>Require authenticated.</li>
+        <li>Search:
+            <ul>
+              <li><code>search</code> (optional, search for users with similar login/firstname/lastname)</li>
+            </ul></li>
         <li>Filter:
           <ul>
             <li><code>campusName</code> (mandatory, Lausanne only)</li>

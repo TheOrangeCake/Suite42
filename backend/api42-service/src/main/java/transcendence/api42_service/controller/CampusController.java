@@ -64,8 +64,11 @@ public class CampusController {
 
 	@GetMapping("/id/{id}")
 	public CampusDto getCampusById(@PathVariable Long id) {
+		if (id == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Campus ID cannot be null");
+		}
 		Campus campus = campusRepository.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Campus " + id + " not found with ID"));
 		return campusMapper.mapToDto(campus);
 	}
 
@@ -73,6 +76,9 @@ public class CampusController {
 	public Page<CampusDto> getCampusesByName(
 			@PathVariable String name,
 			@PageableDefault(size = 25) Pageable pageable) {
+		if (name == null || name.trim().isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Campus name cannot be null or empty");
+		}
 		int maxSize = 50;
 		Pageable safePageable = PageRequest.of(
 				pageable.getPageNumber(),

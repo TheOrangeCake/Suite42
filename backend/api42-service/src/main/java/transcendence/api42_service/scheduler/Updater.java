@@ -63,6 +63,8 @@ public class Updater {
             userRankCalculator.calculateUserRank();
             userProgressScoreCalculator.calculateUserScore();
             userTalentPointCalculator.calculateUserTalentPoint();
+        } else {
+            logger.severe("Databases user and projects users initialization failed");
         }
         finishedUpdate = true;
         logger.info("Database update completed");

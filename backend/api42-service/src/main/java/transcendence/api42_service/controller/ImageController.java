@@ -27,6 +27,9 @@ public class ImageController {
 
 	@GetMapping("/images42/{fileName}")
 	public ResponseEntity<?> getImage(@PathVariable String fileName) {
+		if (fileName == null || fileName.trim().isEmpty()) {
+			return ResponseEntity.badRequest().body("File name cannot be null or empty");
+		}
 		try {
 			Path imagePath = Paths.get(envVariables.getUploadDir()).resolve(fileName).normalize();
 			if (!imagePath.startsWith(Paths.get(envVariables.getUploadDir()).toAbsolutePath())) {
@@ -41,10 +44,15 @@ public class ImageController {
 			return ResponseEntity.status(404).body("Image not found");
 		} catch(WrongExtensionException | InvalidMediaTypeException e) {
 			return ResponseEntity.status(400).body("Bad file extension");
+		} catch (Exception e) {
+			return ResponseEntity.internalServerError().body("Internal server error");
 		}
     }
 
 	private MediaType getMediaType(String fileName) {
+		if (fileName == null || !fileName.contains(".")) {
+			throw new WrongExtensionException();
+		}
 		String extension = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
 		return switch (extension) {
 			case (".gif") -> MediaType.IMAGE_GIF;

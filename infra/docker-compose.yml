@@ -56,6 +56,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
     entrypoint: ["/bin/sh", "-c", "set -a; . /vault/secrets/postgres.env; set +a; exec docker-entrypoint.sh postgres"]
+    ports:
+      - "5435:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
       - vault-secrets:/vault/secrets:ro
@@ -278,6 +280,30 @@ services:
       - ./modsecurity/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:ro
     depends_on:
       - api-gateway
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - app_net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
     networks:
       - app_net
 
@@ -289,6 +315,8 @@ volumes:
   regular-user-images:
   vault-data:
   vault-secrets:
+  prometheus-data:
+  grafana-data:
 
 networks:
   app_net:
