@@ -37,18 +37,18 @@ spring:
               filters:
                 - StripPrefix=2
 
-            - id: chat-service
-              uri: http://chat-service:8082
-              predicates:
-                - Path=/api/chat/**
-              filters:
-                - StripPrefix=2
+            # - id: chat-service
+            #   uri: http://chat-service:8082
+            #   predicates:
+            #     - Path=/api/chat/**
+            #   filters:
+            #     - StripPrefix=2
 
-            - id: chat-socket
-              uri: http://chat-service:8082
-              predicates:
-                - Path=/ws-chat/**
-              filters: []
+            # - id: chat-socket
+            #   uri: http://chat-service:8082
+            #   predicates:
+            #     - Path=/ws-chat/**
+            #   filters: []
 
 management:
   endpoints:

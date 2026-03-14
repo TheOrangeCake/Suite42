@@ -27,4 +27,3 @@ cd "$CERT_DIR"
 mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1
 
 echo "✅ Certificats générés avec succès"
-

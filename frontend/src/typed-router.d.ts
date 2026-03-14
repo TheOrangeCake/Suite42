@@ -20,11 +20,18 @@ declare module 'vue-router/auto-routes' {
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
     '/about': RouteRecordInfo<'/about', '/about', Record<never, never>, Record<never, never>>,
+    '/campuses': RouteRecordInfo<'/campuses', '/campuses', Record<never, never>, Record<never, never>>,
+    '/chat': RouteRecordInfo<'/chat', '/chat', Record<never, never>, Record<never, never>>,
     '/finder': RouteRecordInfo<'/finder', '/finder', Record<never, never>, Record<never, never>>,
     '/friends': RouteRecordInfo<'/friends', '/friends', Record<never, never>, Record<never, never>>,
+    '/home': RouteRecordInfo<'/home', '/home', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
+    '/modify_profile': RouteRecordInfo<'/modify_profile', '/modify_profile', Record<never, never>, Record<never, never>>,
     '/profile': RouteRecordInfo<'/profile', '/profile', Record<never, never>, Record<never, never>>,
+    '/projects': RouteRecordInfo<'/projects', '/projects', Record<never, never>, Record<never, never>>,
     '/signup': RouteRecordInfo<'/signup', '/signup', Record<never, never>, Record<never, never>>,
+    '/tasks': RouteRecordInfo<'/tasks', '/tasks', Record<never, never>, Record<never, never>>,
+    '/user/[login]': RouteRecordInfo<'/user/[login]', '/user/:login', { login: ParamValue<true> }, { login: ParamValue<false> }>,
   }
 
   /**
@@ -46,6 +53,14 @@ declare module 'vue-router/auto-routes' {
       routes: '/about'
       views: never
     }
+    'src/pages/campuses.vue': {
+      routes: '/campuses'
+      views: never
+    }
+    'src/pages/chat.vue': {
+      routes: '/chat'
+      views: never
+    }
     'src/pages/finder.vue': {
       routes: '/finder'
       views: never
@@ -54,16 +69,36 @@ declare module 'vue-router/auto-routes' {
       routes: '/friends'
       views: never
     }
+    'src/pages/home.vue': {
+      routes: '/home'
+      views: never
+    }
     'src/pages/login.vue': {
       routes: '/login'
+      views: never
+    }
+    'src/pages/modify_profile.vue': {
+      routes: '/modify_profile'
       views: never
     }
     'src/pages/profile.vue': {
       routes: '/profile'
       views: never
     }
+    'src/pages/projects.vue': {
+      routes: '/projects'
+      views: never
+    }
     'src/pages/signup.vue': {
       routes: '/signup'
+      views: never
+    }
+    'src/pages/tasks.vue': {
+      routes: '/tasks'
+      views: never
+    }
+    'src/pages/user/[login].vue': {
+      routes: '/user/[login]'
       views: never
     }
   }

@@ -75,7 +75,12 @@ async function onLogin(payload: LoginPayload) {
       otpError.value = ''
       showOtp.value = true
     } else {
-      authStore.setSession(result.user, authStore.accessToken!)
+      const token = authStore.accessToken
+      if (!token) {
+        errorMessage.value = 'Authentication failed: no token received.'
+        return
+      }
+      authStore.setSession(result.user, token)
       router.push('/profile')
     }
   } catch (error) {
@@ -102,7 +107,12 @@ async function onVerifyOtp() {
   otpError.value = ''
   try {
     const user = await verifyOtp(email, otp)
-    authStore.setSession(user, authStore.accessToken!)
+    const token = authStore.accessToken
+    if (!token) {
+      otpError.value = 'Authentication failed: no token received.'
+      return
+    }
+    authStore.setSession(user, token)
     router.push('/profile')
   } catch (error) {
     if (error instanceof Error) otpError.value = error.message

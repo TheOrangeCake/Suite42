@@ -50,4 +50,7 @@ export const http = {
   delete<T>(url: string) {
     return request<T>(url, { method: 'DELETE' })
   },
+  patch<T>(url: string, body?: unknown) {
+    return request<T>(url, { method: 'PATCH', body: body !== undefined ? JSON.stringify(body) : undefined })
+  },
 }

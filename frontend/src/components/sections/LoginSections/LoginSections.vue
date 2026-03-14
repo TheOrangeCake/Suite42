@@ -45,6 +45,7 @@ const router = useRouter();
                   Login with 42 account
                 </button>
               </div>
+            </div>
 
             <div class="loginBlock">
               <div class="blockTitle">
@@ -109,7 +110,6 @@ const router = useRouter();
         />
       </div>
 
-    </div>
   </section>
 </template>
 

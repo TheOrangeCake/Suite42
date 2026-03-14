@@ -60,16 +60,12 @@
 <script setup lang="ts">
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
-import { signout } from '../api/auth'
 
 const authStore = useAuthStore()
 const router = useRouter()
 
 async function handleLogout() {
-  try {
-    await signout()
-  } catch {}
-  authStore.clearSession()
+  await authStore.logout()
   router.push('/login')
 }
 </script>
@@ -127,7 +123,6 @@ async function handleLogout() {
   color: white;
 }
 
-/* Quand la route est active, on met en avant l'item */
 .nav-item.router-link-active .nav-icon {
   filter: brightness(0) invert(1);
 }

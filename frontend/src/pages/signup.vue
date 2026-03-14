@@ -46,6 +46,21 @@ async function onSignup(payload: SignupPayload) {
     return
   }
 
+  if (!/[A-Z]/.test(payload.password)) {
+    errorMessage.value = 'Password must contain at least one uppercase letter'
+    return
+  }
+
+  if (!/[a-z]/.test(payload.password)) {
+    errorMessage.value = 'Password must contain at least one lowercase letter'
+    return
+  }
+
+  if (!/\d/.test(payload.password)) {
+    errorMessage.value = 'Password must contain at least one digit'
+    return
+  }
+
   if (payload.password !== payload.confirmPassword) {
     errorMessage.value = 'Passwords do not match'
     return

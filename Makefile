@@ -1,7 +1,7 @@
 COMPOSE = docker compose -f infra/docker-compose.yml --env-file .env
 
-# certs:
-# 	@bash infra/scripts/setup-certs.sh
+#certs:
+#	@bash infra/scripts/setup-certs.sh
 
 .PHONY: rebuild up down restart logs ps build clean setup-certs
 

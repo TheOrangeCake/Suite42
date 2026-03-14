@@ -167,6 +167,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { getUsers } from '../api/api42'
+import type { User42 } from '../api/api42'
 import { useRouter } from 'vue-router'
 
 definePage({
@@ -174,7 +175,7 @@ definePage({
 })
 
 const router = useRouter()
-const users = ref<any[]>([])
+const users = ref<User42[]>([])
 const isLoading = ref(false)
 const error = ref('')
 const totalElements = ref(0)

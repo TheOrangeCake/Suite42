@@ -1,37 +1,34 @@
+<script setup lang="ts">
+definePage({
+  meta: { layout: 'default' },
+})
+</script>
+
 <template>
   <div class="page">
-    <IndexSections/>
-    <ToolkitSections/>
+    <IndexSections />
+    <ToolkitSections />
     <div class="dark-bg">
-      <AboutSections/>
+      <AboutSections />
     </div>
-
-      <TechSections/>
+    <TechSections />
   </div>
 </template>
 
 <style scoped>
+.page {
+  padding: 30px 0;
+  width: 100%;
+}
+
 .dark-bg {
   background-color: #1a1a1a;
   width: 100%;
-
-}
-.page {
-    padding: 30px 0px; /* ← garde le padding haut/bas, retire gauche/droite */
-  width: 100%;
 }
 
-
-@media (max-width: 868px ){
+@media (max-width: 868px) {
   .page {
-      padding: 0px;
+    padding: 0;
   }
 }
 </style>
-  <script>
-    import TechSections from '../components/sections/IndexSections/TechSections.vue'
-    import IndexSections from '../components/sections/IndexSections/IndexSections.vue'
-    import ToolkitSections from '../components/sections/IndexSections/ToolkitSections.vue'
-    import AboutSections from '../components/sections/IndexSections/AboutSections.vue'
-  </script>
-

@@ -1,5 +1,5 @@
 <template>
-  <p> this is the about vue </p>
+  <p> this is the project vue </p>
 </template>
 
 <script setup lang="ts">

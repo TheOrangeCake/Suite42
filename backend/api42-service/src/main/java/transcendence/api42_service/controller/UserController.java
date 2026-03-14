@@ -99,6 +99,13 @@ public class UserController {
 		return userMapper.mapToDetailedDto(user);
 	}
 
+	@GetMapping("/profile/login/{login}")
+	public UserDetailedResponseDto getUserByLogin(@PathVariable String login) {
+		User user = this.userRepository.findByLogin(login)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		return userMapper.mapToDetailedDto(user);
+	}
+
 	@GetMapping("/last_name/{lastName}")
 	@SuppressWarnings("Duplicates")
 	public Page<UserSimpleResponseDto> getUserByLastName(

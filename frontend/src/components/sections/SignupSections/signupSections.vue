@@ -86,7 +86,7 @@ function handleSignup() {
           <button
             class="btnSignup"
             @click="handleSignup"
-            :disabled="isLoading" >{{ isLoading ? 'Connexion...' : 'Log in'}}</button>
+            :disabled="isLoading" >{{ isLoading ? 'Signing up...' : 'Sign up'}}</button>
         </div>
 
       </div>

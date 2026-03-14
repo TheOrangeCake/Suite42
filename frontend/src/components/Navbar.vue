@@ -2,21 +2,12 @@
 import logo from '/design/assets/logo/logo_full.svg'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
-import { signout, logout42 } from '../api/auth'
 
 const authStore = useAuthStore()
 const router = useRouter()
 
 async function handleLogout() {
-  try {
-    if (authStore.user42) {
-      await logout42()
-    } else {
-      await signout()
-    }
-  } catch {
-  }
-  authStore.clearSession()
+  await authStore.logout()
   router.push('/login')
 }
 </script>
