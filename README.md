@@ -1,54 +1,166 @@
-# Transcendence – Project Overview
+# Transcendence
 
-This repository is organized as a small microservices project.
-Everything is started with **Docker Compose** and the backend is accessed through an **API Gateway**.
+Projet full-stack en microservices : application web de gestion de projets 42 avec chat, profils, et authentification OAuth 42.
 
-## 1) Main folders
+## Stack
 
-### `infra/`
-Infrastructure setup (this is where the project is “wired”).
-- **`infra/docker-compose.yml`** ✅  
-  The main file that declares all containers (frontend, gateway, services, databases), ports, networks, env vars.
-- `infra/nginx/nginx.conf`  
-  Old / optional nginx reverse-proxy config, this is currently commented in compose.
+| Couche | Techno |
+|---|---|
+| Frontend | Vue 3 + TypeScript + Vite + Vuetify |
+| API Gateway | Spring Cloud Gateway |
+| Backend | Spring Boot (microservices) |
+| Auth | OAuth 42 + JWT + 2FA (OTP) |
+| Base de données | PostgreSQL (une par service) |
+| Secrets | HashiCorp Vault |
+| WAF | OWASP ModSecurity (nginx) |
+| Monitoring | Prometheus + Grafana |
 
-### `api-gateway/`
+---
 
-The API Gateway (Spring Boot + Spring Cloud Gateway).
-- **`api-gateway/src/main/resources/application.yaml`** ===> Gateway routing rules (ex: `/api/auth/**` → auth-service).
-- `api-gateway/pom.xml`  ==> Java dependencies.
+## Prérequis
 
+- Docker + Docker Compose
+- `mkcert` (pour les certificats SSL locaux)
+- Un compte 42 avec une **application OAuth créée sur l'intranet 42**
 
-### `backend/`
+### Créer une application OAuth 42
 
-All backend microservices (each service is its own Spring Boot project).
-- `backend/auth-service/`
-- `backend/group-service/`
-- `backend/api42-service/` ==>  [api42-service documentation](./backend/api42-service/README.md)
-- `backend/regular-user-service/` ==> [regular-user-service documentation](./backend/regular-user-service/README.md)
+1. Va sur [https://profile.intra.42.fr/oauth/applications](https://profile.intra.42.fr/oauth/applications)
+2. Clique sur **"New Application"**
+3. Remplis :
+   - **Name** : ce que tu veux (ex: `transcendence-local`)
+   - **Redirect URI** : `https://localhost/api/auth/callback/42`
+   - **Scopes** : `public` minimum
+4. Recupere le **Client ID** et le **Client Secret** -> ce sont tes `FORTYTWO_CLIENT_ID` et `FORTYTWO_CLIENT_SECRET`
 
-### `chat-service/`
-Another Spring Boot service (separate folder, not inside `backend/` (maybe we gonna move it later)).
+---
 
-### `frontend/`
-Frontend app (Vue/Vite) built into static files and served by Nginx.
-- `frontend/containers/Dockerfile` (build frontend + run nginx)
-- `frontend/ressources/nginx.conf` (nginx config for SPA routing)
-- `frontend/design` ==> [design documentation](./frontend/design/README.md)
+## Installation
 
-Each service folder usually contains:
-- `pom.xml` (Java dependencies)
-- `Dockerfile` (build + run container)
-- `src/main/resources/application.yml` (service config, port, etc.)
+### 1. Cloner le repo
 
+```bash
+git clone <repo-url>
+cd Transcendence
+```
 
-## 2) Where services are declared (most important file)
+### 2. Configurer les variables d'environnement
 
-✅ **`infra/docker-compose.yml`**
-- declares containers
-- sets ports (what is exposed to your machine)
-- sets networks (how containers talk to each other)
-- injects environment variables from `.env`
+Cree un fichier `.env` a la racine du projet avec les variables suivantes :
 
-Run with:
-    make
+```env
+# URLs frontend
+VITE_API_URL=https://localhost
+VITE_CHAT_URL=wss://localhost/ws-chat
+
+SPRING_PROFILES_ACTIVE=prod
+
+# Base de donnees principale (auth, chat, group)
+POSTGRES_DB=transcendence
+POSTGRES_USER=transcendence
+POSTGRES_PASSWORD=<mot-de-passe-fort>
+
+FRONTEND_BASE_URL=https://localhost
+
+# OAuth 42 (creer une app sur profile.intra.42.fr/oauth/applications)
+FORTYTWO_CLIENT_ID=<ton-client-id>
+FORTYTWO_CLIENT_SECRET=<ton-client-secret>
+FORTYTWO_REDIRECT_URI=https://localhost/api/auth/callback/42
+
+# JWT (cle aleatoire longue)
+JWT_SECRET=<cle-aleatoire-256-bits>
+
+# Base de donnees api42-service
+API42_POSTGRES_DB=api42
+API42_POSTGRES_USER=api42
+API42_POSTGRES_PASSWORD=<mot-de-passe>
+
+# Credentials API 42 (meme app que OAuth ci-dessus)
+API42_NEXT_SECRET=<secret>
+API42_UID=<uid-de-l-app-42>
+API42_SECRET=<secret-de-l-app-42>
+
+# Base de donnees regular-user-service
+REGULAR_USER_POSTGRES_DB=regularuser
+REGULAR_USER_POSTGRES_USER=regularuser
+REGULAR_USER_POSTGRES_PASSWORD=<mot-de-passe>
+REGULAR_USER_JWT_KEY=<cle-jwt>
+REGULAR_USER_EMAIL=<email-pour-envoi-otp>
+REGULAR_USER_APP_PASSWORD=<mot-de-passe-app-gmail>
+```
+
+### 3. Lancer le projet
+
+```bash
+make up
+```
+
+Le `make up` genere automatiquement les certificats SSL locaux via `mkcert` si absents, puis lance tous les containers.
+
+Acces : **https://localhost**
+
+> La premiere fois, le navigateur affichera un avertissement SSL (certificat auto-signe local). C'est normal, accepte l'exception.
+
+---
+
+## Commandes
+
+```bash
+make up          # Lancer (genere les certs SSL si besoin)
+make down        # Arreter
+make restart     # Rebuild complet + relancer
+make logs        # Logs en direct
+make ps          # Etat des containers
+make clean       # Arreter + supprimer tous les volumes (reset complet)
+```
+
+---
+
+## Architecture
+
+```
+https://localhost
+       |
+       v
+    WAF (nginx + ModSecurity) :443
+       |
+       |-- /           -> frontend:3000     (Vue/Vite dev server)
+       |-- /api/       -> api-gateway:8080  (routing general)
+       |-- /api/chat/  -> chat-service:8082 (REST chat, bypass gateway)
+       +-- /ws-chat/   -> chat-service:8082 (WebSocket STOMP)
+
+api-gateway:8080
+       |-- /api/auth/**             -> auth-service
+       |-- /api/api42/**            -> api42-service
+       |-- /api/regular-user/**     -> regular-user-service
+       +-- /api/group/**            -> group-service
+```
+
+## Structure du repo
+
+```
+Transcendence/
+|-- frontend/                   # Vue 3 + TypeScript
+|-- backend/
+|   |-- auth-service/           # OAuth 42 + JWT + 2FA OTP
+|   |-- api42-service/          # Profils utilisateurs 42 (API intranet)
+|   |-- regular-user-service/   # Comptes locaux (username/password)
+|   |-- group-service/          # Groupes / systeme d'amis
+|   +-- chat-service/           # Chat temps reel (WebSocket STOMP)
+|-- api-gateway/                # Spring Cloud Gateway
++-- infra/
+    |-- docker-compose.yml
+    |-- nginx/nginx.conf         # Config WAF/reverse proxy
+    |-- vault/                  # HashiCorp Vault (gestion des secrets)
+    |-- prometheus/             # Config Prometheus
+    +-- grafana/                # Dashboards Grafana
+```
+
+---
+
+## Monitoring
+
+| Service | URL |
+|---|---|
+| Prometheus | http://localhost:9090 |
+| Grafana | http://localhost:3001 (login: admin / mdp: `GRAFANA_ADMIN_PASSWORD`) |
