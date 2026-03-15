@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { type Colors, colors } from '@/styles/Colors.ts'
 
-  const bigRedButtonProps = withDefaults(
+  const smallRedButtonProps = withDefaults(
     defineProps<{
       text: string
       hoverTextColor?: Colors
@@ -16,20 +16,20 @@
 <template>
   <div class="flex justify-center items-center">
     <button
-      class="flex px-5 py-2.5 justify-center items-center rounded border-2 font-medium font-h4-mobile transition-colors duration-200
-             md:font-h4-mobile
-             lg:font-h4-tablet
-             xl:font-h4-desktop"
+      class="flex px-6 py-2 justify-center items-center rounded border-2 font-medium font-body1-mobile transition-colors duration-200
+             md:font-body1-mobile
+             lg:font-body1-tablet
+             xl:font-body1-desktop"
       :style="{
         borderColor: colors.suite42Red,
-        backgroundColor: isHovered ? 'transparent' : colors.suite42Red,
-        color: isHovered ? colors[bigRedButtonProps.hoverTextColor] : colors.suite42White
+        backgroundColor: isHovered ? colors.suite42Red : 'transparent',
+        color: isHovered ? colors.suite42White : colors[smallRedButtonProps.hoverTextColor]
       }"
       @click="emit('click')"
       @mouseleave="isHovered = false"
       @mouseover="isHovered = true"
     >
-      {{ bigRedButtonProps.text }}
+      {{ smallRedButtonProps.text }}
     </button>
   </div>
 </template>

@@ -9,7 +9,9 @@
 
 <template>
   <div
-    class="flex self-stretch items-center px-2 md:px-3 xl:px-4"
+    class="flex self-stretch items-center pl-3 pr-2
+           md:pl-4
+           xl:pl-4"
     :style="{
       height: singleConnectorProps.height !== undefined
         ? (`${singleConnectorProps.height}rem`)

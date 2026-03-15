@@ -1,235 +1,186 @@
 <script setup lang="ts">
-import Corner from '../../ui/Corner.vue'
+  import { useRouter } from 'vue-router'
+  import { viewportValue } from '@/composables/viewportsValue'
+  import { colors } from '@/styles/Colors.ts'
 
-const categories = [
-  {
-    name: 'Front-end',
-    color: 'var(--color-turquoise)',
-    items: ['Vue.js', 'Vuetify'],
-  },
-  {
-    name: 'Design',
-    color: 'var(--color-green)',
-    items: ['Figma'],
-  },
-  {
-    name: 'Back-end',
-    color: 'var(--color-coral, #FF5959)',
-    items: ['Java Spring Boot', 'Java Spring Security', 'Java sprind DATA JPA', 'Apache Maven', 'Nginx', 'PostgreSQL'],
-  },
-  {
-    name: 'DevOps',
-    color: 'var(--color-green)',
-    items: [
-      'Docker / Docker Compose',
-      'GitHub',
-      'Java Spring Cloud Gateway'
-    ],
-  },
-]
+  const router = useRouter()
+  const categories = [
+    {
+      id: 1,
+      name: 'Front-end',
+      color1: 'suite42Blue',
+      color2: 'suite42Green',
+      items: [
+        'Vue.js',
+        'Vuetify',
+        'TailwindCSS',
+        'Vite',
+      ],
+    },
+    {
+      id: 2,
+      name: 'Design',
+      color1: 'suite42Green',
+      color2: 'suite42Red',
+      items: [
+        'Figma',
+        'Adobe Illustrator',
+      ],
+    },
+    {
+      id: 3,
+      name: 'Back-end',
+      color1: 'suite42Red',
+      color2: 'suite42Black',
+      items: [
+        'Java Spring Boot',
+        'Java Spring Security',
+        'Java JPA',
+        'Hibernate ORM',
+        'Nginx',
+        'PostgreSQL',
+        'Grafana',
+        'Prometheus',
+      ],
+    },
+    {
+      id: 4,
+      name: 'DevOps',
+      color1: 'suite42Black',
+      color2: 'suite42Blue',
+      items: [
+        'Docker / Docker Compose',
+        'GitHub',
+        'Java Spring Cloud Gateway',
+        'HashiCorp Vault',
+      ],
+    },
+  ]
+  const techLogos = [
+    { id: 1, name: 'Vue.js', src: '/design/assets/tech_logos/vuejs.png' },
+    { id: 2, name: 'Tailwind CSS', src: '/design/assets/tech_logos/tailwindcss.svg' },
+    { id: 3, name: 'Vite', src: '/design/assets/tech_logos/vite.svg' },
+    { id: 4, name: 'Figma', src: '/design/assets/tech_logos/figma.svg' },
+    { id: 5, name: 'Adobe Illustrator', src: '/design/assets/tech_logos/adobeIllustrator.svg' },
+    { id: 6, name: 'Spring', src: '/design/assets/tech_logos/spring.svg' },
+    { id: 7, name: 'Hibernate', src: '/design/assets/tech_logos/Hibernate.png' },
+    { id: 8, name: 'Nginx', src: '/design/assets/tech_logos/nginx.svg' },
+    { id: 9, name: 'PostgreSQL', src: '/design/assets/tech_logos/PostgreSQL.svg' },
+    { id: 10, name: 'Grafana', src: '/design/assets/tech_logos/grafana.svg' },
+    { id: 11, name: 'Prometheus', src: '/design/assets/tech_logos/Prometheus.svg' },
+    { id: 12, name: 'Docker', src: '/design/assets/tech_logos/docker.svg' },
+    { id: 13, name: 'GitHub', src: '/design/assets/tech_logos/github.svg' },
+    { id: 14, name: 'HashiCorp Vault', src: '/design/assets/tech_logos/hashiCorp.svg' },
+  ]
 
-const logos = [
-  { name: 'Vue.js',  src: '/design/assets/tech_logos/vuejs.png' },
-  { name: 'NGINX',   src: '/design/assets/tech_logos/nginx.svg' },
-  { name: 'GitHub',  src: '/design/assets/tech_logos/github.svg' },
-  { name: 'Maven',   src: '/design/assets/tech_logos/maven.png' },
-  { name: 'Spring',  src: '/design/assets/tech_logos/spring.svg' },
-]
+  const connectorHeight1 = viewportValue({
+    mobile: 1.7,
+    tablet: 2.1,
+    laptop: 2.6,
+    desktop: 3.6,
+  })
+  const connectorHeight2 = viewportValue({
+    mobile: 0.8,
+    tablet: 1,
+    laptop: 1,
+    desktop: 1,
+  })
+  const connectorHeight3 = viewportValue({
+    mobile: 0.8,
+    tablet: 1,
+    laptop: 1,
+    desktop: 1,
+  })
+
 </script>
 
 <template>
-  <section class="container">
-
-    <div class="titleRow">
-      <Corner :vSize="90" :hSize="20" :thickness="5" color="var(--color-green)" />
-      <h1 class="headline">Tech stack</h1>
+  <section
+    class="flex flex-col w-full px-6
+           md:px-10
+           lg:px-14
+           xl:px-18
+           2xl:px-28"
+  >
+    <SingleConnector color="suite42Green" :height="6" />
+    <div class="flex flex-row">
+      <ConnectConnector color1="suite42Green" color2="suite42Red" :height="connectorHeight1" />
+      <h1
+        class="font-bold font-h1-mobile
+               md:font-h1-tablet
+               lg:font-h1-laptop
+               xl:font-h1-desktop"
+        :style="{ color: colors.suite42Black }"
+      >Tech stack</h1>
     </div>
-
-    <div class="body">
-
-      <div class="leftSection">
-
-        <Corner :vSize="500" :hSize="20" :thickness="4" color="var(--color-coral, #FF5959)" class="redLine" />
-
-        <div class="leftCol">
+    <DoubleConnectors color1="suite42Red" color2="suite42Blue" :height="2" />
+    <div
+      class="flex flex-row gap-2
+             md:gap-4"
+    >
+      <SingleConnector color="suite42Red" />
+      <div
+        class="flex flex-col gap-30
+               xl:flex-row"
+      >
+        <div
+          class="flex flex-col
+                 xl:w-full"
+        >
           <div
-            v-for="cat in categories"
-            :key="cat.name"
-            class="category"
+            v-for="category in categories"
+            :key="category.id"
+            class="flex flex-col"
           >
-            <Corner :vSize="60" :hSize="20" :thickness="4" :color="cat.color" />
-
-            <div class="catContent">
-              <span class="catName">{{ cat.name }}</span>
-
-              <div class="catItems" v-if="cat.items && cat.items.length">
+            <div class="flex flex-row">
+              <ConnectConnector :color1="category.color1" :color2="category.color2" :height="connectorHeight2" />
+              <div class="flex flex-col">
+                <h5
+                  class="font-bold font-h5-mobile
+                       md:font-h5-tablet
+                       lg:font-h5-laptop
+                       xl:font-h5-desktop"
+                  :style="{ color: colors.suite42Black }"
+                >{{ category.name }}</h5>
                 <div
-                  v-for="item in cat.items"
+                  v-for="item in category.items"
                   :key="item"
-                  class="catItem"
+                  class="flex flex-row"
                 >
-                  <Corner :vSize="14" :hSize="12" :thickness="3" :color="cat.color" />
-                  <span>{{ item }}</span>
+                  <EndConnector :color="category.color1" :height="connectorHeight3" />
+                  <span
+                    class="font-regular font-body1-mobile
+                       md:font-body1-tablet
+                       lg:font-body1-laptop
+                       xl:font-body1-desktop"
+                    :style="{ color: colors.suite42Black }"
+                  >{{ item }}</span>
                 </div>
               </div>
             </div>
-
+            <SingleConnector :color="category.color2" :height="2" />
+          </div>
+          <SingleConnector :color="'suite42Blue'" :height="4" />
+          <div class="flex flex-row">
+            <EndConnector :color="'suite42Blue'" :height="1.7" />
+            <BigRedButton text="Let's start working !" @click="router.push('/login')" />
           </div>
         </div>
-
-      </div>
-
-      <div class="rightCol">
-        <div class="logoGrid">
+        <div class="flex flex-row gap-6 md:gap-10 flex-wrap justify-center">
           <div
-            v-for="logo in logos"
-            :key="logo.name"
-            class="logoItem"
+            v-for="logo in techLogos"
+            :key="logo.id"
+            class="flex flex-col items-center justify-center w-24 h-24 md:w-32 m:h-32 p-2 rounded-lg shadow-sm transition duration-200 transform hover:scale-120 ease-out"
           >
-            <img :src="logo.src" :alt="logo.name" class="logoImg" />
-            <span class="logoName">{{ logo.name }}</span>
+            <img
+              :alt="logo.name"
+              class="h-12 md:h-16 w-auto object-contain mb-2"
+              :src="logo.src"
+            >
           </div>
         </div>
       </div>
-
     </div>
+    <SingleConnector color="suite42Red" :height="12" />
   </section>
 </template>
-
-<style scoped>
-* { box-sizing: border-box; }
-
-.container {
-  width: 100%;
-  padding-left: 5%;
-  padding-right: 5%;
-  background-color: white;
-}
-
-.titleRow {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  gap: 16px;
-  margin-bottom: clamp(14px, 3vw, 28px);
-}
-
-.headline {
-  color: #202020;
-  font-family: Monda, system-ui, sans-serif;
-  font-weight: 700;
-  font-size: clamp(1.8rem, 5vw, 64px);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-}
-
-.body {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: clamp(32px, 6vw, 80px);
-}
-
-.leftSection {
-  flex: 0 0 40%;
-  max-width: 40%;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.redLine {
-  flex-shrink: 0;
-}
-
-.leftCol {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(20px, 3vw, 36px);
-}
-
-.category {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.catContent {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.catName {
-  font-family: Monda, system-ui, sans-serif;
-  font-weight: 700;
-  font-size: clamp(0.85rem, 1.6vw, 1.05rem);
-  color: #202020;
-  line-height: 1;
-}
-
-.catItems {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-left: clamp(8px, 1.5vw, 16px);
-}
-
-.catItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.catItem span {
-  font-size: clamp(0.72rem, 1.2vw, 0.88rem);
-  color: #555;
-  line-height: 1.5;
-}
-
-.rightCol {
-  flex: 1;
-  min-width: 0;
-}
-
-.logoGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(32px, 5vw, 60px);
-  align-items: center;
-  justify-items: center;
-}
-
-.logoImg {
-  height: clamp(40px, 6vw, 72px);
-  width: auto;
-  object-fit: contain;
-  display: block;
-}
-
-.logoItem {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.logoName {
-  font-size: clamp(0.65rem, 1vw, 0.8rem);
-  color: #888;
-  font-family: Monda, system-ui, sans-serif;
-  text-align: center;
-}
-@media (max-width: 768px) {
-  .body { flex-direction: column; }
-  .leftSection { flex: none; max-width: 100%; width: 100%; }
-  .logoGrid { grid-template-columns: repeat(3, auto); }
-}
-
-@media (max-width: 480px) {
-  .logoGrid { grid-template-columns: repeat(2, auto); }
-}
-</style>

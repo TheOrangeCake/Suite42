@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { Colors } from '@/styles/Colors'
+import {colors, type Colors} from '@/styles/Colors'
   import { viewportValue } from '@/composables/viewportsValue.ts'
 
   const toolCardProps = defineProps<{
@@ -38,6 +38,7 @@
                md:font-h3-tablet
                lg:font-h3-laptop
                xl:font-h3-desktop"
+        :style="{ color: colors.suite42Black }"
       >{{ toolCardProps.title }}</h3>
       <SingleConnector :color="toolCardProps.colors2" :height="1" />
       <div class="flex flex-row">
@@ -47,6 +48,7 @@
                md:font-body1-tablet
                lg:font-body1-laptop
                xl:font-body1-desktop"
+          :style="{ color: colors.suite42Black }"
         >{{ toolCardProps.text }}</p>
       </div>
       <SingleConnector :color="toolCardProps.colors2" :height="1" />
@@ -55,7 +57,7 @@
           <EndConnector :color="toolCardProps.colors2" :full-width="true" :height="2" />
         </div>
         <div class="flex shrink">
-          <img alt="" class="w-70 md:w-100 lg:w-115 xl:w-150" :src="toolCardProps.image">
+          <img alt="" class="w-70 md:w-100 lg:w-115 xl:w-150 rounded-lg" :src="toolCardProps.image">
         </div>
       </div>
     </div>

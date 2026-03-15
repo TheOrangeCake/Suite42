@@ -10,7 +10,7 @@
 
 <template>
   <div
-    class="flex flex-row gap-3
+    class="flex flex-row gap-2
            md:gap-4"
   >
     <SingleConnector :color="doubleConnectorsProps.color1" :height="doubleConnectorsProps.height" />

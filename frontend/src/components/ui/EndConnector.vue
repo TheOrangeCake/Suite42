@@ -10,7 +10,7 @@
 
   const connectorWidth = viewportValue({
     mobile: 1,
-    tablet: 2,
+    tablet: 1.5,
     laptop: 2,
     desktop: 2,
   })
@@ -18,9 +18,9 @@
 
 <template>
   <div
-    class="flex items-center px-2
-           md:px-3
-           xl:px-4"
+    class="flex items-center pl-3 pr-2
+           md:pl-4
+           xl:pl-4"
     :style="{
       height: `${endConnectorProps.height}rem`,
       width: endConnectorProps.fullWidth ? '100%' : undefined
