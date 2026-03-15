@@ -1,34 +1,21 @@
 <script setup lang="ts">
-definePage({
-  meta: { layout: 'default' },
-})
+  definePage({
+    meta: { layout: 'default' },
+  })
 </script>
 
 <template>
-  <div class="page">
+  <div
+    class="w-full px-6
+          md:px-10
+          lg:px-14
+          xl:px-18
+          2xl:px-28"
+  >
     <IndexSections />
     <ToolkitSections />
-    <div class="dark-bg">
-      <AboutSections />
-    </div>
+    <SingleConnector color="suite42Red" :height="16" />
+    <AboutSections />
     <TechSections />
   </div>
 </template>
-
-<style scoped>
-.page {
-  padding: 30px 0;
-  width: 100%;
-}
-
-.dark-bg {
-  background-color: #1a1a1a;
-  width: 100%;
-}
-
-@media (max-width: 868px) {
-  .page {
-    padding: 0;
-  }
-}
-</style>

@@ -46,7 +46,7 @@ color palette, typography, and icons. (1p)</li>
 
     |   Name    |           Style           | Desktop | Laptop | Tablet | Mobile |
     |:---------:|:-------------------------:|:-------:|:------:|:------:|:------:|
-    | Heading 1 |           Bold            |  3.75   |   3    |  2.75  |  2.25  |
+    | Heading 1 |           Bold            |   6.5   |   3    |  2.75  |   3    |
     | Heading 2 |           Bold            |    3    |  2.5   |  2.25  |  1.75  |
     | Heading 3 |          Medium           |   2.5   |   2    |  1.75  |  1.5   |
     | Heading 4 |          Regular          |  1.75   |  1.5   |  1.25  |  1.25  |

@@ -4,37 +4,33 @@
  * Automatic routes for `./src/pages/*.vue`
  */
 
+import { setupLayouts } from 'virtual:generated-layouts'
 // Composables
 import { createRouter, createWebHistory } from 'vue-router'
-import { setupLayouts } from 'virtual:generated-layouts'
 import { routes } from 'vue-router/auto-routes'
 import { useAuthStore } from '@/stores/auth'
-
-
-
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: setupLayouts(routes),
 })
 
-
-router.beforeEach(async (to) => {
+router.beforeEach(async to => {
   const auth = useAuthStore()
-   if (!auth.authReady) {
+  if (!auth.authReady) {
     await new Promise<void>(resolve => {
       const unwatch = watch(
         () => auth.authReady,
-        (ready) => {
+        ready => {
           if (ready) {
             unwatch()
             resolve()
           }
-        }
+        },
       )
     })
   }
-   if (to.meta.requiresAuth && !auth.isLoggedIn) {
+  if (to.meta.requiresAuth && !auth.isLoggedIn) {
     return '/login'
   }
 })

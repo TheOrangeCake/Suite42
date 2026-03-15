@@ -13,7 +13,11 @@ declare module 'vue' {
   export interface GlobalComponents {
     AboutSections: typeof import('./components/sections/IndexSections/AboutSections.vue')['default']
     AppFooter: typeof import('./components/AppFooter.vue')['default']
+    BigRedButton: typeof import('./components/ui/BigRedButton.vue')['default']
+    ConnectConnector: typeof import('./components/ui/ConnectConnector.vue')['default']
     Corner: typeof import('./components/ui/Corner.vue')['default']
+    DoubleConnectors: typeof import('./components/ui/DoubleConnectors.vue')['default']
+    EndConnector: typeof import('./components/ui/EndConnector.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     HeroSections: typeof import('./components/sections/LoginSections/HeroSections.vue')['default']
     IndexSections: typeof import('./components/sections/IndexSections/IndexSections.vue')['default']
@@ -23,8 +27,12 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SignupSections: typeof import('./components/sections/SignupSections/signupSections.vue')['default']
-    TechSectins: typeof import('./components/sections/IndexSections/TechSectins.vue')['default']
+    SingleConnectionConnector: typeof import('./components/ui/SingleConnectionConnector.vue')['default']
+    SingleConnector: typeof import('./components/ui/SingleConnector.vue')['default']
+    SingleEndConnectors: typeof import('./components/ui/SingleEndConnectors.vue')['default']
     TechSections: typeof import('./components/sections/IndexSections/TechSections.vue')['default']
+    ToolCard: typeof import('./components/ui/ToolCard.vue')['default']
     ToolkitSections: typeof import('./components/sections/IndexSections/ToolkitSections.vue')['default']
+    TripleConnectors: typeof import('./components/ui/TripleConnectors.vue')['default']
   }
 }

@@ -4,18 +4,18 @@
  * Framework documentation: https://vuetifyjs.com`
  */
 
-// Styles
-import '@mdi/font/css/materialdesignicons.css'
-import 'vuetify/styles'
-
 // Composables
 import { createVuetify } from 'vuetify'
+// Styles
+import '@mdi/font/css/materialdesignicons.css'
+
+import 'vuetify/styles'
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
   theme: {
     defaultTheme: 'light',
-  	themes: {
+    themes: {
       light: {
         colors: {
           primary: '#1976D2',

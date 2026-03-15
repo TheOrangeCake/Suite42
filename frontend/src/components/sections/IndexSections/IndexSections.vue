@@ -1,171 +1,56 @@
 <script setup lang="ts">
-import Corner from '../../ui/Corner.vue'
-import { useRouter } from 'vue-router'
-const router = useRouter()
+  import { viewportValue } from '@/composables/viewportsValue'
 
+  const connectorHeight1 = viewportValue({
+    mobile: 2,
+    tablet: 2.2,
+    laptop: 2,
+    desktop: 3.5,
+  })
+  const connectorHeight2 = viewportValue({
+    mobile: 1,
+    tablet: 1.1,
+    laptop: 1,
+    desktop: 1.1,
+  })
 </script>
 
 <template>
-  <section class="container2">
-    <div class="title">
-      <div class="titleCorner" >
-        <Corner :vSize="60" :hSize="30" :thickness="5" color="var(--color-turquoise)" />
-        <Corner :vSize="15" :hSize="3" :thickness="5" color=white />
-        <Corner :vSize="130" :hSize="3" :thickness="5" color="var(--color-green)" />
-      </div>
-
-      <h1 class="headline">
-        A practical companion for </br>the 42 journey !
-      </h1>
+  <section class="flex flex-col">
+    <SingleConnector color="suite42Blue" :height="4" />
+    <div class="flex flex-row">
+      <ConnectConnector color1="suite42Blue" color2="suite42Green" :height="connectorHeight1" />
+      <h1
+        class="font-bold leading-15 font-hero-mobile
+                md:font-hero-tablet md:leading-20
+                lg:font-hero-laptop lg:leading-25
+                xl:font-hero-desktop xl:leading-30 xl:w-3/4"
+      >A practical companion for the 42 journey</h1>
     </div>
-    <div class="sndcontainer">
-
-        <Corner :vSize="640" :hSize="20" :thickness="5" color="var(--color-green)" />
-     <div class="box">
-      <div class="boxCorner" aria-hidden="true">
-        <Corner :vSize="50" :hSize="40" color="var(--color-turquoise)" :thickness="5"/>
-        <h3> An unofficial collection of tools for learning <br/> and collaboration dedicated to 42 students</h3>
-      </div>
-      <div class= "boxCorner2">
-         <Corner class="corner" :vSize="70" :hSize="40" :thickness="5" color="var(--color-turquoise)" />
-         <button @click="router.push('/login')"> Start your 42 journey here </button>
-      </div>
+    <DoubleConnectors color1="suite42Green" color2="suite42Blue" :height="3" />
+    <div class="flex flex-row items-stretch">
+      <SingleConnectionConnector color1="suite42Green" color2="suite42Blue" color3="suite42Blue" :height="connectorHeight2" />
+      <h4
+        class="font-regular font-h5-mobile
+                md:font-h5-tablet
+                lg:font-h5-laptop
+                xl:font-h5-desktop"
+      >An unofficial collection of tools for learning and collaboration dedicated to 42 students.</h4>
     </div>
-
-      <img
-    src="/design/assets/images/homepage_illustration.png"
-    alt=""
-    class="illustration"
-    aria-hidden="true"
-  />
+    <div
+      class="flex flex-row gap-3
+             md:gap-4"
+    >
+      <SingleConnector color="suite42Green" />
+      <div class="flex flex-row flex-wrap w-full">
+        <EndConnector color="suite42Blue" :height="9.5" />
+        <div class="pt-32">
+          <BigRedButton path="/login" text="Start your 42 journey here" />
+        </div>
+        <div class="flex grow justify-end">
+          <img alt="" class="w-75 md:w-100 lg:w-130 xl:w-200 transform scale-x-[-1]" src="/design/assets/images/homepage_illustration.png">
+        </div>
+      </div>
     </div>
   </section>
 </template>
-
-<style scoped>
-
-
-.illustration {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-
-  width: clamp(230px, 43vw, 720px);
-  height: auto;
-
-  pointer-events: none;
-}
-
-button {
-
-  margin-left: 19px;
-  background-color: #FF5959;
-  font-size: clamp(0.85rem, 2.2vw, 1.4rem);
-  line-height: 1.3;
-  padding: 12px 36px;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.boxCorner2 {
-  position: absolute;
-  top: clamp(78px, 3vw, 120px);
-  left: clamp(20px, 4vw, 36px);
-
-  min-height: 180px;
-  width: calc(100% - 2 * clamp(10px, 2vw, 18px));
-
-  display: flex;
-  align-items: center;
-  gap: clamp(8px, 1.5vw, 14px);
-
-}
-
-.corner {
-  align-self: flex-start;
-}
-
-.boxCorner2 { pointer-events: auto; }
-
-.corner { pointer-events: none; }
-
-.cta {
-}
-
-h3 {
-  color: black;
-  align-self: end;
-    font-size: clamp(0.85rem, 2.2vw, 1.4rem);
-
-}
-.sndcontainer {
-
-  display: flex;
-  gap: clamp(12px, 2vw, 24px);
-  position: relative;
-  align-items: flex-start;
-}
-.container2 {
-  padding-left: 5%;
-  padding-right: 5%;
-}
-
-.container2 > * {
-  /*
-  border: 3px solid red;
-  */
-}
-
-.title {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: flex-start;
-  gap: clamp(10px, 2vw, 20px);
-}
-
-.titleCorner {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.headline {
-  margin: 0;
-  flex: 1 1 auto;
-  min-width: 0;
-  color: var(--Black, #202020);
-  font-family: Monda, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  font-style: normal;
-  font-weight: 700;
-  font-size: clamp(1.6rem, 7vw, var(--Text-hero, 96px));
-  line-height: 1.05;
-  letter-spacing: -0.04em;
-}
-
-.decor {
-  margin-top: clamp(8px, 2vw, 20px);
-}
-
-.box {
-  width: 85%;
-  max-width: 85%;
-  min-height: clamp(140px, 35vh, 420px);
-  position: relative;
-}
-
-.boxCorner {
-    position: absolute;
-  top: clamp(4px, 1vw, 18px);
-  left: clamp(10px, 2vw, 18px);
-
-  display: flex;
-  gap: clamp(8px, 1.5vw, 14px);
-
-  width: calc(100% - 2 * clamp(10px, 2vw, 18px));
-  max-width: 100%;
-
-  pointer-events: none;
-}
-</style>

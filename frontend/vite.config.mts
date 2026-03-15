@@ -1,28 +1,25 @@
-// Plugins
-import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
-import Fonts from 'unplugin-fonts/vite'
-import Layouts from 'vite-plugin-vue-layouts-next'
+import { fileURLToPath, URL } from 'node:url'
+import tailwindcss from '@tailwindcss/vite'
 import Vue from '@vitejs/plugin-vue'
-import VueRouter from 'unplugin-vue-router/vite'
+import AutoImport from 'unplugin-auto-import/vite'
+import Fonts from 'unplugin-fonts/vite'
+import Components from 'unplugin-vue-components/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
-import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+import VueRouter from 'unplugin-vue-router/vite'
 
 // Utilities
 import { defineConfig } from 'vite'
-import { fileURLToPath, URL } from 'node:url'
+import Layouts from 'vite-plugin-vue-layouts-next'
 
-import tailwindcss from "@tailwindcss/vite"
-
+import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    tailwindcss(),
     VueRouter({
       dts: 'src/typed-router.d.ts',
     }),
-    tailwindcss(),
-
 
     Layouts(),
     AutoImport({
@@ -89,13 +86,13 @@ export default defineConfig({
     ],
   },
   server: {
-  host: true,
-  port: 3000,
-  hmr: {
-    protocol: 'ws',
-    host: 'localhost',
+    host: true,
     port: 3000,
-  }
-}
+    hmr: {
+      protocol: 'ws',
+      host: 'localhost',
+      port: 3000,
+    },
+  },
 
 })
