@@ -6,7 +6,7 @@ Projet full-stack en microservices : application web de gestion de projets 42 av
 
 | Couche | Techno |
 |---|---|
-| Frontend | Vue 3 + TypeScript + Vite + Vuetify |
+| Frontend | Vue 3 + TypeScript + Vite + TailwindCSS |
 | API Gateway | Spring Cloud Gateway |
 | Backend | Spring Boot (microservices) |
 | Auth | OAuth 42 + JWT + 2FA (OTP) |
@@ -142,9 +142,9 @@ api-gateway:8080
 Transcendence/
 |-- frontend/                   # Vue 3 + TypeScript
 |-- backend/
-|   |-- auth-service/           # OAuth 42 + JWT + 2FA OTP
+|   |-- auth-service/           # OAuth 42 + JWT
 |   |-- api42-service/          # Profils utilisateurs 42 (API intranet)
-|   |-- regular-user-service/   # Comptes locaux (username/password)
+|   |-- regular-user-service/   # Comptes locaux (username/password) + 2FA OTP
 |   |-- group-service/          # Groupes / systeme d'amis
 |   +-- chat-service/           # Chat temps reel (WebSocket STOMP)
 |-- api-gateway/                # Spring Cloud Gateway
