@@ -5,21 +5,21 @@
     <div v-if="isLoading" class="loading">Loading...</div>
     <p v-else-if="loadError" class="errorMsg">{{ loadError }}</p>
 
-    <div v-else-if="profile" class="pageBody bodyContent">
+    <!-- 42 user: avatar + banner -->
+    <div v-else-if="profile42" class="pageBody bodyContent">
 
         <!-- Hero -->
         <div class="hero">
           <img :src="avatarPreview || avatarUrl" alt="avatar" class="avatar" />
           <div class="heroRight">
             <img :src="bannerPreview || bannerUrl" alt="banner" class="banner" />
-            <h2 class="fullname">{{ fullName }}</h2>
-            <p class="email">{{ profile.email }}</p>
+            <h2 class="fullname">{{ fullName42 }}</h2>
+            <p class="email">{{ profile42.email }}</p>
           </div>
         </div>
 
         <!-- Change avatar / Change banner -->
         <div class="formRow">
-          <!-- Avatar upload -->
           <div class="formCol">
             <label class="fieldLabel">Change avatar</label>
             <div class="fileInputRow">
@@ -36,7 +36,6 @@
             </div>
           </div>
 
-          <!-- Banner upload -->
           <div class="formCol">
             <label class="fieldLabel">Change banner</label>
             <div class="fileInputRow">
@@ -54,14 +53,55 @@
           </div>
         </div>
 
-        <!-- Error / Success -->
         <p v-if="saveError" class="errorMsg">{{ saveError }}</p>
         <p v-if="saveSuccess" class="successMsg">Profile updated!</p>
 
-        <!-- Actions -->
         <div class="actionRow">
           <Corner :vSize="60" :hSize="16" :thickness="3" color="var(--color-coral, #FF5959)" />
-          <button class="saveBtn" @click="saveChanges" :disabled="isSaving">
+          <button class="saveBtn" @click="saveChanges42" :disabled="isSaving">
+            {{ isSaving ? 'Saving...' : 'Save changes' }}
+          </button>
+          <RouterLink to="/profile" class="cancelLink">Cancel</RouterLink>
+        </div>
+
+    </div>
+
+    <!-- Regular user: 2FA toggle -->
+    <div v-else-if="profileRegular" class="pageBody bodyContent">
+
+        <div class="hero">
+          <div class="heroRight">
+            <h2 class="fullname">{{ profileRegular.username }}</h2>
+            <p class="email">{{ profileRegular.email }}</p>
+          </div>
+        </div>
+
+        <div class="sectionTitle">Security</div>
+
+        <div class="twoFaBlock">
+          <label class="twoFaLabel">
+            <input type="checkbox" v-model="twoFaEnabled" class="twoFaCheckbox" />
+            Enable two-factor authentication (2FA via email)
+          </label>
+          <p class="twoFaHint">When enabled, a one-time code will be sent to your email at each login.</p>
+        </div>
+
+        <div class="formCol">
+          <label class="fieldLabel">Confirm password</label>
+          <input
+            v-model="confirmPassword"
+            type="password"
+            class="fieldInput"
+            placeholder="Your current password"
+          />
+        </div>
+
+        <p v-if="saveError" class="errorMsg">{{ saveError }}</p>
+        <p v-if="saveSuccess" class="successMsg">Settings updated!</p>
+
+        <div class="actionRow">
+          <Corner :vSize="60" :hSize="16" :thickness="3" color="var(--color-coral, #FF5959)" />
+          <button class="saveBtn" @click="saveChangesRegular" :disabled="isSaving">
             {{ isSaving ? 'Saving...' : 'Save changes' }}
           </button>
           <RouterLink to="/profile" class="cancelLink">Cancel</RouterLink>
@@ -75,6 +115,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { getUserProfile } from '../api/api42'
 import type { UserDetailed } from '../api/api42'
+import { getMyProfile, updateMyProfile } from '../api/auth'
+import type { User } from '../api/auth'
 import { useAuthStore } from '../stores/auth'
 
 definePage({
@@ -85,35 +127,41 @@ definePage({
 })
 
 const authStore = useAuthStore()
-const profile = ref<UserDetailed | null>(null)
+const profile42 = ref<UserDetailed | null>(null)
+const profileRegular = ref<User | null>(null)
 const isLoading = ref(false)
 const loadError = ref('')
 const isSaving = ref(false)
 const saveError = ref('')
 const saveSuccess = ref(false)
 
+// 42 user fields
 const avatarFile = ref<File | null>(null)
 const bannerFile = ref<File | null>(null)
 const avatarPreview = ref<string | null>(null)
 const bannerPreview = ref<string | null>(null)
 
+// Regular user fields
+const twoFaEnabled = ref(false)
+const confirmPassword = ref('')
+
 const API_BASE_URL = import.meta.env.VITE_API_URL
 
-const fullName = computed(() => {
-  if (!profile.value) return ''
-  return `${profile.value.first_name ?? ''} ${profile.value.last_name ?? ''}`.trim() || profile.value.login
+const fullName42 = computed(() => {
+  if (!profile42.value) return ''
+  return `${profile42.value.first_name ?? ''} ${profile42.value.last_name ?? ''}`.trim() || profile42.value.login
 })
 
 const avatarUrl = computed(() => {
-  if (!profile.value) return '/design/assets/images/default_avatar_cropped.jpg'
-  return profile.value.custom_avatar_url
-    || profile.value.image?.versions?.medium
+  if (!profile42.value) return '/design/assets/images/default_avatar_cropped.jpg'
+  return profile42.value.custom_avatar_url
+    || profile42.value.image?.versions?.medium
     || '/design/assets/images/default_avatar_cropped.jpg'
 })
 
 const bannerUrl = computed(() => {
-  if (!profile.value) return '/design/assets/images/default_profile_banner.jpg'
-  return profile.value.custom_banner_url || '/design/assets/images/default_profile_banner.jpg'
+  if (!profile42.value) return '/design/assets/images/default_profile_banner.jpg'
+  return profile42.value.custom_banner_url || '/design/assets/images/default_profile_banner.jpg'
 })
 
 function onAvatarChange(e: Event) {
@@ -151,7 +199,7 @@ async function uploadFile(file: File, endpoint: string, fieldName: string) {
   }
 }
 
-async function saveChanges() {
+async function saveChanges42() {
   saveError.value = ''
   saveSuccess.value = false
   isSaving.value = true
@@ -167,7 +215,35 @@ async function saveChanges() {
     bannerFile.value = null
     if (avatarPreview.value) { URL.revokeObjectURL(avatarPreview.value); avatarPreview.value = null }
     if (bannerPreview.value) { URL.revokeObjectURL(bannerPreview.value); bannerPreview.value = null }
-    profile.value = await getUserProfile()
+    profile42.value = await getUserProfile()
+  } catch (e) {
+    saveError.value = e instanceof Error ? e.message : 'Failed to save changes'
+  } finally {
+    isSaving.value = false
+  }
+}
+
+async function saveChangesRegular() {
+  if (!profileRegular.value) return
+  if (!confirmPassword.value) {
+    saveError.value = 'Please confirm your password.'
+    return
+  }
+  saveError.value = ''
+  saveSuccess.value = false
+  isSaving.value = true
+  try {
+    const updated = await updateMyProfile({
+      email: profileRegular.value.email,
+      first_name: profileRegular.value.first_name,
+      last_name: profileRegular.value.last_name,
+      double_authentication: twoFaEnabled.value,
+      confirm_password: confirmPassword.value,
+    })
+    profileRegular.value = updated
+    authStore.user = updated
+    confirmPassword.value = ''
+    saveSuccess.value = true
   } catch (e) {
     saveError.value = e instanceof Error ? e.message : 'Failed to save changes'
   } finally {
@@ -178,7 +254,13 @@ async function saveChanges() {
 onMounted(async () => {
   isLoading.value = true
   try {
-    profile.value = await getUserProfile()
+    if (authStore.is42User) {
+      profile42.value = await getUserProfile()
+    } else {
+      const user = await getMyProfile()
+      profileRegular.value = user
+      twoFaEnabled.value = user.double_authentication
+    }
   } catch (e) {
     loadError.value = e instanceof Error ? e.message : 'Failed to load profile'
   } finally {
@@ -204,7 +286,6 @@ onMounted(async () => {
   margin-bottom: 32px;
 }
 
-/* ── Page body ── */
 .pageBody {
   position: relative;
   padding-left: 24px;
@@ -228,7 +309,6 @@ onMounted(async () => {
   gap: 28px;
 }
 
-/* ── Hero ── */
 .hero {
   display: flex;
   flex-direction: row;
@@ -274,7 +354,47 @@ onMounted(async () => {
   margin: 0;
 }
 
-/* ── Form ── */
+.sectionTitle {
+  font-family: Monda, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #202020;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.twoFaBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.twoFaLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Monda, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #202020;
+  cursor: pointer;
+}
+
+.twoFaCheckbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--color-turquoise, #37E3F0);
+}
+
+.twoFaHint {
+  font-family: Monda, sans-serif;
+  font-size: 0.78rem;
+  color: #888;
+  margin: 0;
+  padding-left: 26px;
+}
+
 .formRow {
   display: flex;
   flex-direction: row;
@@ -294,6 +414,24 @@ onMounted(async () => {
   font-size: 0.88rem;
   font-weight: 600;
   color: #202020;
+}
+
+.fieldInput {
+  background: white;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 0.88rem;
+  font-family: Monda, sans-serif;
+  color: #202020;
+  outline: none;
+  width: 100%;
+  max-width: 280px;
+  transition: border-color 0.2s;
+}
+
+.fieldInput:focus {
+  border-color: var(--color-turquoise, #37E3F0);
 }
 
 .fileInputRow {
@@ -333,7 +471,6 @@ onMounted(async () => {
   display: none;
 }
 
-/* ── Actions ── */
 .actionRow {
   display: flex;
   align-items: center;
@@ -372,7 +509,6 @@ onMounted(async () => {
 
 .cancelLink:hover { text-decoration: underline; }
 
-/* ── Messages ── */
 .loading {
   font-family: Monda, sans-serif;
   color: #888;

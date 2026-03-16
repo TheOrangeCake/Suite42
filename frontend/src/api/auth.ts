@@ -78,3 +78,19 @@ export function refreshToken() {
 export function signout() {
   return http.get<void>(`${BASE}/user/signout`)
 }
+
+export function getMyProfile() {
+  return http.get<User>(`${BASE}/user/profile`)
+}
+
+export interface UpdateProfileDto {
+  email: string
+  first_name?: string | null
+  last_name?: string | null
+  double_authentication: boolean
+  confirm_password: string
+}
+
+export function updateMyProfile(data: UpdateProfileDto) {
+  return http.put<User>(`${BASE}/user/profile`, data)
+}

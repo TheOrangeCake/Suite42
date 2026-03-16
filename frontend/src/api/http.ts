@@ -27,7 +27,9 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   }
 
   const errorData = await response.json().catch(() => ({}))
-  const message = errorData.message || errorData.error || 'Unknown error'
+  const message = typeof errorData === 'string'
+    ? errorData
+    : (errorData.message || errorData.error || 'Unknown error')
 
   if (response.status === 401) throw new UnauthenticatedError(message)
   if (response.status === 403) throw new ForbiddenError(message)
