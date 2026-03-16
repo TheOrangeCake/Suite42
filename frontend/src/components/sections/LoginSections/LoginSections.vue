@@ -107,26 +107,27 @@
         <div class="flex flex-row">
           <SingleConnectionConnector color1="suite42Background" color2="suite42Blue" color3="suite42Green" :height="connectorHeight3" />
           <div
-            class="flex flex-col gap-4 items-start
-               md:flex-row md:gap-4 md:items-center"
+            class="flex flex-col gap-4 items-start"
           >
             <BigRedButton :disabled="loginSectionProps.isLoading" text="Sign in" @click="handleLogin" />
-            <p
-              v-if="loginSectionProps.isLoading"
-              class="font-regular font-h5-mobile
-                     md:font-h5-tablet
-                     lg:font-h5-laptop
-                     xl:font-h5-desktop"
-              :style="{ color: colors.suite42Black }"
-            >Signing in ...</p>
-            <p
-              v-if="loginSectionProps.errorMessage"
-              class="font-regular font-h5-mobile
-                     md:font-h5-tablet
-                     lg:font-h5-laptop
-                     xl:font-h5-desktop"
-              :style="{ color: colors.suite42Red }"
-            >{{ loginSectionProps.errorMessage }}</p>
+            <div class="min-h-12">
+              <p
+                v-if="loginSectionProps.isLoading"
+                class="font-regular font-h5-mobile
+                       md:font-h5-tablet
+                       lg:font-h5-laptop
+                       xl:font-h5-desktop"
+                :style="{ color: colors.suite42Black }"
+              >Signing in ...</p>
+              <p
+                v-if="loginSectionProps.errorMessage"
+                class="font-regular font-h5-mobile
+                       md:font-h5-tablet
+                       lg:font-h5-laptop
+                       xl:font-h5-desktop"
+                :style="{ color: colors.suite42Red }"
+              >{{ loginSectionProps.errorMessage }}</p>
+            </div>
           </div>
         </div>
         <DoubleConnectors color1="suite42Background" color2="suite42Green" :height="6" />

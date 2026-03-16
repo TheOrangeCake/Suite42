@@ -21,6 +21,7 @@
       email: email.value,
       password: password.value,
       confirmPassword: confirmPassword.value,
+      agreeToTerms: agreeToTerms.value,
     })
   }
   const connectorHeight1 = viewportValue({
@@ -111,26 +112,27 @@
         <div class="flex flex-row">
           <SingleEndConnectors color1="suite42Background" color2="suite42Blue" :height2="connectorHeight2" />
           <div
-            class="flex flex-col gap-4 items-start
-                   md:flex-row md:gap-4 md:items-center"
+            class="flex flex-col gap-4 items-start"
           >
             <BigRedButton :disabled="signupSectionProps.isLoading" text="Sign up" @click="handleSignup" />
-            <p
-              v-if="signupSectionProps.isLoading"
-              class="font-regular font-h5-mobile
-                     md:font-h5-tablet
-                     lg:font-h5-laptop
-                     xl:font-h5-desktop"
-              :style="{ color: colors.suite42Black }"
-            >Creating your account ...</p>
-            <p
-              v-if="signupSectionProps.errorMessage"
-              class="font-regular font-h5-mobile
-                     md:font-h5-tablet
-                     lg:font-h5-laptop
-                     xl:font-h5-desktop"
-              :style="{ color: colors.suite42Red }"
-            >{{ signupSectionProps.errorMessage }}</p>
+            <div class="min-h-12">
+              <p
+                v-if="signupSectionProps.isLoading"
+                class="font-regular font-h5-mobile
+                       md:font-h5-tablet
+                       lg:font-h5-laptop
+                       xl:font-h5-desktop"
+                :style="{ color: colors.suite42Black }"
+              >Creating your account ...</p>
+              <p
+                v-if="signupSectionProps.errorMessage"
+                class="font-regular font-h5-mobile
+                       md:font-h5-tablet
+                       lg:font-h5-laptop
+                       xl:font-h5-desktop"
+                :style="{ color: colors.suite42Red }"
+              >{{ signupSectionProps.errorMessage }}</p>
+            </div>
           </div>
         </div>
       </div>
