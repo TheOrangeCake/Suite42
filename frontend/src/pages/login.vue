@@ -1,10 +1,89 @@
+<script setup lang="ts">
+  import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { signin, verifyOtp } from '../api/auth'
+  import { useAuthStore } from '../stores/auth'
+
+  type LoginPayload = { username: string, password: string }
+
+  const router = useRouter()
+  const authStore = useAuthStore()
+
+  const isLoading = ref(false)
+  const errorMessage = ref('')
+
+  const showOtp = ref(false)
+  const pendingEmail = ref('')
+  const emailInput = ref('')
+  const otpInput = ref('')
+  const otpError = ref('')
+
+  async function onLogin (payload: LoginPayload) {
+    isLoading.value = true
+    errorMessage.value = ''
+    try {
+      const result = await signin(payload.username, payload.password)
+      if (result.twoFa) {
+        pendingEmail.value = result.email
+        emailInput.value = result.email
+        otpInput.value = ''
+        otpError.value = ''
+        showOtp.value = true
+      } else {
+        const token = authStore.accessToken
+        if (!token) {
+          errorMessage.value = 'Authentication failed: no token received.'
+          return
+        }
+        authStore.setSession(result.user, token)
+        router.push('/profile')
+      }
+    } catch (error) {
+      if (error instanceof Error) errorMessage.value = error.message
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  function onLogin42 () {
+    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/oauth2/authorization/42`
+  }
+
+  async function onVerifyOtp () {
+    const email = pendingEmail.value || emailInput.value
+    const otp = Number.parseInt(otpInput.value)
+
+    if (!email || Number.isNaN(otp) || otpInput.value.length !== 6) {
+      otpError.value = 'Please enter a valid 6-digit code.'
+      return
+    }
+
+    isLoading.value = true
+    otpError.value = ''
+    try {
+      const user = await verifyOtp(email, otp)
+      const token = authStore.accessToken
+      if (!token) {
+        otpError.value = 'Authentication failed: no token received.'
+        return
+      }
+      authStore.setSession(user, token)
+      router.push('/profile')
+    } catch (error) {
+      if (error instanceof Error) otpError.value = error.message
+    } finally {
+      isLoading.value = false
+    }
+  }
+</script>
+
 <template>
   <div>
     <LoginSections
+      :error-message="errorMessage"
+      :is-loading="isLoading"
       @login="onLogin"
       @login42="onLogin42"
-      :isLoading="isLoading"
-      :errorMessage="errorMessage"
     />
 
     <div v-if="showOtp" class="otp-overlay">
@@ -14,25 +93,25 @@
 
         <div v-if="!pendingEmail" class="field">
           <label>Email</label>
-          <input v-model="emailInput" type="email" placeholder="your@email.com" />
+          <input v-model="emailInput" placeholder="your@email.com" type="email">
         </div>
 
         <div class="field">
           <label>Code</label>
           <input
             v-model="otpInput"
-            type="text"
             inputmode="numeric"
             maxlength="6"
             placeholder="123456"
+            type="text"
             @keyup.enter="onVerifyOtp"
-          />
+          >
         </div>
 
         <p v-if="otpError" class="otp-error">{{ otpError }}</p>
 
         <div class="otp-actions">
-          <button class="btn-confirm" @click="onVerifyOtp" :disabled="isLoading">
+          <button class="btn-confirm" :disabled="isLoading" @click="onVerifyOtp">
             {{ isLoading ? 'Verifying...' : 'Confirm' }}
           </button>
           <button class="btn-cancel" @click="showOtp = false">Cancel</button>
@@ -41,86 +120,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue'
-import { signin, verifyOtp } from '../api/auth'
-import LoginSections from '../components/sections/LoginSections/LoginSections.vue'
-import { useAuthStore } from '../stores/auth'
-import { useRouter } from 'vue-router'
-
-type LoginPayload = { username: string; password: string }
-
-const router = useRouter()
-const authStore = useAuthStore()
-
-const isLoading = ref(false)
-const errorMessage = ref('')
-
-const showOtp = ref(false)
-const pendingEmail = ref('')
-const emailInput = ref('')
-const otpInput = ref('')
-const otpError = ref('')
-
-async function onLogin(payload: LoginPayload) {
-  isLoading.value = true
-  errorMessage.value = ''
-  try {
-    const result = await signin(payload.username, payload.password)
-    if (result.twoFa) {
-      pendingEmail.value = result.email
-      emailInput.value = result.email
-      otpInput.value = ''
-      otpError.value = ''
-      showOtp.value = true
-    } else {
-      const token = authStore.accessToken
-      if (!token) {
-        errorMessage.value = 'Authentication failed: no token received.'
-        return
-      }
-      authStore.setSession(result.user, token)
-      router.push('/profile')
-    }
-  } catch (error) {
-    if (error instanceof Error) errorMessage.value = error.message
-  } finally {
-    isLoading.value = false
-  }
-}
-
-function onLogin42() {
-  window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/oauth2/authorization/42`
-}
-
-async function onVerifyOtp() {
-  const email = pendingEmail.value || emailInput.value
-  const otp = parseInt(otpInput.value)
-
-  if (!email || isNaN(otp) || otpInput.value.length !== 6) {
-    otpError.value = 'Please enter a valid 6-digit code.'
-    return
-  }
-
-  isLoading.value = true
-  otpError.value = ''
-  try {
-    const user = await verifyOtp(email, otp)
-    const token = authStore.accessToken
-    if (!token) {
-      otpError.value = 'Authentication failed: no token received.'
-      return
-    }
-    authStore.setSession(user, token)
-    router.push('/profile')
-  } catch (error) {
-    if (error instanceof Error) otpError.value = error.message
-  } finally {
-    isLoading.value = false
-  }
-}
-</script>
 
 <style scoped>
 .otp-overlay {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {colors, type Colors} from '@/styles/Colors'
   import { viewportValue } from '@/composables/viewportsValue.ts'
+  import { colors, type Colors } from '@/styles/Colors'
 
   const toolCardProps = defineProps<{
     title: string

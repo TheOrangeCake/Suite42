@@ -1,5 +1,5 @@
 <template>
-  <signupSections
+  <SignupSections
     @signup="onSignup"
     :isLoading="isLoading"
     :errorMessage="errorMessage"
@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import signupSections from '../components/sections/SignupSections/signupSections.vue'
+import SignupSections from '../components/sections/SignupSections/SignupSections.vue'
 import { signup } from '../api/auth'
 import { useRouter } from 'vue-router'
 

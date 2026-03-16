@@ -2,7 +2,7 @@ COMPOSE = docker compose -f infra/docker-compose.yml --env-file .env
 
 .PHONY: rebuild up down restart logs ps build clean setup-certs
 
-rebuild: setup-certs
+rebuild: 
 	$(COMPOSE) up -d --build
 
 setup-certs:
