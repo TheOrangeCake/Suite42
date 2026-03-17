@@ -1,8 +1,8 @@
 package com.transcendence.auth.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -10,9 +10,15 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
   private final FortyTwoSuccessHandler fortyTwoSuccessHandler;
+  private final FortyTwoCampusOAuth2UserService fortyTwoCampusOAuth2UserService;
 
-  public SecurityConfig(FortyTwoSuccessHandler fortyTwoSuccessHandler) {
+  @Value("${app.frontend.base-url:http://localhost:8080}")
+  private String frontendBaseUrl;
+
+  public SecurityConfig(FortyTwoSuccessHandler fortyTwoSuccessHandler,
+                        FortyTwoCampusOAuth2UserService fortyTwoCampusOAuth2UserService) {
     this.fortyTwoSuccessHandler = fortyTwoSuccessHandler;
+    this.fortyTwoCampusOAuth2UserService = fortyTwoCampusOAuth2UserService;
   }
 
   @Bean
@@ -24,6 +30,9 @@ public class SecurityConfig {
         .anyRequest().authenticated()
       )
       .oauth2Login(oauth -> oauth
+        .redirectionEndpoint(ep -> ep.baseUri("/callback"))
+        .userInfoEndpoint(u -> u.userService(fortyTwoCampusOAuth2UserService))
+        .failureHandler((req, res, ex) -> res.sendRedirect(frontendBaseUrl + "/login?error=oauth_failed"))
         .successHandler(fortyTwoSuccessHandler)
       )
       .logout(logout -> logout.logoutUrl("/logout"));

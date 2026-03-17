@@ -57,7 +57,7 @@ public class FortyTwoSuccessHandler implements AuthenticationSuccessHandler {
         Cookie cookie = new Cookie(cookieName, jwt);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
-        cookie.setSecure(false);
+        cookie.setSecure(true);
         cookie.setMaxAge(60 * 60 * 2);
         response.addCookie(cookie);
 
