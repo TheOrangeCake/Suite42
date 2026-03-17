@@ -34,7 +34,7 @@ async function tryRestore42Session(
   try {
     const me = await getMe42()
     if (me.authenticated) {
-      authStore.setSession42({ login: me.sub })
+      authStore.setSession42({ login: me.sub }, me.token)
       if (router.currentRoute.value.path === '/') {
         router.push('/profile')
       }

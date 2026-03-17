@@ -61,6 +61,7 @@ export function verifyOtp(email: string, otp: number) {
 export interface Me42Response {
   authenticated: boolean
   sub: string
+  token?: string
 }
 
 export function getMe42() {

@@ -42,7 +42,7 @@ public class MeController {
       body.put("email", claims.get("email"));
       body.put("iat", claims.getIssuedAt());
       body.put("exp", claims.getExpiration());
-
+	  body.put("token", token);
       // si tu ajoutes plus de claims plus tard, tu les mets ici
       return ResponseEntity.ok(body);
 

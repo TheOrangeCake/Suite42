@@ -119,9 +119,11 @@ async function selectContact(login: string) {
   messages.value = []
 
   try {
+  console.log('ici');
     messages.value = await getMessageHistory(myId, login)
     await scrollToBottom()
   } catch {
+    console.log('ici');
     // historique vide ou service indisponible
   }
 }

@@ -30,10 +30,12 @@ export const useAuthStore = defineStore('auth', {
       sessionStorage.setItem('access_token', token)
     },
 
-    setSession42(user42: User42) {
+    setSession42(user42: User42, token?: string) {
       this.user42 = user42
       this.user = null
-      this.accessToken = null
+      this.accessToken = token ?? null;
+      if (token)
+        sessionStorage.setItem('accessToken', token);
     },
 
     setAuthReady() {
