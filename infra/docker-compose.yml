@@ -262,28 +262,28 @@ services:
     networks:
       - app_net
 
-  # waf:
-  #   image: owasp/modsecurity-crs:nginx-alpine
-  #   container_name: waf
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   environment:
-  #     MODSEC_RULE_ENGINE: "On"
-  #     PARANOIA: "2"
-  #     BLOCKING_PARANOIA: "2"
-  #     ANOMALY_INBOUND: "5"
-  #     ANOMALY_OUTBOUND: "4"
-  #   volumes:
-  #     - ./nginx/nginx.conf:/etc/nginx/conf.d/gateway.conf:ro
-  #     - ./nginx:/etc/nginx/certs:ro
-  #     - ./modsecurity/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:ro
-  #     - ./modsecurity/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:ro
-  #   depends_on:
-  #     - api-gateway
-  #     - frontend
-  #   networks:
-  #     - app_net
+  waf:
+   image: owasp/modsecurity-crs:nginx-alpine
+   container_name: waf
+   ports:
+     - "80:80"
+     - "443:443"
+   environment:
+     MODSEC_RULE_ENGINE: "On"
+     PARANOIA: "2"
+     BLOCKING_PARANOIA: "2"
+     ANOMALY_INBOUND: "5"
+     ANOMALY_OUTBOUND: "4"
+   volumes:
+     - ./nginx/nginx.conf:/etc/nginx/conf.d/gateway.conf:ro
+     - ./nginx:/etc/nginx/certs:ro
+     - ./modsecurity/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:ro
+     - ./modsecurity/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:ro
+   depends_on:
+     - api-gateway
+     - frontend
+   networks:
+     - app_net
 
   prometheus:
     image: prom/prometheus:latest
