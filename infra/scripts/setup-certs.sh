@@ -12,19 +12,18 @@ fi
 
 echo "🔐 Certificats absents, génération en cours..."
 
-# Vérifier mkcert
-if ! command -v mkcert >/dev/null 2>&1; then
-  echo "❌ mkcert n'est pas installé"
-  echo "➡️ Installe-le avec : sudo apt install mkcert libnss3-tools"
+if ! command -v openssl >/dev/null 2>&1; then
+  echo "❌ openssl n'est pas installé"
   exit 1
 fi
 
-# Installer la CA locale si besoin
-mkcert -install
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout "$KEY_FILE" \
+  -out "$CERT_FILE" \
+  -subj "/CN=localhost" \
+  -addext "subjectAltName=DNS:localhost,IP:127.0.0.1,IP:::1" \
+  2>/dev/null
 
-# Générer les certifs
-cd "$CERT_DIR"
-mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1
-chmod 644 localhost-key.pem
+chmod 644 "$KEY_FILE"
 
 echo "✅ Certificats générés avec succès"
