@@ -51,7 +51,7 @@ public class User {
 	@Column(name = "login_attempt")
 	private int loginAttempt = 0;
 
-	@Column(name = "2FA")
+	@Column(name = "double_auth")
 	private boolean doubleAuth = false;
 
 	@Column(name = "created_at")
