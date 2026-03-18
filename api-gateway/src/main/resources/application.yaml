@@ -37,6 +37,20 @@ spring:
               filters:
                 - StripPrefix=2
 
+            - id: api42-service-images
+              uri: http://api42-service:8084
+              predicates:
+                - Path=/images42/**
+              filters:
+                - StripPrefix=0
+
+            - id: ragular-user-service-images
+              uri: http://regular-user-service:8085
+              predicates:
+                - Path=/images-regular/**
+              filters:
+                - StripPrefix=0
+
             # - id: chat-service
             #   uri: http://chat-service:8082
             #   predicates:

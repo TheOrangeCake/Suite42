@@ -43,7 +43,6 @@ export interface UserDetailed {
   rank: number
   rank_progress_percent: number
   performance_score: number
-  lfg: string | null
   finished_projects: string[]
   eligible_projects: string[]
   common_core: {

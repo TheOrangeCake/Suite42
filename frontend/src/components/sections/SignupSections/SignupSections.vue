@@ -72,6 +72,7 @@
                    md:font-h3-tablet
                    lg:font-h3-laptop
                    xl:font-h3-desktop"
+            :style="{ color: colors.suite42Black }"
           >Credentials</h3>
         </div>
         <DoubleConnectors color1="suite42Background" color2="suite42Blue" :height="2" />

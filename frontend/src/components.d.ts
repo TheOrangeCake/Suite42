@@ -23,6 +23,7 @@ declare module 'vue' {
     HeroSections: typeof import('./components/sections/LoginSections/HeroSections.vue')['default']
     IndexSections: typeof import('./components/sections/IndexSections/IndexSections.vue')['default']
     InputField: typeof import('./components/ui/InputField.vue')['default']
+    IntraNavLink: typeof import('./components/ui/IntraNavLink.vue')['default']
     LabeledCorner: typeof import('./components/ui/LabeledCorner.vue')['default']
     LoginSections: typeof import('./components/sections/LoginSections/LoginSections.vue')['default']
     Navbar: typeof import('./components/Navbar.vue')['default']

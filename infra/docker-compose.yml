@@ -202,8 +202,8 @@ services:
       context: ../backend/api42-service
       dockerfile: Dockerfile
     container_name: api42-service
-    ports:
-      - "8084:8084"
+#    ports:
+#      - "8084:8084"
     environment:
       SPRING_PROFILES_ACTIVE: prod
       POSTGRES_HOST: api42-postgresql
@@ -253,8 +253,8 @@ services:
     build:
       context: ../api-gateway
       dockerfile: Dockerfile
-      #   ports:
-      # - "8080:8080"
+#    ports:
+#      - "8080:8080"
     depends_on:
       - auth-service
       - group-service
