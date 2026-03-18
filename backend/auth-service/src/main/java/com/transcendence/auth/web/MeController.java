@@ -30,7 +30,7 @@ public class MeController {
     String token = readCookie(request, cookieName);
 
     if (token == null || token.isBlank()) {
-      return ResponseEntity.status(401).body(Map.of("authenticated", false));
+      return ResponseEntity.ok(Map.of("authenticated", false));
     }
 
     try {
@@ -48,7 +48,7 @@ public class MeController {
 
     } catch (Exception e) {
       // token invalide/expiré
-      return ResponseEntity.status(401).body(Map.of("authenticated", false));
+      return ResponseEntity.ok(Map.of("authenticated", false));
     }
   }
 

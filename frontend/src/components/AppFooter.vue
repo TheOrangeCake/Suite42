@@ -44,7 +44,7 @@
         v-for="link in legalLinks"
         :key="link.id"
       >
-        <PublicNavLink color="suite42White" :label="link.label" :link="link.link" />
+        <a :href="link.link" class="text-white text-sm opacity-60 hover:opacity-100">{{ link.label }}</a>
       </div>
     </div>
   </footer>

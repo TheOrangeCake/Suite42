@@ -23,7 +23,7 @@ public class LogoutController {
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setMaxAge(0);
-        cookie.setSecure(false); // dev (à enlever en prod)
+        cookie.setSecure(true);
         response.addCookie(cookie);
         return ResponseEntity.noContent().build();
     }

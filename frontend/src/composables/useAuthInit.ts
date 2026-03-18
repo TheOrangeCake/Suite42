@@ -15,6 +15,7 @@ export function useAuthInit() {
   onMounted(async () => {
     try {
       authStore.loadFromStorage()
+      if (!authStore.accessToken) throw new Error('No stored token')
       const user = await refreshToken()
       const token = authStore.accessToken
       if (!token) throw new Error('No access token received after refresh')
