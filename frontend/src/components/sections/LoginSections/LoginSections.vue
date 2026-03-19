@@ -84,52 +84,54 @@
           />
         </div>
         <SingleConnector color="suite42Blue" :height="6" />
-        <div class="flex flex-row">
-          <ConnectConnector color1="suite42Blue" color2="suite42Background" :height="connectorHeight1" />
-          <h3
-            class="font-medium font-h3-mobile
-                   md:font-h3-tablet
-                   lg:font-h3-laptop
-                   xl:font-h3-desktop"
-          >Regular user login</h3>
-        </div>
-        <DoubleConnectors color1="suite42Background" color2="suite42Blue" :height="2" />
-        <div class="flex flex-row">
-          <SingleConnectionConnector color1="suite42Background" color2="suite42Blue" color3="suite42Blue" :height="connectorHeight3" />
-          <InputField v-model="username" label="USERNAME" placeholder="pookie42" type="text" />
-        </div>
-        <DoubleConnectors color1="suite42Background" color2="suite42Blue" :height="2" />
-        <div class="flex flex-row">
-          <SingleConnectionConnector color1="suite42Background" color2="suite42Blue" color3="suite42Blue" :height="connectorHeight3" />
-          <InputField v-model="password" label="PASSWORD" type="password" />
-        </div>
-        <DoubleConnectors color1="suite42Background" color2="suite42Blue" :height="4" />
-        <div class="flex flex-row">
-          <SingleConnectionConnector color1="suite42Background" color2="suite42Blue" color3="suite42Green" :height="connectorHeight3" />
-          <div
-            class="flex flex-col gap-4 items-start"
-          >
-            <BigRedButton :disabled="loginSectionProps.isLoading" text="Sign in" @click="handleLogin" />
-            <div class="min-h-12">
-              <p
-                v-if="loginSectionProps.isLoading"
-                class="font-regular font-h5-mobile
-                       md:font-h5-tablet
-                       lg:font-h5-laptop
-                       xl:font-h5-desktop"
-                :style="{ color: colors.suite42Black }"
-              >Signing in ...</p>
-              <p
-                v-if="loginSectionProps.errorMessage"
-                class="font-regular font-h5-mobile
-                       md:font-h5-tablet
-                       lg:font-h5-laptop
-                       xl:font-h5-desktop"
-                :style="{ color: colors.suite42Red }"
-              >{{ loginSectionProps.errorMessage }}</p>
+        <form @submit.prevent="handleLogin">
+          <div class="flex flex-row">
+            <ConnectConnector color1="suite42Blue" color2="suite42Background" :height="connectorHeight1" />
+            <h3
+              class="font-medium font-h3-mobile
+                     md:font-h3-tablet
+                     lg:font-h3-laptop
+                     xl:font-h3-desktop"
+            >Regular user login</h3>
+          </div>
+          <DoubleConnectors color1="suite42Background" color2="suite42Blue" :height="2" />
+          <div class="flex flex-row">
+            <SingleConnectionConnector color1="suite42Background" color2="suite42Blue" color3="suite42Blue" :height="connectorHeight3" />
+            <InputField v-model="username" label="USERNAME" placeholder="pookie42" type="text" />
+          </div>
+          <DoubleConnectors color1="suite42Background" color2="suite42Blue" :height="2" />
+          <div class="flex flex-row">
+            <SingleConnectionConnector color1="suite42Background" color2="suite42Blue" color3="suite42Blue" :height="connectorHeight3" />
+            <InputField v-model="password" label="PASSWORD" type="password" />
+          </div>
+          <DoubleConnectors color1="suite42Background" color2="suite42Blue" :height="4" />
+          <div class="flex flex-row">
+            <SingleConnectionConnector color1="suite42Background" color2="suite42Blue" color3="suite42Green" :height="connectorHeight3" />
+            <div
+              class="flex flex-col gap-4 items-start"
+            >
+              <BigRedButton :disabled="loginSectionProps.isLoading" text="Sign in" type="submit" />
+              <div class="min-h-12">
+                <p
+                  v-if="loginSectionProps.isLoading"
+                  class="font-regular font-h5-mobile
+                         md:font-h5-tablet
+                         lg:font-h5-laptop
+                         xl:font-h5-desktop"
+                  :style="{ color: colors.suite42Black }"
+                >Signing in ...</p>
+                <p
+                  v-if="loginSectionProps.errorMessage"
+                  class="font-regular font-h5-mobile
+                         md:font-h5-tablet
+                         lg:font-h5-laptop
+                         xl:font-h5-desktop"
+                  :style="{ color: colors.suite42Red }"
+                >{{ loginSectionProps.errorMessage }}</p>
+              </div>
             </div>
           </div>
-        </div>
+        </form>
         <DoubleConnectors color1="suite42Background" color2="suite42Green" :height="6" />
         <div class="flex flex-row">
           <SingleEndConnectors color1="suite42Background" color2="suite42Green" :height2="connectorHeight4" />

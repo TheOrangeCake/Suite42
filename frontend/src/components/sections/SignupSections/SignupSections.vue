@@ -64,7 +64,7 @@
       class="flex flex-col flex-wrap w-full gap-10
              xl:flex-row xl:gap-0 xl:mb-50"
     >
-      <div class="flex flex-col">
+      <form class="flex flex-col" @submit.prevent="handleSignup">
         <SingleConnector color="suite42Blue" :height="2" />
         <div class="flex flex-row">
           <ConnectConnector color1="suite42Blue" color2="suite42Background" :height="connectorHeight1" />
@@ -113,10 +113,8 @@
         <DoubleConnectors color1="suite42Background" color2="suite42Blue" :height="4" />
         <div class="flex flex-row">
           <SingleEndConnectors color1="suite42Background" color2="suite42Blue" :height2="connectorHeight2" />
-          <div
-            class="flex flex-col gap-4 items-start"
-          >
-            <BigRedButton :disabled="signupSectionProps.isLoading" text="Sign up" @click="handleSignup" />
+          <div class="flex flex-col gap-4 items-start">
+            <BigRedButton :disabled="signupSectionProps.isLoading" text="Sign up" type="submit" />
             <div class="min-h-12">
               <p
                 v-if="signupSectionProps.isLoading"
@@ -145,7 +143,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </form>
       <div class="flex grow justify-end">
         <img alt="" class="w-75 md:w-100 lg:w-120 lg:h-120 xl:w-150 xl:h-150" src="/design/assets/images/sign_up_illustration.png">
       </div>

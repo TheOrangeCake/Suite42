@@ -5,8 +5,12 @@
     defineProps<{
       text: string
       hoverTextColor?: Colors
+      type?: 'submit' | 'reset' | 'button'
     }>(),
-    { hoverTextColor: 'suite42Black' },
+    {
+      hoverTextColor: 'suite42Black',
+      type: 'button',
+    },
   )
 
   const isHovered = ref(false)
@@ -25,6 +29,7 @@
         backgroundColor: isHovered ? 'transparent' : colors.suite42Red,
         color: isHovered ? colors[bigRedButtonProps.hoverTextColor] : colors.suite42White
       }"
+      :type="bigRedButtonProps.type"
       @click="emit('click')"
       @mouseleave="isHovered = false"
       @mouseover="isHovered = true"

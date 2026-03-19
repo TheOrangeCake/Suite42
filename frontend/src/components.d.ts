@@ -41,5 +41,6 @@ declare module 'vue' {
     ToolCard: typeof import('./components/ui/ToolCard.vue')['default']
     ToolkitSections: typeof import('./components/sections/IndexSections/ToolkitSections.vue')['default']
     TripleConnectors: typeof import('./components/ui/TripleConnectors.vue')['default']
+    UploadField: typeof import('./components/ui/UploadField.vue')['default']
   }
 }

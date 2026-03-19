@@ -433,58 +433,109 @@
         <SmallBlueButton text="Modify profile" @click="router.push('/modify_profile')" />
       </div>
     </div>
+
+    <div v-else-if="authStore.isRegularUser">
+      <h1
+        class="font-bold font-h1-mobile
+             md:font-h1-tablet
+             lg:font-h1-laptop
+             xl:font-h1-desktop"
+        :style="{ color: colors.suite42Black }"
+      >Oh hey, it's me!</h1>
+      <SingleConnector color="suite42Blue" :height="3" />
+      <div class="flex flex-row w-full items-start relative">
+        <ConnectConnector color1="suite42Blue" color2="suite42Green" :height="4" />
+        <div
+          class="aspect-square w-32
+                 md:w-40
+                 lg:w-44
+                 2xl:w-52"
+        >
+          <img
+            alt="user avatar"
+            class="object-cover w-full h-full rounded"
+            :src="authStore.user?.custom_avatar_url"
+          >
+        </div>
+        <div
+          class="flex flex-col ml-2 gap-2 absolute top-0 bottom-0 left-42 right-0
+                 md:left-54
+                 lg:left-60
+                 2xl:left-70"
+        >
+          <img alt="banner" class="object-cover rounded w-full flex-1 min-h-0" :src="authStore.user?.custom_banner_url">
+          <div class="flex flex-col w-fit shrink-0">
+            <div
+              class="font-bold font-h4-mobile hover:underline
+                     md:font-h4-tablet
+                     lg:font-h4-laptop
+                     xl:font-h4-desktop"
+              :style="{ color: colors.suite42Black }"
+            >{{
+              authStore.user?.first_name || authStore.user?.last_name
+                ? `${authStore.user?.first_name ?? ''} ${authStore.user?.last_name ?? ''}`.trim()
+                : authStore.user?.username
+            }}</div>
+            <p
+              class="font-regular font-body2-mobile
+                     md:font-body2-tablet
+                     lg:font-body2-laptop
+                     xl:font-body2-desktop"
+              :style="{ color: colors.suite42Darkgrey }"
+            >{{ authStore.user?.email }}</p>
+          </div>
+        </div>
+      </div>
+      <SingleConnector color="suite42Green" :height="3" />
+      <div class="flex flex-row">
+        <ConnectConnector color1="suite42Green" color2="suite42Red" :height="connectorHeight1" />
+        <div
+          class="flex flex-row flex-wrap gap-4
+                 md:gap-8
+                 lg:gap-12
+                 xl:gap-20"
+        >
+          <div class="flex flex-col">
+            <h3
+              class="font-regular font-h3-mobile
+                       md:font-h3-tablet
+                       lg:font-h3-laptop
+                       xl:font-h3-desktop"
+              :style="{ color: colors.suite42Black }"
+            >Personal</h3>
+            <SingleConnector color="suite42Green" :height="1" />
+            <div class="flex flex-row">
+              <EndConnector color="suite42Green" :height="connectorHeight2" />
+              <p
+                class="font-regular font-body1-mobile
+                       md:font-body1-tablet
+                       lg:font-body1-laptop
+                       xl:font-body1-desktop"
+                :style="{ color: colors.suite42Black }"
+              >Username: {{ authStore.user?.username }}</p>
+            </div>
+            <SingleConnector color="suite42Green" :height="0.5" />
+            <div class="flex flex-row">
+              <EndConnector color="suite42Green" :height="connectorHeight2" />
+              <p
+                class="font-regular font-body1-mobile
+                       md:font-body1-tablet
+                       lg:font-body1-laptop
+                       xl:font-body1-desktop"
+                :style="{ color: colors.suite42Black }"
+              >2FA status: {{ authStore.user?.double_authentication ? 'on' : 'off' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <SingleConnector color="suite42Red" :height="6" />
+      <div class="flex flex-row">
+        <EndConnector color="suite42Red" :height="connectorHeight3" />
+        <SmallBlueButton text="Modify profile" @click="router.push('/modify_profile')" />
+      </div>
+    </div>
     <div class="flex grow justify-end">
       <img alt="" class="w-75 md:w-100 lg:w-120 lg:h-120 xl:w-150 xl:h-150" src="/design/assets/images/user_page_illustration.png">
     </div>
-
-    <!-- PLEASE DONT DELETE, KEEPING FOR REFERENCE -->
-    <!--      &lt;!&ndash; Regular user: simplified info &ndash;&gt;-->
-    <!--      <div v-if="authStore.isRegularUser" class="infoGrid">-->
-    <!--        <div class="infoSection">-->
-    <!--          <Corner color="var(&#45;&#45;color-turquoise)" :h-size="16" :thickness="2" :v-size="80" />-->
-    <!--          <div class="sectionContent">-->
-    <!--            <p class="sectionTitle">Personal</p>-->
-    <!--            <div class="infoRow">-->
-    <!--              <Corner color="var(&#45;&#45;color-green)" :h-size="16" :thickness="2" :v-size="20" />-->
-    <!--              <span>Username: {{ authStore.user?.username ?? '–' }}</span>-->
-    <!--            </div>-->
-    <!--            <div class="infoRow">-->
-    <!--              <Corner color="var(&#45;&#45;color-green)" :h-size="16" :thickness="2" :v-size="20" />-->
-    <!--              <span>Email: {{ authStore.user?.email ?? '–' }}</span>-->
-    <!--            </div>-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--      </div>-->
-
-    <!--    <div v-else-if="authStore.isRegularUser" class="pageBody bodyContent">-->
-
-    <!--      &lt;!&ndash; Hero: avatar + banner + name/email &ndash;&gt;-->
-    <!--      <div class="hero">-->
-    <!--        <img alt="avatar" class="avatar" :src="avatarUrl">-->
-    <!--        <div class="heroRight">-->
-    <!--          <img alt="banner" class="banner" :src="bannerUrl">-->
-    <!--          <h2 class="fullname">{{ fullName }}</h2>-->
-    <!--          <p class="email">{{ authStore.isRegularUser ? authStore.user?.email : profile?.email }}</p>-->
-    <!--        </div>-->
-    <!--      </div>-->
-
-    <!--      &lt;!&ndash; Regular user: simplified info &ndash;&gt;-->
-    <!--      <div v-if="authStore.isRegularUser" class="infoGrid">-->
-    <!--        <div class="infoSection">-->
-    <!--          <Corner color="var(&#45;&#45;color-turquoise)" :h-size="16" :thickness="2" :v-size="80" />-->
-    <!--          <div class="sectionContent">-->
-    <!--            <p class="sectionTitle">Personal</p>-->
-    <!--            <div class="infoRow">-->
-    <!--              <Corner color="var(&#45;&#45;color-green)" :h-size="16" :thickness="2" :v-size="20" />-->
-    <!--              <span>Username: {{ authStore.user?.username ?? '–' }}</span>-->
-    <!--            </div>-->
-    <!--            <div class="infoRow">-->
-    <!--              <Corner color="var(&#45;&#45;color-green)" :h-size="16" :thickness="2" :v-size="20" />-->
-    <!--              <span>Email: {{ authStore.user?.email ?? '–' }}</span>-->
-    <!--            </div>-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--      </div>-->
-
   </div>
 </template>
