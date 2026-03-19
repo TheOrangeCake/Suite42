@@ -1,8 +1,8 @@
 <template>
   <SignupSections
     :error-message="errorMessage"
-    :success-message="successMessage"
     :is-loading="isLoading"
+    :success-message="successMessage"
     @signup="onSignup"
   />
 </template>

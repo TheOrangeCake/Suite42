@@ -49,27 +49,37 @@
     transition: 'transform 0.35s ease, opacity 0.25s ease',
   }))
 
+  function canShowLink (user: string) {
+    if (user === 'all') return true
+    if (user === 'user42' && profile.value) return true
+    return user === 'regular' && authStore.isRegularUser
+  }
+
+  function groupHasVisibleLinks (group: typeof navLinkGroups.value[0]) {
+    return group.navLinks.some(link => canShowLink(link.user))
+  }
+
   const navLinkGroups = computed(() => [
     {
       id: 1,
       navLinks: [
-        { id: 1, label: 'Profile', link: '/profile', icon: avatarUrl.value, alt: '', isAvatar: true },
+        { id: 1, label: 'Profile', link: '/profile', icon: avatarUrl.value, alt: '', isAvatar: true, user: 'all' },
       ],
     },
     {
       id: 2,
       navLinks: [
-        { id: 1, label: 'Finder', link: '/finder', icon: '/design/assets/icons/group.png', alt: '', isAvatar: false },
-        { id: 2, label: 'Projects', link: '/projects', icon: '/design/assets/icons/project.png', alt: '', isAvatar: false },
-        { id: 3, label: 'Tasks', link: '/tasks', icon: '/design/assets/icons/to-do-list.png', alt: '', isAvatar: false },
+        { id: 1, label: 'Finder', link: '/finder', icon: '/design/assets/icons/group.png', alt: '', isAvatar: false, user: 'user42' },
+        { id: 2, label: 'Projects', link: '/projects', icon: '/design/assets/icons/project.png', alt: '', isAvatar: false, user: 'user42' },
+        { id: 3, label: 'Tasks', link: '/tasks', icon: '/design/assets/icons/to-do-list.png', alt: '', isAvatar: false, user: 'user42' },
       ],
     },
     {
       id: 3,
       navLinks: [
-        { id: 1, label: 'Home', link: '/home', icon: '/design/assets/icons/home.png', alt: '', isAvatar: false },
-        { id: 2, label: 'Chat', link: '/chat', icon: '/design/assets/icons/chat.png', alt: '', isAvatar: false },
-        { id: 3, label: 'Friends', link: '/friends', icon: '/design/assets/icons/group.png', alt: '', isAvatar: false },
+        { id: 1, label: 'Home', link: '/home', icon: '/design/assets/icons/home.png', alt: '', isAvatar: false, user: 'all' },
+        { id: 2, label: 'Chat', link: '/chat', icon: '/design/assets/icons/chat.png', alt: '', isAvatar: false, user: 'user42' },
+        { id: 3, label: 'Friends', link: '/friends', icon: '/design/assets/icons/group.png', alt: '', isAvatar: false, user: 'user42' },
       ],
     },
   ])
@@ -128,7 +138,7 @@
           class="flex flex-row gap-6"
         >
           <div
-            v-for="(navLink, nIndex) in group.navLinks"
+            v-for="(navLink, nIndex) in group.navLinks.filter(link => canShowLink(link.user))"
             :key="navLink.id"
             class="w-20"
             :style="{
@@ -185,7 +195,7 @@
           class="flex flex-col"
         >
           <div
-            v-for="navLink in group.navLinks"
+            v-for="navLink in group.navLinks.filter(link => canShowLink(link.user))"
             :key="navLink.id"
           >
             <IntraNavLink
@@ -196,7 +206,7 @@
               :link="navLink.link"
             />
           </div>
-          <div class="border-t-1 my-4 mx-4" :style="{ borderColor: colors.suite42Darkgrey }" />
+          <div v-if="groupHasVisibleLinks(group)" class="border-t-1 my-4 mx-4" :style="{ borderColor: colors.suite42Darkgrey }" />
         </div>
       </nav>
       <button

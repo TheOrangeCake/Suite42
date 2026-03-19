@@ -1,145 +1,137 @@
-<template>
-  <div class="home-page">
-    <h1 class="greeting">Hello, {{ authStore.user?.username ?? authStore.user42?.login }}</h1>
-
-    <div class="body">
-      <Corner :vSize="200" :hSize="16" :thickness="5" color="var(--color-turquoise)" />
-
-      <div class="content">
-        <div v-if="randomProject" class="block">
-          <Corner :vSize="60" :hSize="16" :thickness="5" color="var(--color-turquoise)" />
-          <p class="text">You still haven't done project <strong>{{ randomProject }}</strong> yet.</p>
-        </div>
-
-        <div class="block">
-          <Corner :vSize="40" :hSize="16" :thickness="5" color="var(--color-turquoise)" />
-          <p class="text">Want to find group members or a learning buddy?</p>
-        </div>
-
-        <RouterLink to="/finder" class="cta">Look for someone special</RouterLink>
-
-        <div class="block" style="margin-top: 48px">
-          <Corner :vSize="60" :hSize="16" :thickness="5" color="var(--color-green)" />
-          <p class="text">Or maybe want to work on your projects instead?</p>
-        </div>
-
-        <div class="block">
-          <Corner :vSize="40" :hSize="16" :thickness="5" color="var(--color-green)" />
-          <p class="subtext">Let's start studying!</p>
-        </div>
-      </div>
-    </div>
-
-    <img
-      src="/design/assets/images/intra_home_illustration.png"
-      alt=""
-      class="illustration"
-    />
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useAuthStore } from '../stores/auth'
-import { getUserProfile } from '../api/api42'
+  import { onMounted, ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { viewportValue } from '@/composables/viewportsValue.ts'
+  import { colors } from '@/styles/Colors.ts'
+  import { getUserProfile } from '../api/api42'
+  import { useAuthStore } from '../stores/auth'
 
-const authStore = useAuthStore()
-const randomProject = ref<string | null>(null)
+  const authStore = useAuthStore()
+  const randomProject = ref<string | null>(null)
+  const router = useRouter()
 
-onMounted(async () => {
-  try {
-    const profile = await getUserProfile()
-    const eligible = profile.eligible_projects
-    if (eligible && eligible.length > 0) {
-      randomProject.value = eligible[Math.floor(Math.random() * eligible.length)]
-    }
-  } catch {
+  onMounted(async () => {
+    if (authStore.isRegularUser) return
+    try {
+      const profile = await getUserProfile()
+      const eligible = profile.eligible_projects
+      if (eligible && eligible.length > 0) {
+        randomProject.value = eligible[Math.floor(Math.random() * eligible.length)] || ''
+      }
+    } catch {
     // Not a 42 user or API unavailable
-  }
-})
+    }
+  })
 
-definePage({
-  meta: {
-    requiresAuth: true,
-    layout: 'dashboard',
-  },
-})
+  definePage({
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard',
+    },
+  })
+  const textConnector = viewportValue({
+    mobile: 0.8,
+    tablet: 1.1,
+    laptop: 1,
+    desktop: 1.1,
+  })
+  const buttonConnector = viewportValue({
+    mobile: 1.2,
+    tablet: 1.4,
+    laptop: 1.6,
+    desktop: 1.8,
+  })
+
 </script>
 
-<style scoped>
-.home-page {
-  padding: 48px 56px;
-  min-height: 100vh;
-  background: white;
-  position: relative;
-  overflow: hidden;
-}
-
-.greeting {
-  font-family: Monda, sans-serif;
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  font-weight: 700;
-  color: #202020;
-  margin-bottom: 40px;
-}
-
-.body {
-  display: flex;
-  flex-direction: row;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.block {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  gap: 12px;
-}
-
-.text {
-  font-family: Monda, sans-serif;
-  font-size: clamp(1rem, 2vw, 1.3rem);
-  color: #202020;
-  margin: 0;
-}
-
-.subtext {
-  font-family: Monda, sans-serif;
-  font-size: 0.9rem;
-  color: #555;
-  margin: 0;
-}
-
-.cta {
-  margin-left: 28px;
-  padding: 16px 32px;
-  background-color: #FF5959;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-family: Monda, sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  align-self: flex-start;
-  text-decoration: none;
-  display: inline-block;
-}
-
-.cta:hover { opacity: 0.85; }
-
-.illustration {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: clamp(280px, 40vw, 560px);
-  pointer-events: none;
-}
-</style>
+<template>
+  <div
+    class="flex flex-col w-full px-4 mb-20 mt-28
+           md:mt-12
+           lg:px-8 lg:mb-48
+           xl:px-18
+           2xl:px-28"
+  >
+    <div v-if="authStore.user42">
+      <h1
+        class="font-bold font-h1-mobile leading-12
+             md:font-h1-tablet md:leading-16
+             lg:font-h1-laptop lg:leading-24
+             xl:font-h1-desktop"
+        :style="{ color: colors.suite42Black }"
+      >Hello, {{ authStore.user42?.login }}</h1>
+      <h4
+        class="font-semibold font-h4-mobile
+             md:font-h4-tablet
+             lg:font-h4-laptop
+             xl:font-h4-desktop"
+        :style="{ color: colors.suite42Darkgrey }"
+      >How are you today?</h4>
+      <SingleConnector color="suite42Blue" :height="3" />
+      <div class="flex flex-row">
+        <ConnectConnector color1="suite42Blue" color2="suite42Green" :height="textConnector" />
+        <p
+          v-if="randomProject"
+          class="font-regular font-body1-mobile
+             md:font-body1-tablet
+             lg:font-body1-laptop
+             xl:font-body1-desktop"
+          :style="{ color: colors.suite42Black }"
+        >You still haven't done project <strong>{{ randomProject }}</strong> yet.</p>
+        <p
+          v-else
+          class="font-regular font-body1-mobile
+             md:font-body1-tablet
+             lg:font-body1-laptop
+             xl:font-body1-desktop"
+          :style="{ color: colors.suite42Black }"
+        >Peer learning is the core philosophy of 42 and nothing beat group learning for this! Let's look for peers to progress together.</p>
+      </div>
+      <DoubleConnectors color1="suite42Green" color2="suite42Blue" :height="1" />
+      <div class="flex flex-row">
+        <SingleEndConnectors color1="suite42Green" color2="suite42Blue" :height2="buttonConnector" />
+        <SmallRedButton text="Look for that special someone" @click="router.push('/finder')" />
+      </div>
+      <SingleConnector color="suite42Green" :height="4" />
+      <div class="flex flex-row">
+        <EndConnector color="suite42Green" :height="textConnector" />
+        <p
+          class="font-regular font-body1-mobile
+                   md:font-body1-tablet
+                   lg:font-body1-laptop
+                   xl:font-body1-desktop"
+          :style="{ color: colors.suite42Black }"
+        >Or do you want to discuss project with friends instead?</p>
+      </div>
+      <DoubleConnectors color1="suite42Background" color2="suite42Green" :height="1" />
+      <div class="flex flex-row">
+        <SingleEndConnectors color1="suite42Background" color2="suite42Green" :height2="buttonConnector" />
+        <SmallBlueButton text="Chat with friends" @click="router.push('/chat')" />
+      </div>
+    </div>
+    <div v-else-if="authStore.user">
+      <h1 class="greeting">Hello, {{ authStore.user?.username }}</h1>
+      <h4
+        class="font-semibold font-h4-mobile
+             md:font-h4-tablet
+             lg:font-h4-laptop
+             xl:font-h4-desktop"
+        :style="{ color: colors.suite42Darkgrey }"
+      >How are you today?</h4>
+      <SingleConnector color="suite42Blue" :height="3" />
+      <div class="flex flex-row">
+        <EndConnector color="suite42Blue" :height="textConnector" />
+        <p
+          class="font-regular font-body1-mobile
+                   md:font-body1-tablet
+                   lg:font-body1-laptop
+                   xl:font-body1-desktop"
+          :style="{ color: colors.suite42Black }"
+        >Tools that are destined for non 42 students are coming soon. Stay tuned!</p>
+      </div>
+    </div>
+    <div class="flex grow justify-end">
+      <img alt="" class="w-75 md:w-100 lg:w-120 lg:h-120 xl:w-150 xl:h-150" src="/design/assets/images/intra_home_illustration.png">
+    </div>
+  </div>
+</template>

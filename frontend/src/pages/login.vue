@@ -44,7 +44,7 @@
           return
         }
         authStore.setSession(result.user, token)
-        router.push('/profile')
+        router.push('/home')
       }
     } catch (error) {
       if (error instanceof Error) errorMessage.value = error.message
@@ -76,7 +76,7 @@
         return
       }
       authStore.setSession(user, token)
-      router.push('/profile')
+      router.push('/home')
     } catch (error) {
       if (error instanceof Error) otpError.value = error.message
     } finally {

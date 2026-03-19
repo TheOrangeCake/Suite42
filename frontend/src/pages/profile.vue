@@ -135,9 +135,7 @@
              md:font-h5-tablet
              lg:font-h5-laptop
              xl:font-h5-desktop"
-      :style="{
-        color: colors.suite42Black
-      }"
+      :style="{ color: colors.suite42Black }"
     >Loading...</h5>
     <p
       v-else-if="error"
@@ -145,9 +143,7 @@
              md:font-h5-tablet
              lg:font-h5-laptop
              xl:font-h5-desktop"
-      :style="{
-        color: colors.suite42Red
-      }"
+      :style="{ color: colors.suite42Red }"
     >{{ error }}</p>
 
     <div v-else-if="profile">
