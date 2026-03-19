@@ -19,8 +19,16 @@
   const otpError = ref('')
 
   async function onLogin (payload: LoginPayload) {
-    isLoading.value = true
     errorMessage.value = ''
+    if (!payload.username.trim()) {
+      errorMessage.value = 'Username is required.'
+      return
+    }
+    if (!payload.password) {
+      errorMessage.value = 'Password is required.'
+      return
+    }
+    isLoading.value = true
     try {
       const result = await signin(payload.username, payload.password)
       if (result.twoFa) {
