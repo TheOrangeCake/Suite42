@@ -13,6 +13,7 @@
   const signupSectionProps = defineProps<{
     isLoading?: boolean
     errorMessage?: string
+    successMessage?: string
   }>()
 
   function handleSignup () {
@@ -133,6 +134,14 @@
                        xl:font-h5-desktop"
                 :style="{ color: colors.suite42Red }"
               >{{ signupSectionProps.errorMessage }}</p>
+              <p
+                v-if="signupSectionProps.successMessage"
+                class="font-regular font-h5-mobile
+                       md:font-h5-tablet
+                       lg:font-h5-laptop
+                       xl:font-h5-desktop"
+                :style="{ color: colors.suite42Green }"
+              >{{ signupSectionProps.successMessage }}</p>
             </div>
           </div>
         </div>

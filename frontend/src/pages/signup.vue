@@ -1,6 +1,7 @@
 <template>
   <SignupSections
     :error-message="errorMessage"
+    :success-message="successMessage"
     :is-loading="isLoading"
     @signup="onSignup"
   />
@@ -21,6 +22,7 @@
 
   const isLoading = ref(false)
   const errorMessage = ref('')
+  const successMessage = ref('')
   const router = useRouter()
 
   function isValidEmail (email: string): boolean {
@@ -74,7 +76,8 @@
 
     try {
       await signup(payload.username, payload.email, payload.password)
-      router.push('/login')
+      successMessage.value = 'Account created successfully! Redirecting to login...'
+      setTimeout(() => router.push('/login'), 2000)
     } catch (error) {
       if (error instanceof Error) {
         errorMessage.value = error.message
