@@ -1,21 +1,19 @@
-import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { refreshToken, getMe42 } from '../api/auth'
 import { useAuthStore } from '../stores/auth'
 
 /**
  * Handles authentication initialization on app startup.
- * Tries to restore a regular user session via token refresh,
- * then falls back to checking a 42 OAuth session.
+ * Runs immediately in setup (not onMounted) so the router guard's watch
+ * on authReady can resolve before navigation completes.
  */
 export function useAuthInit() {
   const authStore = useAuthStore()
   const router = useRouter()
 
-  onMounted(async () => {
+  ;(async () => {
     try {
       authStore.loadFromStorage()
-      if (!authStore.accessToken) throw new Error('No stored token')
       const user = await refreshToken()
       const token = authStore.accessToken
       if (!token) throw new Error('No access token received after refresh')
@@ -25,7 +23,7 @@ export function useAuthInit() {
     } finally {
       authStore.setAuthReady()
     }
-  })
+  })()
 }
 
 async function tryRestore42Session(

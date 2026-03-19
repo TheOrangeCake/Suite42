@@ -142,8 +142,12 @@ public class AuthController {
 					.orElseThrow(() -> new BadTokenException("User not found"));
 			jwtService.revokeToken(currentRefreshToken, "refresh token");
 
-			String currentAccessToken = jwtService.extractAccessToken(request);
-			jwtService.revokeToken(currentAccessToken, "access token");
+			try {
+				String currentAccessToken = jwtService.extractAccessToken(request);
+				jwtService.revokeToken(currentAccessToken, "access token");
+			} catch (Exception ignored) {
+				// No access token in header (e.g. new browser window) — skip revocation
+			}
 
 			logger.info("User " + userId + " has generated new refresh and access tokens");
 			return generateResponse(user, userId);
