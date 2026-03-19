@@ -92,8 +92,14 @@
       <button class="applyBtn" @click="applyFilters">Apply</button>
     </div>
 
+    <!-- Regular user notice -->
+    <div v-if="authStore.isRegularUser" class="noticeBox">
+      <p class="noticeTitle">42 students only</p>
+      <p class="noticeText">The Buddy Finder is only available for users connected with a 42 account.</p>
+    </div>
+
     <!-- Loading -->
-    <div v-if="isLoading" class="loading">Loading...</div>
+    <div v-else-if="isLoading" class="loading">Loading...</div>
 
     <!-- Error -->
     <p v-else-if="error" class="errorMsg">{{ error }}</p>
@@ -169,12 +175,14 @@ import { ref, reactive, onMounted } from 'vue'
 import { getUsers } from '../api/api42'
 import type { User42 } from '../api/api42'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
 definePage({
   meta: { requiresAuth: true, layout: 'dashboard' },
 })
 
 const router = useRouter()
+const authStore = useAuthStore()
 const users = ref<User42[]>([])
 const isLoading = ref(false)
 const error = ref('')
@@ -232,7 +240,10 @@ function goToProfile(login: string) {
   router.push(`/user/${login}`)
 }
 
-onMounted(fetchUsers)
+onMounted(() => {
+  if (authStore.isRegularUser) return
+  fetchUsers()
+})
 </script>
 
 <style scoped>
@@ -559,6 +570,30 @@ onMounted(fetchUsers)
   font-family: Monda, sans-serif;
   font-size: 0.85rem;
   color: #555;
+}
+
+.noticeBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.noticeTitle {
+  font-family: Monda, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #202020;
+  margin: 0;
+}
+
+.noticeText {
+  font-family: Monda, sans-serif;
+  font-size: 0.9rem;
+  color: #888;
+  margin: 0;
 }
 
 .loading {
