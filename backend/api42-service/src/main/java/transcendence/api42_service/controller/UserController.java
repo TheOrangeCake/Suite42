@@ -230,7 +230,7 @@ public class UserController {
 				}
 				user.setCustomAvatarUrl(fileName);
 			} else if (type.equals("banner")) {
-				if (!user.getCustomBannerUrl().equals(envVariables.getDefaultBanner())) {
+				if (user.getCustomBannerUrl() != null && !user.getCustomBannerUrl().equals(envVariables.getDefaultBanner())) {
 					fileUploadService.deleteImage(user.getCustomBannerUrl());
 				}
 				user.setCustomBannerUrl(fileName);
