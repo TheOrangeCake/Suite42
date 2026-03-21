@@ -1,9 +1,10 @@
 package com.transcendence.auth.security;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -54,12 +55,14 @@ public class FortyTwoSuccessHandler implements AuthenticationSuccessHandler {
 
         String jwt = jwtService.createToken(login, claims);
 
-        Cookie cookie = new Cookie(cookieName, jwt);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setSecure(true);
-        cookie.setMaxAge(60 * 60 * 2);
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from(cookieName, jwt)
+                .httpOnly(true)
+                .path("/")
+                .secure(true)
+                .sameSite("Lax")
+                .maxAge(60 * 60 * 2)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         String target = frontendBaseUrl.endsWith("/") ? frontendBaseUrl : (frontendBaseUrl + "/");
         response.setStatus(302);

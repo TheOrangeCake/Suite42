@@ -1,6 +1,7 @@
 package com.transcendence.auth.security;
 
-import jakarta.servlet.http.Cookie;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,12 +45,14 @@ public class SecurityConfig {
       .logout(logout -> logout
         .logoutUrl("/logout")
         .addLogoutHandler((request, response, authentication) -> {
-          Cookie cookie = new Cookie(cookieName, "");
-          cookie.setMaxAge(0);
-          cookie.setPath("/");
-          cookie.setHttpOnly(true);
-          cookie.setSecure(true);
-          response.addCookie(cookie);
+          ResponseCookie cookie = ResponseCookie.from(cookieName, "")
+              .maxAge(0)
+              .path("/")
+              .httpOnly(true)
+              .secure(true)
+              .sameSite("Lax")
+              .build();
+          response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         })
         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
       );

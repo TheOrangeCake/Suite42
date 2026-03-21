@@ -86,8 +86,11 @@ public class FriendshipController {
 
 	@GetMapping("/check-internal")
 	public ResponseEntity<Map<String, Boolean>> checkFriendshipInternal(
-			@RequestParam Long user1, @RequestParam Long user2) {
-		return ResponseEntity.ok(Map.of("friends", friendshipService.areFriends(user1, user2)));
+			@RequestParam String user1, @RequestParam String user2) {
+		return userRepository.findByLogin(user1)
+				.flatMap(u1 -> userRepository.findByLogin(user2)
+						.map(u2 -> ResponseEntity.ok(Map.of("friends", friendshipService.areFriends(u1.getId(), u2.getId())))))
+				.orElse(ResponseEntity.ok(Map.of("friends", false)));
 	}
 
 	private Long getUserId() {

@@ -22,10 +22,11 @@
         v-for="login in recentContacts"
         :key="login"
         class="contact-item"
-        :class="{ active: recipientId === login }"
+        :class="{ active: recipientId === login, unread: unreadContacts.has(login) }"
         @click="selectContact(login)"
       >
         <span class="contact-login">{{ login }}</span>
+        <span v-if="unreadContacts.has(login)" class="unread-dot"></span>
       </div>
 
       <p v-if="recentContacts.length === 0" class="empty-hint">
@@ -76,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick, onUnmounted } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import {
   connectChat,
@@ -85,6 +86,7 @@ import {
   getMessageHistory,
   type ChatMessage,
 } from '../api/chat'
+import { getFriends } from '../api/friends'
 
 definePage({
   meta: {
@@ -92,6 +94,8 @@ definePage({
     layout: 'dashboard',
   },
 })
+
+const STORAGE_KEY = 'chat_recent_contacts'
 
 const authStore = useAuthStore()
 const myId = authStore.user42?.login ?? authStore.user?.username ?? ''
@@ -101,8 +105,13 @@ const searchInput = ref('')
 const messages = ref<ChatMessage[]>([])
 const inputText = ref('')
 const connected = ref(false)
-const recentContacts = ref<string[]>([])
+const recentContacts = ref<string[]>(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]'))
+const unreadContacts = ref<Set<string>>(new Set())
 const messagesEl = ref<HTMLElement | null>(null)
+
+watch(recentContacts, (val) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(val))
+}, { deep: true })
 
 function openConversation() {
   const login = searchInput.value.trim()
@@ -115,15 +124,14 @@ async function selectContact(login: string) {
   if (!recentContacts.value.includes(login)) {
     recentContacts.value.unshift(login)
   }
+  unreadContacts.value.delete(login)
   recipientId.value = login
   messages.value = []
 
   try {
-  console.log('ici');
     messages.value = await getMessageHistory(myId, login)
     await scrollToBottom()
   } catch {
-    console.log('ici');
     // historique vide ou service indisponible
   }
 }
@@ -145,8 +153,8 @@ function send() {
   scrollToBottom()
 }
 
-function formatTime(ts: number) {
-  return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+function formatTime(ts: number | string) {
+  return new Date(ts as any).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
 async function scrollToBottom() {
@@ -156,21 +164,47 @@ async function scrollToBottom() {
   }
 }
 
+onMounted(async () => {
+  try {
+    const friends = await getFriends()
+    for (const f of friends) {
+      if (f.status === 'ACCEPTED' && !recentContacts.value.includes(f.friend_login)) {
+        recentContacts.value.push(f.friend_login)
+      }
+    }
+  } catch {
+    // service indisponible
+  }
+})
+
 // Connexion WebSocket au montage
 connectChat(myId, (msg) => {
-  // N'ajoute le message que si on est dans la bonne conversation
-  if (
-    (msg.senderId === recipientId.value && msg.recipientId === myId) ||
-    (msg.senderId === myId && msg.recipientId === recipientId.value)
-  ) {
-    messages.value.push(msg)
-    scrollToBottom()
-  }
+  const contact = msg.senderId === myId ? msg.recipientId : msg.senderId
+
+  console.log('[CHAT] onMessage called')
+  console.log('[CHAT] myId:', JSON.stringify(myId))
+  console.log('[CHAT] recipientId.value:', JSON.stringify(recipientId.value))
+  console.log('[CHAT] msg.senderId:', JSON.stringify(msg.senderId))
+  console.log('[CHAT] msg.recipientId:', JSON.stringify(msg.recipientId))
 
   // Ajoute l'expéditeur aux contacts récents si pas déjà présent
-  const contact = msg.senderId === myId ? msg.recipientId : msg.senderId
   if (!recentContacts.value.includes(contact)) {
     recentContacts.value.unshift(contact)
+  }
+
+  // Si la conversation est ouverte, affiche le message directement
+  const isActiveConv =
+    (msg.senderId === recipientId.value && msg.recipientId === myId) ||
+    (msg.senderId === myId && msg.recipientId === recipientId.value)
+
+  console.log('[CHAT] isActiveConv:', isActiveConv)
+
+  if (isActiveConv) {
+    messages.value.push(msg)
+    scrollToBottom()
+  } else {
+    // Sinon marque le contact comme ayant un message non lu
+    unreadContacts.value = new Set(unreadContacts.value).add(contact)
   }
 }, (isConnected) => {
   connected.value = isConnected
@@ -263,10 +297,22 @@ watch(recipientId, scrollToBottom)
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .contact-item:hover { background: #f4f4f4; }
 .contact-item.active { background: #e8fdfe; }
+.contact-item.unread .contact-login { font-weight: 800; color: var(--color-turquoise); }
+
+.unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-turquoise);
+  flex-shrink: 0;
+}
 
 .contact-login {
   font-size: 0.9rem;

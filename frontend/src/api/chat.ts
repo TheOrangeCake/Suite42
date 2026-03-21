@@ -45,13 +45,15 @@ export function connectChat(
       onConnectionChange?.(true)
 
       stompClient?.subscribe(
-        `/user/${userId}/queue/messages`,
+        `/user/queue/messages`,
         (frame: IMessage) => {
+          console.log('[WS] MESSAGE RECEIVED — raw body:', frame.body)
           try {
             const message: ChatMessage = JSON.parse(frame.body)
+            console.log('[WS] Parsed message:', message)
             onMessage(message)
           } catch (err) {
-            console.error('Invalid chat message', err)
+            console.error('[WS] Failed to parse message:', err)
           }
         }
       )
