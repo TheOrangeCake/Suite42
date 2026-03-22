@@ -27,9 +27,10 @@ import transcendence.api42_service.repositories.UserRepository;
 import transcendence.api42_service.services.FileUploadService;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @RequestMapping("v1/42users")
 @AllArgsConstructor
@@ -58,22 +59,14 @@ public class UserController {
 			@RequestParam(required = false) String eligibleProject,
 			@RequestParam(required = false) Set<String> finishedProjects,
 			@RequestParam(required = false) String lfg,
+			@RequestParam(required = false) Integer minScore,
+			@RequestParam(required = false) Integer maxScore,
 			@PageableDefault(size = 25) Pageable pageable) {
 		int maxSize = 50;
-		Sort sort = pageable
-				.getSort()
-				.stream()
-				.filter(order -> ALL_USERS_ALLOWED_SORTS.contains(order.getProperty()))
-				.collect(Collectors.collectingAndThen(
-						Collectors.toList(),
-						orders -> orders.isEmpty()
-								? Sort.by(Sort.Direction.DESC, "performanceScore")
-								: Sort.by(orders)
-				));
 		Pageable safePageable = PageRequest.of(
 				pageable.getPageNumber(),
 				Math.min(pageable.getPageSize(), maxSize),
-				sort);
+				buildUserSort(pageable.getSort()));
 		Specification<User> spec = Specification
 				.where(UserSpecifications.isActive())
 				.and(UserSpecifications.betweenRank(0, 6))
@@ -84,9 +77,53 @@ public class UserController {
 				.and(UserSpecifications.hasRank(rank))
 				.and(UserSpecifications.hasEligibleProject(eligibleProject))
 				.and(UserSpecifications.hasFinishedProjects(finishedProjects))
-				.and(UserSpecifications.hasLfg(lfg));
+				.and(UserSpecifications.hasLfg(lfg))
+				.and(UserSpecifications.performanceScoreBetween(minScore, maxScore));
 		return userRepository.findAll(spec, safePageable)
 				.map(userMapper::mapToSimpleDto);
+	}
+
+
+	private Sort buildUserSort(Sort requestedSort) {
+		List<Sort.Order> orders = requestedSort.stream()
+				.filter(order -> ALL_USERS_ALLOWED_SORTS.contains(order.getProperty()))
+				.toList();
+
+		if (orders.isEmpty()) {
+			return Sort.by(Sort.Direction.DESC, "performanceScore");
+		}
+
+		boolean sortingByRank = orders.stream()
+				.anyMatch(order -> order.getProperty().equals("rank"));
+		boolean sortingByPoolYear = orders.stream()
+				.anyMatch(order -> order.getProperty().equals("poolYear"));
+
+		if (sortingByRank) {
+			Sort.Direction rankDirection = getDirectionFor("rank", orders);
+			List<Sort.Order> extendedOrders = new ArrayList<>(orders);
+			extendedOrders.add(new Sort.Order(rankDirection, "rankProgressPercent"));
+			extendedOrders.add(new Sort.Order(Sort.Direction.DESC, "performanceScore"));
+			return Sort.by(extendedOrders);
+		}
+
+		if (sortingByPoolYear) {
+			Sort.Direction poolYearDirection = getDirectionFor("poolYear", orders);
+			List<Sort.Order> extendedOrders = new ArrayList<>(orders);
+			extendedOrders.add(new Sort.Order(poolYearDirection, "rank"));
+			extendedOrders.add(new Sort.Order(poolYearDirection, "rankProgressPercent"));
+			extendedOrders.add(new Sort.Order(Sort.Direction.DESC, "performanceScore"));
+			return Sort.by(extendedOrders);
+		}
+
+		return Sort.by(orders);
+	}
+
+	private Sort.Direction getDirectionFor(String property, List<Sort.Order> orders) {
+		return orders.stream()
+				.filter(order -> order.getProperty().equals(property))
+				.findFirst()
+				.map(Sort.Order::getDirection)
+				.orElse(Sort.Direction.DESC);
 	}
 
 	@GetMapping("/profile/{id}")

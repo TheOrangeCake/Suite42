@@ -3,7 +3,7 @@
 
   const inputFieldProps = defineProps<{
     label: string
-    modelValue: string
+    modelValue: string | number
     tooltip?: string
     type?: string
     placeholder?: string

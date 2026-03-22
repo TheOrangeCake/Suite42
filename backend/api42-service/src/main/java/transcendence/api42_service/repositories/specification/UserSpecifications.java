@@ -68,6 +68,24 @@ public final class UserSpecifications {
 		};
 	}
 
+	public static Specification<User> performanceScoreBetween(Integer min, Integer max) {
+		return (table, query, criteria) -> {
+			if (min == null && max == null) {
+				return null;
+			}
+			if ((min != null && min < 0) || (max != null && max > 100)) {
+				return null;
+			}
+			if (min != null && max != null) {
+				return criteria.between(table.get("performanceScore"), min, max);
+			}
+			if (min != null) {
+				return criteria.greaterThanOrEqualTo(table.get("performanceScore"), min);
+			}
+			return criteria.lessThanOrEqualTo(table.get("performanceScore"), max);
+		};
+	}
+
 	public static Specification<User> hasFinishedProjects(Set<String> finishedProjects) {
 		return (table, query, criteria) -> {
 			if (finishedProjects == null || finishedProjects.isEmpty()) {

@@ -89,6 +89,8 @@ export interface FinderFilters {
   poolMonth?: string
   eligibleProject?: string
   finishedProjects?: string[]
+  minScore?: number
+  maxScore?: number
   sort?: string
   search?: string
 }
@@ -116,13 +118,18 @@ export function getUsers (filters: FinderFilters) {
       params.append('finishedProjects', p)
     }
   }
+  if (filters.minScore !== undefined && filters.minScore !== null) {
+    params.set('minScore', filters.minScore.toString())
+  }
+  if (filters.maxScore !== undefined && filters.maxScore !== null) {
+    params.set('maxScore', filters.maxScore.toString())
+  }
   if (filters.sort) {
     params.set('sort', filters.sort)
   }
   if (filters.search) {
     params.set('search', filters.search)
   }
-
   return http.get<PagedResponse<User42>>('/api/api42/v1/42users', params)
 }
 

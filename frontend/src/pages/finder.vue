@@ -46,6 +46,8 @@
     poolMonth: 'all',
     eligibleProject: 'any',
     finishedProjects: [] as string[],
+    minScore: 0,
+    maxScore: 100,
     sort: 'performanceScore,desc',
     search: '',
   })
@@ -56,6 +58,8 @@
     filters.poolMonth = 'all'
     filters.eligibleProject = 'any'
     filters.finishedProjects = []
+    filters.minScore = 0
+    filters.maxScore = 100
     filters.sort = 'performanceScore,desc'
     filters.search = ''
     filters.page = 0
@@ -83,9 +87,40 @@
     }
   }
 
+  function validateScoreRange (min: number | undefined, max: number | undefined): string | null {
+    const minVal = min === undefined || min === null || (min as unknown as string) === '' ? undefined : Number(min)
+    const maxVal = max === undefined || max === null || (max as unknown as string) === '' ? undefined : Number(max)
+
+    if (minVal == null && maxVal == null) return null
+    if (minVal != null && !Number.isInteger(minVal)) {
+      return 'Min score must be an integer'
+    }
+    if (maxVal != null && !Number.isInteger(maxVal)) {
+      return 'Max score must be an integer'
+    }
+    if (minVal != null && (minVal < 0 || minVal > 100)) {
+      return 'Min score must be between 0 and 100'
+    }
+    if (maxVal != null && (maxVal < 0 || maxVal > 100)) {
+      return 'Max score must be between 0 and 100'
+    }
+    if (minVal != null && maxVal != null && minVal > maxVal) {
+      return 'Min score cannot be greater than max score'
+    }
+    return null
+  }
+
   function applyFilters () {
+    const validationError = validateScoreRange(filters.minScore, filters.maxScore)
+    if (validationError) {
+      error.value = validationError
+      filters.minScore = 0
+      filters.maxScore = 100
+      return
+    }
     filters.page = 0
     panelOpen.value = false
+    error.value = ''
     fetchUsers()
   }
 
@@ -109,10 +144,8 @@
     { id: 2, value: 'performanceScore,asc', text: 'Performance ↑' },
     { id: 3, value: 'rank,desc', text: 'Rank ↓' },
     { id: 4, value: 'rank,asc', text: 'Rank ↑' },
-    { id: 5, value: 'rankProgressPercent,desc', text: 'Progress ↓' },
-    { id: 6, value: 'rankProgressPercent,asc', text: 'Progress ↑' },
-    { id: 7, value: 'poolYear,desc', text: 'Pool year ↓' },
-    { id: 8, value: 'poolYear,asc', text: 'Pool year ↑' },
+    { id: 5, value: 'poolYear,desc', text: 'Pool year ↓' },
+    { id: 6, value: 'poolYear,asc', text: 'Pool year ↑' },
   ]
 
   const pageSizeOptions: SelectOption[] = [
@@ -356,6 +389,16 @@
                 <SingleConnector color="suite42Blue" :height="1" />
                 <div class="flex flex-row">
                   <ConnectConnector color1="suite42Blue" color2="suite42Blue" :height="filterMobileConnector" />
+                  <InputField v-model="filters.minScore" label="Min performance score" type="number" />
+                </div>
+                <SingleConnector color="suite42Blue" :height="1" />
+                <div class="flex flex-row">
+                  <ConnectConnector color1="suite42Blue" color2="suite42Blue" :height="filterMobileConnector" />
+                  <InputField v-model="filters.maxScore" label="Max performance score" type="number" />
+                </div>
+                <SingleConnector color="suite42Blue" :height="1" />
+                <div class="flex flex-row">
+                  <ConnectConnector color1="suite42Blue" color2="suite42Blue" :height="filterMobileConnector" />
                   <SelectField v-model="filters.eligibleProject" label="Eligible project" :options="projectOptions" />
                 </div>
                 <SingleConnector color="suite42Blue" :height="1" />
@@ -457,6 +500,18 @@
                 />
               </div>
               <div class="flex flex-col gap-6">
+                <InputField
+                  v-model="filters.minScore"
+                  label="Min performance score"
+                  type="number"
+                />
+                <InputField
+                  v-model="filters.maxScore"
+                  label="Max performance score"
+                  type="number"
+                />
+              </div>
+              <div class="flex flex-col gap-6">
                 <SelectField
                   v-model="filters.eligibleProject"
                   label="Eligible project"
@@ -507,7 +562,19 @@
     >{{ error }}</p>
     <div v-else>
       <SingleConnector color="suite42Red" :height="2" />
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-4 mb-20">
+      <div v-if="users.length === 0">
+        <p
+          class="font-medium font-body1-mobile
+             md:font-body1-tablet
+             lg:font-body1-laptop
+             xl:font-body1-desktop"
+          :style="{ color: colors.suite42Darkgrey }"
+        >No students found matching your filters</p>
+      </div>
+      <div
+        v-else
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-4 mb-20"
+      >
         <FinderProfileCard
           v-for="user in users"
           :key="user.id"

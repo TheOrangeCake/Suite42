@@ -64,6 +64,8 @@ Currently only support Lausanne campus
             <li><code>eligibleProject</code> (a project user can do but hasn't done)</li>
             <li><code>finishedProjects</code> (list of finished projects)</li>
             <li><code>lfg</code></li>
+            <li><code>minScore</code></li>
+            <li><code>maxScore</code></li>
           </ul>
         </li>
         <li>Sorting:
