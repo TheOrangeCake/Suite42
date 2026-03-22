@@ -44,16 +44,16 @@ color palette, typography, and icons. (1p)</li>
   - Font base size: 1 rem = 16px 
   - Setup (size in rem):
 
-    |   Name    |           Style           | Desktop | Laptop | Tablet | Mobile |
-    |:---------:|:-------------------------:|:-------:|:------:|:------:|:------:|
-    | Heading 1 |           Bold            |   6.5   |   3    |  2.75  |   3    |
-    | Heading 2 |           Bold            |    3    |  2.5   |  2.25  |  1.75  |
-    | Heading 3 |          Medium           |   2.5   |   2    |  1.75  |  1.5   |
-    | Heading 4 |          Regular          |  1.75   |  1.5   |  1.25  |  1.25  |
-    | Heading 5 |      Bold Uppercase       |  1.125  | 1.125  | 1.125  |   1    |
-    |   Hero    |           Bold            |    6    |   5    |   4    |  3.25  |
-    |  Body 1   |       Bold, Regular       |  1.125  | 1.125  | 1.125  |   1    |
-    |  Body 2   | SemiBold, Medium, Regular |    1    |   1    |   1    | 0.875  |
+    |                               Name                                |   Desktop    | Laptop | Tablet | Mobile |
+    |:-----------------------------------------------------------------:|:------------:|:------:|:------:|:------:|
+    |                             Heading 1                             |     6.5      |   3    |  2.75  |   3    |
+    |                             Heading 2                             |      3       |  2.5   |  2.25  |  1.75  |
+    |                             Heading 3                             |     2.5      |   2    |  1.75  |  1.5   |
+    |                             Heading 4                             |     1.75     |  1.5   |  1.25  |  1.25  |
+    |                             Heading 5                             |    1.125     | 1.125  | 1.125  |   1    |
+    |                               Hero                                |      6       |   5    |   4    |  3.25  |
+    |                              Body 1                               |    1.125     | 1.125  | 1.125  |   1    |
+    |                              Body 2                               |      1       |   1    |   1    | 0.875  |
 
 <br>
 
@@ -69,54 +69,46 @@ color palette, typography, and icons. (1p)</li>
 <br>
 
 - ### Icons
-  | Name                 | Visual                                                                                | Description                                                        |
-  |----------------------|---------------------------------------------------------------------------------------|--------------------------------------------------------------------|
-  | Filter default       | <img style="background: #F8F8F8;" src="./assets/icons/filter_black.svg" width="40">   | Filter button icon in default state.                               |
-  | Filter hover         | <img src="./assets/icons/filter_white.svg" width="40">                                | Filter button icon in hover state.                                 |
-  | Filter arrow         | <img src="./assets/icons/filter_field_arrow.svg" width="20">                          | Arrow for filter fields. Rotate 90 degree to indicate active state |
-  | Chat menu            | <img src="./assets/icons/chat.png" width="40">                                        | Intranet navigation bar points to Chatting page.                   |
-  | Group menu           | <img src="./assets/icons/group.png" width="40">                                       | Intranet navigation bar points to Finder page.                     |
-  | Project menu         | <img src="./assets/icons/project.png" width="40">                                     | Intranet navigation bar points to Projects page.                   |
-  | Todo menu            | <img src="./assets/icons/to-do-list.png" width="40">                                  | Intranet navigation bar points to Tasks page.                      | 
-  | Home menu            | <img src="./assets/icons/home.png" width="40">                                        | Intranet navigation bar points to Intranet home page.              | 
-  | Yes                  | <img src="./assets/icons/yes_icon.svg" width="30">                                    | Accept friend request.                                             |
-  | No                   | <img src="./assets/icons/no_icon.svg" width="30">                                     | Decline friend request.                                            |
-  | Hamburger menu       | <img style="background: #F8F8F8;" src="./assets/icons/hamburger_menu.svg" width="30"> | Hamburger menu for intranet mobile.                                |
-  | Hamburger menu close | <img src="./assets/icons/x_close.svg" width="40">                                     | Close the hamburger menu.                                          |
-  | Facebook social      | <img style="background: #F8F8F8;" src="./assets/icons/facebook.png" width="40">       | Facebook icon for campus social media.                             |
-  | X social             | <img src="./assets/icons/x_social.png" width="40">                                    | X icon for campus social media.                                    |                   
+  | Name            | Visual                                                                              | Description                                           |
+  |-----------------|-------------------------------------------------------------------------------------|-------------------------------------------------------|
+  | Filter          | <img style="background: #F8F8F8;" src="./assets/icons/filter_black.svg" width="40"> | Filter button icon.                                   |
+  | Chat menu       | <img src="./assets/icons/chat.png" width="40">                                      | Intranet navigation bar points to Chatting page.      |
+- | Finder menu     | <img src="./assets/icons/finder.png" width="40">                                    | Intranet navigation bar points to Finder page.        |
+  | Friend menu     | <img src="./assets/icons/group.png" width="40">                                     | Intranet navigation bar points to Friend page.        |
+  | Project menu    | <img src="./assets/icons/project.png" width="40">                                   | Intranet navigation bar points to Projects page.      |
+  | Todo menu       | <img src="./assets/icons/to-do-list.png" width="40">                                | Intranet navigation bar points to Tasks page.         | 
+  | Home menu       | <img src="./assets/icons/home.png" width="40">                                      | Intranet navigation bar points to Intranet home page. | 
+  | Facebook social | <img style="background: #F8F8F8;" src="./assets/icons/facebook.png" width="40">     | Facebook icon for campus social media.                |
+  | X social        | <img src="./assets/icons/x_social.png" width="40">                                  | X icon for campus social media.                       |
+- | 42 logo         | <img src="./assets/icons/42_Logo.svg.png" width="42">                               | 42 icon for Oauth login button                        |
 
 <br>
 
 # Components
-### Reusable components
-| Name                    | Visual                                                              | Description                                                               |
-|-------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------------|
-| Connector middle single | <img src="./support/reusable_components/Connector body single.png"> | Use to build connector middle section, single indentation.                |
-| Connector middle double | <img src="./support/reusable_components/Connector body double.png"> | Use to build connector middle section, double indentation.                |
-| Connector middle triple | <img src="./support/reusable_components/Connector body triple.png"> | Use to build connector middle section, triple indentation.                |
-| Connector end middle    | <img src="./support/reusable_components/Connector middle.png">      | Use to build connector middle section, precede non last element.          |
-| Connector end           | <img src="./support/reusable_components/Connector end.png">         | Use to build connector end section, precede last element.                 |
-| Big red button          | <img src="./support/reusable_components/Big red button.png">        | Use as primary button. Top is default state, bottom is hover state.       |
-| Small red button        | <img src="./support/reusable_components/Small red button.png">      | Use as secondary button. Top is default state, bottom is hover state.     |
-| Small blue button       | <img src="./support/reusable_components/Small blue button.png">     | Use as non important button. Top is default state, bottom is hover state. |
-| Filter button           | <img src="./support/reusable_components/Filter button.png">         | Use in directory pages, this will open the filter panel.                  |
-| Filter field            | <img src="./support/reusable_components/Filter field.png">          | Use in filter panel (sort, filter and results per page).                  |
+| No | Name                         | Type      | Description                                                 |
+|---:|------------------------------|-----------|-------------------------------------------------------------|
+|  1 | Single Connector            | Connector | Straight connector.                                         |
+|  2 | End Connector                | Connector | Elbow connector.                                            |
+|  3 | Double Connector             | Connector | 2 Single connectors with predefined responsive gap.         |
+|  4 | Connect Connector            | Connector | Single connector and End connector with predefined gap.     |
+|  5 | Single Connect Connector     | Connector | Single connector and Connect connector with predefined gap. |
+|  6 | Single End Connector         | Connector | Single connector and End connector with predefined gap.     |
+|  7 | Big Red Button               | Button    | Big red CTA, big focus.                                     |
+|  8 | Small Red Button             | Button    | Small red cta, medium focus.                                |
+|  9 | Small Blue Button            | Button    | Small blue cta, small focus.                                |
+| 10 | Oauth Button                 | Button    | Oauth button to log in.                                     |
+| 11 | Filter Button                | Button    | Filter button for fitlering directories.                    |
+| 12 | Public Navigation Bar Link   | Button    | Public navigation individual link.                          |
+| 13 | Intranet Navigation Bar Link | Button    | Intranet navigation individual link.                        |
+| 14 | Input Field         | Field     | Custom input field.                                         |
+| 15 | Multi Select Field  | Field     | Custom multi select field.                                  |
+| 16 | Seclect Field       | Field     | Custom select field.                                        |
+| 17 | Upload Field        | Field     | Custom file upload field.                                   |
+| 18 | Finder Profile Card | Card      | Student profile card in finder search result.               | 
+| 19 | Friend Search Card | Card      | Simple friend card in friend search result.                 |
+| 20 | Friend Tab Card | Card      | Simple friend card in friend tab.                           |
+| 21 | Tool Card | Card      | Service card for available services.                        |
 
-<br>
-
-### Recommended Repeatable components
-| Name                | Visual                                                         | Description                                                                     |
-|---------------------|----------------------------------------------------------------|---------------------------------------------------------------------------------|
-| Public nav bar menu | <img src="./support/repeatable_components/Public nav link.png"> | Use as nav link in public nav bar. State top to bottom: default, hover, active. |
-| Tool section tile   | <img src="./support/repeatable_components/Tool card.png">      | Tile to briefly show case a tool. Repeat for each tool.                         |
-| Campus card         | <img src="./support/repeatable_components/Campus card.png">    | Campus card to show campus information.                                         |
-| Input field         | <img src="./support/repeatable_components/Input field.png">    | Use in sign in or sign up forms.                                                |
-| Oauth login button  | <img src="./support/repeatable_components/Oauth login.png">    | Use in sign in page. Top is default, bottom is hover.                           |
-| Intra nav link      | <img src="./support/repeatable_components/Intra nav link.png"> | Use as nav link in intra nav bar. Left is default, right is hover and active.   |
-| Friend tile         | <img src="./support/repeatable_components/Chat tile.png">      | Individual friend in friend list. Top is default, bottom is hover and active.   |
-| Chat bubble         | <img src="./support/repeatable_components/Chat bubble.png">    | Chat bubble. Top is friend text, bottom is user text.                           |
-| Student card        | <img src="./support/repeatable_components/User card.png">      | User card to show student information.                                          |
 
 <br>
 

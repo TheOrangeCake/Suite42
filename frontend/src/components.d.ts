@@ -16,7 +16,6 @@ declare module 'vue' {
     BigRedButton: typeof import('./components/ui/BigRedButton.vue')['default']
     ConnectConnector: typeof import('./components/ui/ConnectConnector.vue')['default']
     ContactSections: typeof import('./components/sections/IndexSections/ContactSections.vue')['default']
-    Corner: typeof import('./components/ui/Corner.vue')['default']
     DoubleConnectors: typeof import('./components/ui/DoubleConnectors.vue')['default']
     EndConnector: typeof import('./components/ui/EndConnector.vue')['default']
     FilterButton: typeof import('./components/ui/FilterButton.vue')['default']
@@ -24,12 +23,10 @@ declare module 'vue' {
     FriendCard: typeof import('./components/ui/FriendCard.vue')['default']
     FriendSearchCard: typeof import('./components/ui/FriendSearchCard.vue')['default']
     FriendTabCard: typeof import('./components/ui/FriendTabCard.vue')['default']
-    HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     HeroSections: typeof import('./components/sections/LoginSections/HeroSections.vue')['default']
     IndexSections: typeof import('./components/sections/IndexSections/IndexSections.vue')['default']
     InputField: typeof import('./components/ui/InputField.vue')['default']
     IntraNavLink: typeof import('./components/ui/IntraNavLink.vue')['default']
-    LabeledCorner: typeof import('./components/ui/LabeledCorner.vue')['default']
     LoginSections: typeof import('./components/sections/LoginSections/LoginSections.vue')['default']
     MultiSelectField: typeof import('./components/ui/MultiSelectField.vue')['default']
     Navbar: typeof import('./components/Navbar.vue')['default']
@@ -48,7 +45,6 @@ declare module 'vue' {
     TechSections: typeof import('./components/sections/IndexSections/TechSections.vue')['default']
     ToolCard: typeof import('./components/ui/ToolCard.vue')['default']
     ToolkitSections: typeof import('./components/sections/IndexSections/ToolkitSections.vue')['default']
-    TripleConnectors: typeof import('./components/ui/TripleConnectors.vue')['default']
     UploadField: typeof import('./components/ui/UploadField.vue')['default']
   }
 }
