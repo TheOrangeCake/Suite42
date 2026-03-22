@@ -1,76 +1,5 @@
-<template>
-  <div class="friends-page">
-    <h1 class="title">Friends</h1>
-
-    <div class="search-section">
-      <div class="search-bar">
-        <input
-          v-model="searchQuery"
-          class="search-input"
-          placeholder="Search by login..."
-          type="text"
-          @input="onSearch"
-          @keyup.enter="onSearchNow"
-        >
-        <button class="btn search-btn" @click="onSearchNow">Search</button>
-      </div>
-      <div v-if="searchResults.length > 0" class="search-results">
-        <div v-for="u in searchResults" :key="u.id" class="friend-card">
-          <img alt="" class="avatar" :src="u.avatar_url || '/default-avatar.png'">
-          <span class="username">{{ u.login }}</span>
-          <button class="btn accept" @click="sendRequest(u.id)">Add</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="tabs">
-      <button :class="{ active: tab === 'friends' }" @click="tab = 'friends'">
-        Friends ({{ friends.length }})
-      </button>
-      <button :class="{ active: tab === 'pending' }" @click="tab = 'pending'">
-        Pending ({{ pending.length }})
-      </button>
-      <button :class="{ active: tab === 'sent' }" @click="tab = 'sent'">
-        Sent ({{ sent.length }})
-      </button>
-    </div>
-
-    <div v-if="tab === 'friends'" class="list">
-      <p v-if="friends.length === 0" class="empty">No friends yet.</p>
-      <div v-for="f in friends" :key="f.id" class="friend-card">
-        <div class="avatar-wrapper">
-          <img alt="" class="avatar" :src="f.friend_avatar_url">
-          <span class="status-dot" :class="{ online: f.online }" />
-        </div>
-        <span class="username">{{ f.friend_login }}</span>
-        <span v-if="f.online" class="online-label">Online</span>
-        <button class="btn danger" @click="remove(f.id)">Remove</button>
-      </div>
-    </div>
-
-    <div v-if="tab === 'pending'" class="list">
-      <p v-if="pending.length === 0" class="empty">No pending requests.</p>
-      <div v-for="f in pending" :key="f.id" class="friend-card">
-        <img alt="" class="avatar" :src="f.friend_avatar_url">
-        <span class="username">{{ f.friend_login }}</span>
-        <button class="btn accept" @click="accept(f.id)">Accept</button>
-        <button class="btn danger" @click="decline(f.id)">Decline</button>
-      </div>
-    </div>
-
-    <div v-if="tab === 'sent'" class="list">
-      <p v-if="sent.length === 0" class="empty">No sent requests.</p>
-      <div v-for="f in sent" :key="f.id" class="friend-card">
-        <img alt="" class="avatar" :src="f.friend_avatar_url">
-        <span class="username">{{ f.friend_login }}</span>
-        <span class="status">Pending...</span>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-  import { onMounted, onUnmounted, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import {
     acceptFriendRequest,
     declineFriendRequest,
@@ -84,6 +13,9 @@
     sendHeartbeat,
     type UserSearchResult,
   } from '@/api/friends'
+  import { useViewports } from '@/composables/useViewports.ts'
+  import { viewportValue } from '@/composables/viewportsValue.ts'
+  import { colors } from '@/styles/Colors.ts'
 
   definePage({
     meta: {
@@ -96,6 +28,9 @@
   const friends = ref<FriendshipDto[]>([])
   const pending = ref<FriendshipDto[]>([])
   const sent = ref<FriendshipDto[]>([])
+  const router = useRouter()
+  const viewPort = useViewports().currentViewport
+  const isDesktop = computed(() => viewPort.value === 'desktop')
 
   const searchQuery = ref('')
   const searchResults = ref<UserSearchResult[]>([])
@@ -160,6 +95,10 @@
     await loadAll()
   }
 
+  function goToProfile (login: string) {
+    router.push(`/user/${login}`)
+  }
+
   let heartbeatInterval: ReturnType<typeof setInterval> | null = null
 
   onMounted(() => {
@@ -174,174 +113,122 @@
   onUnmounted(() => {
     if (heartbeatInterval) clearInterval(heartbeatInterval)
   })
+
+  const searchConnector = viewportValue({
+    mobile: 1.5,
+    tablet: 1.5,
+    laptop: 1.6,
+    desktop: 2,
+  })
 </script>
 
-<style scoped>
-.friends-page {
-  padding: 48px 56px;
-  min-height: 100vh;
-  background: white;
-}
-
-.title {
-  font-family: Monda, sans-serif;
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  font-weight: 700;
-  color: #202020;
-  margin-bottom: 32px;
-}
-
-.search-section {
-  margin-bottom: 24px;
-  position: relative;
-}
-
-.search-bar {
-  display: flex;
-  gap: 8px;
-  max-width: 500px;
-}
-
-.search-input {
-  flex: 1;
-  padding: 10px 16px;
-  border: 2px solid #ddd;
-  border-radius: 4px;
-  font-family: Monda, sans-serif;
-  font-size: 0.95rem;
-  outline: none;
-}
-
-.search-input:focus {
-  border-color: #00babc;
-}
-
-.search-btn {
-  background: #00babc;
-  color: white;
-  padding: 10px 20px;
-  font-size: 0.95rem;
-}
-
-.search-results {
-  margin-top: 8px;
-  max-width: 500px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-}
-
-.tabs button {
-  padding: 10px 20px;
-  border: 2px solid #ddd;
-  background: white;
-  border-radius: 4px;
-  font-family: Monda, sans-serif;
-  font-size: 0.95rem;
-  cursor: pointer;
-}
-
-.tabs button.active {
-  border-color: #00babc;
-  color: #00babc;
-  font-weight: 600;
-}
-
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.friend-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 16px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-}
-
-.avatar-wrapper {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.status-dot {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #ccc;
-  border: 2px solid white;
-}
-
-.status-dot.online {
-  background: #22c55e;
-}
-
-.online-label {
-  font-family: Monda, sans-serif;
-  font-size: 0.8rem;
-  color: #22c55e;
-  font-weight: 600;
-}
-
-.username {
-  font-family: Monda, sans-serif;
-  font-weight: 600;
-  flex: 1;
-}
-
-.status {
-  font-family: Monda, sans-serif;
-  color: #999;
-  font-size: 0.9rem;
-}
-
-.btn {
-  padding: 6px 16px;
-  border: none;
-  border-radius: 4px;
-  font-family: Monda, sans-serif;
-  font-size: 0.85rem;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.btn.accept {
-  background: #00babc;
-  color: white;
-}
-
-.btn.danger {
-  background: #ff5959;
-  color: white;
-}
-
-.btn:hover {
-  opacity: 0.85;
-}
-
-.empty {
-  font-family: Monda, sans-serif;
-  color: #999;
-}
-</style>
+<template>
+  <div
+    class="flex flex-col w-full pl-4 pr-12 mb-20 mt-28
+           md:mt-12
+           lg:px-8 lg:mb-48
+           xl:px-18
+           2xl:px-28"
+  >
+    <h1
+      class="font-bold font-h1-mobile
+             md:font-h1-tablet
+             lg:font-h1-laptop
+             xl:font-h1-desktop"
+      :style="{ color: colors.suite42Black }"
+    >My buddies</h1>
+    <SingleConnector color="suite42Blue" :height="3" />
+    <div class="flex flex-col xl:flex-row xl:gap-20">
+      <div class="flex flex-row">
+        <EndConnector v-if="isDesktop" color="suite42Blue" :height="searchConnector" />
+        <ConnectConnector v-else color1="suite42Blue" color2="suite42Green" :height="searchConnector" />
+        <div
+          class="flex flex-col w-full
+                 md:w-auto"
+        >
+          <div class="flex flex-row gap-2">
+            <InputField
+              v-model="searchQuery"
+              label="Search user"
+              placeholder="user login"
+              type="text"
+              @input="onSearch"
+              @keyup.enter="onSearchNow"
+            />
+            <SmallRedButton text="Search" @click="onSearchNow" />
+          </div>
+          <div v-if="searchResults.length > 0">
+            <div
+              v-for="u in searchResults"
+              :key="u.id"
+            >
+              <FriendSearchCard :user="u" @click="sendRequest(u.id)" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <SingleConnector v-if="!isDesktop" color="suite42Green" :height="4" />
+      <div class="flex flex-row w-full max-w-2xl">
+        <EndConnector v-if="!isDesktop" color="suite42Green" :height="searchConnector" />
+        <div class="flex flex-col gap-8 w-full">
+          <div class="flex flex-row gap-2 w-full">
+            <TabSwitcher :active="tab === 'friends'" :count="friends.length" label="Friends" @click="tab = 'friends'" />
+            <TabSwitcher :active="tab === 'pending'" :count="pending.length" label="Pending" @click="tab = 'pending'" />
+            <TabSwitcher :active="tab === 'sent'" :count="sent.length" label="Sent" @click="tab = 'sent'" />
+          </div>
+          <div v-if="tab === 'friends'">
+            <p
+              v-if="friends.length === 0"
+              class="font-regular font-body1-mobile
+                     md:font-body1-tablet
+                     lg:font-body1-laptop
+                     xl:font-body1-desktop"
+              :style="{ color: colors.suite42Black }"
+            >No friends yet.</p>
+            <div
+              v-for="friend in friends"
+              v-else
+              :key="friend.id"
+            >
+              <FriendTabCard :friend="friend" type="friends" @button1="goToProfile(friend.friend_login)" @button2="remove(friend.id)" />
+            </div>
+          </div>
+          <div v-if="tab === 'pending'">
+            <p
+              v-if="pending.length === 0"
+              class="font-regular font-body1-mobile
+                     md:font-body1-tablet
+                     lg:font-body1-laptop
+                     xl:font-body1-desktop"
+              :style="{ color: colors.suite42Black }"
+            >No pending request.</p>
+            <div
+              v-for="friend in pending"
+              v-else
+              :key="friend.id"
+            >
+              <FriendTabCard :friend="friend" type="pending" @button1="accept(friend.id)" @button2="decline(friend.id)" />
+            </div>
+          </div>
+          <div v-if="tab === 'sent'">
+            <p
+              v-if="sent.length === 0"
+              class="font-regular font-body1-mobile
+                     md:font-body1-tablet
+                     lg:font-body1-laptop
+                     xl:font-body1-desktop"
+              :style="{ color: colors.suite42Black }"
+            >No request sent.</p>
+            <div
+              v-for="friend in sent"
+              v-else
+              :key="friend.id"
+            >
+              <FriendTabCard :friend="friend" type="sent" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

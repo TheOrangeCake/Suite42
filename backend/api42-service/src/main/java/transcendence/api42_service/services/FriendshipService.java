@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import transcendence.api42_service.dto.EnvVariables;
 import transcendence.api42_service.dto.FriendshipDto;
 import transcendence.api42_service.entities.Friendship;
 import transcendence.api42_service.entities.FriendshipStatus;
@@ -19,6 +20,7 @@ public class FriendshipService {
 
 	private final FriendshipRepository friendshipRepository;
 	private final UserRepository userRepository;
+	private final EnvVariables envVariables;
 
 	public FriendshipDto sendRequest(Long requesterId, Long addresseeId) {
 		if (requesterId.equals(addresseeId)) {
@@ -125,7 +127,7 @@ public class FriendshipService {
 		boolean isRequester = f.getRequester().getId().equals(currentUserId);
 		User friend = isRequester ? f.getAddressee() : f.getRequester();
 		String avatarUrl = friend.getCustomAvatarUrl() != null
-				? friend.getCustomAvatarUrl()
+				? envVariables.getImageDomain() + friend.getCustomAvatarUrl()
 				: friend.getImageMedium();
 		return new FriendshipDto(
 				f.getId(),

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import transcendence.api42_service.dto.EnvVariables;
 import transcendence.api42_service.dto.FriendshipDto;
 import transcendence.api42_service.entities.User;
 import transcendence.api42_service.exception.BadTokenException;
@@ -18,6 +19,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("v1/42users/friends")
 public class FriendshipController {
+	private final EnvVariables envVariables;
 
 	private final FriendshipService friendshipService;
 	private final UserRepository userRepository;
@@ -58,6 +60,13 @@ public class FriendshipController {
 		return ResponseEntity.ok(friendshipService.getSentRequests(getUserId()));
 	}
 
+	private String getAvatar(User user) {
+		if (user.getCustomAvatarUrl() == null) {
+			return user.getImageMedium() != null ? user.getImageMedium() : envVariables.getImageDomain() + envVariables.getDefaultAvatar();
+		}
+		return envVariables.getImageDomain() + user.getCustomAvatarUrl();
+	}
+
 	@GetMapping("/search")
 	public ResponseEntity<List<Map<String, Object>>> searchUsers(@RequestParam String login) {
 		Long currentUserId = getUserId();
@@ -67,7 +76,7 @@ public class FriendshipController {
 				.map(u -> Map.<String, Object>of(
 						"id", u.getId(),
 						"login", u.getLogin(),
-						"avatar_url", u.getImageMedium() != null ? u.getImageMedium() : ""
+						"avatar_url", getAvatar(u)
 				))
 				.toList();
 		return ResponseEntity.ok(results);

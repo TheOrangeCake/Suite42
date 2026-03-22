@@ -6,7 +6,7 @@
       text: string
       hoverTextColor?: Colors
     }>(),
-    { hoverTextColor: 'suite42Black' },
+    { hoverTextColor: 'suite42White' },
 
   )
   const isHovered = ref(false)
@@ -22,8 +22,8 @@
              xl:font-body1-desktop"
       :style="{
         borderColor: colors.suite42Red,
-        backgroundColor: isHovered ? colors.suite42Red : 'transparent',
-        color: isHovered ? colors.suite42White : colors[smallRedButtonProps.hoverTextColor]
+        backgroundColor: isHovered ? 'transparent' : colors.suite42Red,
+        color: isHovered ? colors.suite42Black : colors[smallRedButtonProps.hoverTextColor]
       }"
       @click="emit('click')"
       @mouseleave="isHovered = false"
