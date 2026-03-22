@@ -97,7 +97,13 @@
           <DoubleConnectors color1="suite42Background" color2="suite42Blue" :height="2" />
           <div class="flex flex-row">
             <SingleConnectionConnector color1="suite42Background" color2="suite42Blue" color3="suite42Blue" :height="connectorHeight3" />
-            <InputField v-model="username" label="USERNAME" placeholder="pookie42" type="text" />
+            <InputField
+              v-model="username"
+              label="LOGIN"
+              placeholder="pookie42"
+              tooltip="username or email"
+              type="text"
+            />
           </div>
           <DoubleConnectors color1="suite42Background" color2="suite42Blue" :height="2" />
           <div class="flex flex-row">

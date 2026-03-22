@@ -67,7 +67,7 @@ public class UserController {
 				.collect(Collectors.collectingAndThen(
 						Collectors.toList(),
 						orders -> orders.isEmpty()
-								? Sort.by("performanceScore")
+								? Sort.by(Sort.Direction.DESC, "performanceScore")
 								: Sort.by(orders)
 				));
 		Pageable safePageable = PageRequest.of(

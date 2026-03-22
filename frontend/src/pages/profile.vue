@@ -72,6 +72,7 @@
     'netpractice',
     '42_collaborative_resume',
   ])
+
   function scoreColor (m = 0, slug: string) {
     if (m >= 125) return { background: '#62D868', color: '#202020', bar: '#1D9E75' }
     if (m >= 100 && noBonusProjects.has(slug)) {
@@ -255,7 +256,7 @@
                   target="_blank"
                   @mouseleave="isHovered = false"
                   @mouseover="isHovered = true"
-                >link</a></span>
+                >{{ profile.login ?? '–' }}</a></span>
             </div>
           </div>
           <div class="flex flex-col">

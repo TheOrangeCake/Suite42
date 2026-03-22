@@ -1,14 +1,17 @@
 <script setup lang="ts">
   import { colors } from '@/styles/Colors.ts'
 
-  const inputFieldProps = defineProps<{
+  export type SelectOption = {
+    id: number
+    value: string
+    text: string
+  }
+
+  const selectFieldProps = defineProps<{
     label: string
     modelValue: string
+    options: SelectOption[]
     tooltip?: string
-    type?: string
-    placeholder?: string
-    inputmode?: 'text' | 'none' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search' | undefined
-    maxlength?: string
   }>()
 
   const emit = defineEmits<{
@@ -25,7 +28,7 @@
                 xl:font-body2-desktop"
       :style="{ backgroundColor: colors.suite42Background, color: colors.suite42Darkgrey }"
     >
-      {{ inputFieldProps.label }}
+      {{ selectFieldProps.label }}
       <div
         v-if="tooltip"
         class="relative group"
@@ -49,27 +52,29 @@
             color: colors.suite42White
           }"
         >
-          {{ inputFieldProps.tooltip }}
+          {{ selectFieldProps.tooltip }}
         </div>
       </div>
     </label>
-    <input
-      class="w-full border border-(--border-color-default) rounded px-3 py-3 outline-none focus:border-(--border-color) font-regular font-h5-mobile max-w-md
+    <select
+      class="min-w-xs w-full border border-(--border-color-default) rounded px-3 py-3 outline-none focus:border-(--border-color) font-regular font-h5-mobile max-w-md
         md:font-h5-tablet
         lg:font-h5-laptop
         xl:font-h5-desktop"
-      :inputmode="inputFieldProps.inputmode"
-      :maxlength="inputFieldProps.maxlength"
-      :placeholder="inputFieldProps.placeholder"
       :style="{
         backgroundColor: colors.suite42Background,
         color: colors.suite42Black,
         '--border-color-default': colors.suite42Grey,
         '--border-color': colors.suite42Blue
       }"
-      :type="inputFieldProps.type ?? 'text'"
-      :value="inputFieldProps.modelValue"
-      @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+      :value="selectFieldProps.modelValue"
+      @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
     >
+      <option
+        v-for="option in selectFieldProps.options"
+        :key="option.id"
+        :value="option.value"
+      >{{ option.text }}</option>
+    </select>
   </div>
 </template>

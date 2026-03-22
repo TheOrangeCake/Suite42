@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @RequiredArgsConstructor
@@ -87,10 +88,27 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Wrong password");
 		}
 		if (password.confirm_deletion()) {
-			userRepository.delete(user);
-			return ResponseEntity.ok("Profile deleted successfully");
+			try {
+				fileUploadService.deleteImage(user.getCustomAvatarUrl());
+			} catch(DeleteDefaultException e) {
+			} catch(Exception e) {
+				logger.severe("Fail to delete custom avatar in account " + user.getId() + " desactivation: " + e.getMessage());
+			}
+			try {
+				fileUploadService.deleteImage(user.getCustomBannerUrl());
+			} catch(DeleteDefaultException e) {
+			} catch(Exception e) {
+				logger.severe("Fail to delete custom banner in account " + user.getId() + " desactivation: " + e.getMessage());
+			}
+			user.setCustomAvatarUrl(envVariables.getDefaultAvatar());
+			user.setCustomBannerUrl(envVariables.getDefaultBanner());
+			user.setFirstName(null);
+			user.setLastName(null);
+			user.setActive(false);
+			userRepository.save(user);
+			return ResponseEntity.ok("User is deactived");
 		}
-		return ResponseEntity.badRequest().body("Deletion not confirmed");
+		return ResponseEntity.badRequest().body("Account deactivation not confirmed");
 	}
 
 	private Long getUserId() {
@@ -209,7 +227,7 @@ public class UserController {
 	}
 
 	@GetMapping("/signout")
-	public ResponseEntity<String> logoutUser(HttpServletRequest request) {
+	public ResponseEntity<?> logoutUser(HttpServletRequest request) {
 		try {
 			String currentRefreshToken = jwtService.extractRefreshToken(request);
 			String currentAccessToken = jwtService.extractAccessToken(request);
@@ -228,7 +246,7 @@ public class UserController {
 			logger.info("User " + userId + " logged out");
 			return ResponseEntity.ok()
 					.header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-					.body("Sign out successfully");
+					.body(Map.of("message", "Sign out successfully"));
 		} catch (BadTokenException e) {
 			return ResponseEntity.badRequest().body("{\"error\": \"" + e.getMessage() + "\"}");
 		}

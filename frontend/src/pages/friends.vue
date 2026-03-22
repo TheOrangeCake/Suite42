@@ -6,17 +6,17 @@
       <div class="search-bar">
         <input
           v-model="searchQuery"
-          type="text"
-          placeholder="Search by login..."
           class="search-input"
+          placeholder="Search by login..."
+          type="text"
           @input="onSearch"
           @keyup.enter="onSearchNow"
-        />
+        >
         <button class="btn search-btn" @click="onSearchNow">Search</button>
       </div>
       <div v-if="searchResults.length > 0" class="search-results">
         <div v-for="u in searchResults" :key="u.id" class="friend-card">
-          <img :src="u.avatar_url || '/default-avatar.png'" alt="" class="avatar" />
+          <img alt="" class="avatar" :src="u.avatar_url || '/default-avatar.png'">
           <span class="username">{{ u.login }}</span>
           <button class="btn accept" @click="sendRequest(u.id)">Add</button>
         </div>
@@ -39,11 +39,11 @@
       <p v-if="friends.length === 0" class="empty">No friends yet.</p>
       <div v-for="f in friends" :key="f.id" class="friend-card">
         <div class="avatar-wrapper">
-          <img :src="f.friend_avatar_url" alt="" class="avatar" />
-          <span class="status-dot" :class="{ online: f.online }"></span>
+          <img alt="" class="avatar" :src="f.friend_avatar_url">
+          <span class="status-dot" :class="{ online: f.online }" />
         </div>
         <span class="username">{{ f.friend_login }}</span>
-        <span class="online-label" v-if="f.online">Online</span>
+        <span v-if="f.online" class="online-label">Online</span>
         <button class="btn danger" @click="remove(f.id)">Remove</button>
       </div>
     </div>
@@ -51,7 +51,7 @@
     <div v-if="tab === 'pending'" class="list">
       <p v-if="pending.length === 0" class="empty">No pending requests.</p>
       <div v-for="f in pending" :key="f.id" class="friend-card">
-        <img :src="f.friend_avatar_url" alt="" class="avatar" />
+        <img alt="" class="avatar" :src="f.friend_avatar_url">
         <span class="username">{{ f.friend_login }}</span>
         <button class="btn accept" @click="accept(f.id)">Accept</button>
         <button class="btn danger" @click="decline(f.id)">Decline</button>
@@ -61,7 +61,7 @@
     <div v-if="tab === 'sent'" class="list">
       <p v-if="sent.length === 0" class="empty">No sent requests.</p>
       <div v-for="f in sent" :key="f.id" class="friend-card">
-        <img :src="f.friend_avatar_url" alt="" class="avatar" />
+        <img alt="" class="avatar" :src="f.friend_avatar_url">
         <span class="username">{{ f.friend_login }}</span>
         <span class="status">Pending...</span>
       </div>
@@ -70,110 +70,110 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import {
-  getFriends,
-  getPendingRequests,
-  getSentRequests,
-  acceptFriendRequest,
-  declineFriendRequest,
-  removeFriend,
-  sendFriendRequest,
-  searchUsers,
-  sendHeartbeat,
-  type FriendshipDto,
-  type UserSearchResult,
-} from '../api/friends'
+  import { onMounted, onUnmounted, ref } from 'vue'
+  import {
+    acceptFriendRequest,
+    declineFriendRequest,
+    type FriendshipDto,
+    getFriends,
+    getPendingRequests,
+    getSentRequests,
+    removeFriend,
+    searchUsers,
+    sendFriendRequest,
+    sendHeartbeat,
+    type UserSearchResult,
+  } from '@/api/friends'
 
-definePage({
-  meta: {
-    requiresAuth: true,
-    layout: 'dashboard',
-  },
-})
+  definePage({
+    meta: {
+      requiresAuth: true,
+      layout: 'dashboard',
+    },
+  })
 
-const tab = ref<'friends' | 'pending' | 'sent'>('friends')
-const friends = ref<FriendshipDto[]>([])
-const pending = ref<FriendshipDto[]>([])
-const sent = ref<FriendshipDto[]>([])
+  const tab = ref<'friends' | 'pending' | 'sent'>('friends')
+  const friends = ref<FriendshipDto[]>([])
+  const pending = ref<FriendshipDto[]>([])
+  const sent = ref<FriendshipDto[]>([])
 
-const searchQuery = ref('')
-const searchResults = ref<UserSearchResult[]>([])
-let searchTimeout: ReturnType<typeof setTimeout> | null = null
+  const searchQuery = ref('')
+  const searchResults = ref<UserSearchResult[]>([])
+  let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
-function onSearch() {
-  if (searchTimeout) clearTimeout(searchTimeout)
-  const query = searchQuery.value.trim()
-  if (query.length < 2) {
-    searchResults.value = []
-    return
+  function onSearch () {
+    if (searchTimeout) clearTimeout(searchTimeout)
+    const query = searchQuery.value.trim()
+    if (query.length < 2) {
+      searchResults.value = []
+      return
+    }
+    searchTimeout = setTimeout(async () => {
+      searchResults.value = await searchUsers(query)
+    }, 300)
   }
-  searchTimeout = setTimeout(async () => {
+
+  async function onSearchNow () {
+    if (searchTimeout) clearTimeout(searchTimeout)
+    const query = searchQuery.value.trim()
+    if (query.length < 2) {
+      searchResults.value = []
+      return
+    }
     searchResults.value = await searchUsers(query)
-  }, 300)
-}
+  }
 
-async function onSearchNow() {
-  if (searchTimeout) clearTimeout(searchTimeout)
-  const query = searchQuery.value.trim()
-  if (query.length < 2) {
+  async function sendRequest (userId: number) {
+    await sendFriendRequest(userId)
+    searchQuery.value = ''
     searchResults.value = []
-    return
+    await loadAll()
   }
-  searchResults.value = await searchUsers(query)
-}
 
-async function sendRequest(userId: number) {
-  await sendFriendRequest(userId)
-  searchQuery.value = ''
-  searchResults.value = []
-  await loadAll()
-}
-
-async function loadAll() {
-  try {
-    const [f, p, s] = await Promise.all([
-      getFriends(),
-      getPendingRequests(),
-      getSentRequests(),
-    ])
-    friends.value = f
-    pending.value = p
-    sent.value = s
-  } catch (e) {
-    console.error('Failed to load friends data:', e)
+  async function loadAll () {
+    try {
+      const [f, p, s] = await Promise.all([
+        getFriends(),
+        getPendingRequests(),
+        getSentRequests(),
+      ])
+      friends.value = f
+      pending.value = p
+      sent.value = s
+    } catch (error) {
+      console.error('Failed to load friends data:', error)
+    }
   }
-}
 
-async function accept(id: number) {
-  await acceptFriendRequest(id)
-  await loadAll()
-}
+  async function accept (id: number) {
+    await acceptFriendRequest(id)
+    await loadAll()
+  }
 
-async function decline(id: number) {
-  await declineFriendRequest(id)
-  await loadAll()
-}
+  async function decline (id: number) {
+    await declineFriendRequest(id)
+    await loadAll()
+  }
 
-async function remove(id: number) {
-  await removeFriend(id)
-  await loadAll()
-}
+  async function remove (id: number) {
+    await removeFriend(id)
+    await loadAll()
+  }
 
-let heartbeatInterval: ReturnType<typeof setInterval> | null = null
+  let heartbeatInterval: ReturnType<typeof setInterval> | null = null
 
-onMounted(() => {
-  loadAll()
-  sendHeartbeat().catch(() => {})
-  heartbeatInterval = setInterval(() => {
-    sendHeartbeat().catch(() => {})
+  onMounted(() => {
     loadAll()
-  }, 30000)
-})
+    sendHeartbeat().catch(() => {})
+    heartbeatInterval = setInterval(() => {
+      sendHeartbeat().catch(() => {})
+      loadAll()
+    }, 30_000)
+  })
 
-onUnmounted(() => {
-  if (heartbeatInterval) clearInterval(heartbeatInterval)
-})
+  onUnmounted(() => {
+    if (heartbeatInterval) clearInterval(heartbeatInterval)
+  })
 </script>
 
 <style scoped>

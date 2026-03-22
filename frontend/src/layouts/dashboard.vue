@@ -69,9 +69,9 @@
     {
       id: 2,
       navLinks: [
-        { id: 1, label: 'Finder', link: '/finder', icon: '/design/assets/icons/group.png', alt: '', isAvatar: false, user: 'user42' },
-        { id: 2, label: 'Projects', link: '/projects', icon: '/design/assets/icons/project.png', alt: '', isAvatar: false, user: 'user42' },
-        { id: 3, label: 'Tasks', link: '/tasks', icon: '/design/assets/icons/to-do-list.png', alt: '', isAvatar: false, user: 'user42' },
+        { id: 1, label: 'Finder', link: '/finder', icon: '/design/assets/icons/finder.png', alt: '', isAvatar: false, user: 'user42' },
+        // { id: 2, label: 'Projects', link: '/projects', icon: '/design/assets/icons/project.png', alt: '', isAvatar: false, user: 'user42' },
+        // { id: 3, label: 'Tasks', link: '/tasks', icon: '/design/assets/icons/to-do-list.png', alt: '', isAvatar: false, user: 'user42' },
       ],
     },
     {

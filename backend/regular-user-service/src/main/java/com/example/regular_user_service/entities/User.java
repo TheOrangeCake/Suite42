@@ -56,4 +56,7 @@ public class User {
 
 	@Column(name = "created_at")
 	private Date createdAt;
+
+	@Column(name = "active")
+	private boolean active;
 }

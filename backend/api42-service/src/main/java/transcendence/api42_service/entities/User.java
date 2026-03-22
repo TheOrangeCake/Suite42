@@ -116,9 +116,8 @@ public class User {
     @Column(columnDefinition="TEXT")
     private String detailedProfileJson;
 
-    @OneToOne(
-            mappedBy = "user",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "pool_result_id")
     private PoolResult poolResult;
 
 }

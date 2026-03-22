@@ -8,6 +8,7 @@ public record UserDto(
 	String custom_banner_url,
 	String first_name,
 	String last_name,
-	boolean double_authentication
+	boolean double_authentication,
+	boolean active
 ) {
 }

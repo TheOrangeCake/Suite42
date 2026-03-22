@@ -48,6 +48,7 @@ public class AuthController {
 			newUser.setCustomAvatarUrl(envVariables.getDefaultAvatar());
 			newUser.setCustomBannerUrl(envVariables.getDefaultBanner());
 			newUser.setDoubleAuth(false);
+			newUser.setActive(true);
 			newUser.setCreatedAt(new Date());
 			userRepository.save(newUser);
 			logger.info("A new user is created. User id: " + newUser.getId());
@@ -122,9 +123,9 @@ public class AuthController {
 			return generateResponse(user, userId);
 		} else {
 			int loginAttempts = user.getLoginAttempt();
-			if (loginAttempts > 5) {
+			if (loginAttempts >= 5) {
 				otpCache.invalidate(user.getEmail());
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Max 5 attempts reached. Please log in again.");
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Max 5 attempts reached.");
 			}
 			user.setLoginAttempt(loginAttempts + 1);
 			userRepository.save(user);

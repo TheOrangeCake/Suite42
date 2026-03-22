@@ -1,611 +1,542 @@
-<template>
-  <div class="finder-page">
-
-    <!-- Header -->
-    <div class="header">
-      <h1 class="title">Buddy finder</h1>
-
-      <div class="headerBody">
-        <Corner :vSize="180" :hSize="16" :thickness="3" color="var(--color-turquoise)" />
-        <div class="headerText">
-          <p class="desc">Find a learning buddy or group members.</p>
-          <p class="hint">Only active and non alumni students.</p>
-          <p class="hint">Rank 7 means student has finished Common Core.</p>
-        </div>
-      </div>
-
-      <div class="refineRow">
-        <Corner :vSize="60" :hSize="16" :thickness="3" color="var(--color-green)" />
-        <button class="refineBtn" :class="{ active: panelOpen }" @click="panelOpen = !panelOpen">
-          <span class="refineIcon">⚙</span>
-          Refine results
-        </button>
-        <span class="resultCount">{{ totalElements }} results</span>
-      </div>
-    </div>
-
-    <!-- Filter panel overlay -->
-    <div v-if="panelOpen" class="filterPanel">
-      <div class="panelSection">
-        <div class="panelSectionHeader">
-          <Corner :vSize="120" :hSize="16" :thickness="3" color="var(--color-turquoise)" />
-          <span class="panelSectionTitle">Sort</span>
-        </div>
-        <div class="panelFields">
-          <div class="panelField">
-            <Corner :vSize="30" :hSize="16" :thickness="3" color="var(--color-turquoise)" />
-            <select v-model="filters.sort" class="panelSelect">
-              <option value="">Default</option>
-              <option value="rank,desc">Rank ↓</option>
-              <option value="rank,asc">Rank ↑</option>
-              <option value="rankProgressPercent,desc">Progress ↓</option>
-              <option value="rankProgressPercent,asc">Progress ↑</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="panelSection">
-        <div class="panelSectionHeader">
-          <Corner :vSize="220" :hSize="16" :thickness="3" color="var(--color-green)" />
-          <span class="panelSectionTitle">Filter</span>
-        </div>
-        <div class="panelFields">
-          <div class="panelField">
-            <Corner :vSize="30" :hSize="16" :thickness="3" color="var(--color-green)" />
-            <select v-model="filters.poolMonth" class="panelSelect">
-              <option value="">Pool month</option>
-              <option v-for="m in poolMonths" :key="m" :value="m">{{ m }}</option>
-            </select>
-          </div>
-          <div class="panelField">
-            <Corner :vSize="30" :hSize="16" :thickness="3" color="var(--color-green)" />
-            <select v-model="filters.poolYear" class="panelSelect">
-              <option value="">Pool year</option>
-              <option v-for="y in poolYears" :key="y" :value="y">{{ y }}</option>
-            </select>
-          </div>
-          <div class="panelField">
-            <Corner :vSize="30" :hSize="16" :thickness="3" color="var(--color-coral, #FF5959)" />
-            <select v-model="filters.rank" class="panelSelect">
-              <option :value="undefined">Rank</option>
-              <option v-for="r in [0,1,2,3,4,5,6,7]" :key="r" :value="r">Rank {{ r }}</option>
-            </select>
-          </div>
-          <div class="panelField">
-            <Corner :vSize="30" :hSize="16" :thickness="3" color="var(--color-coral, #FF5959)" />
-            <select v-model="filters.eligibleProject" class="panelSelect">
-              <option value="">Eligible project</option>
-              <option v-for="p in commonProjects" :key="p" :value="p">{{ p }}</option>
-            </select>
-          </div>
-          <div class="panelField lfgField">
-            <Corner :vSize="30" :hSize="16" :thickness="3" color="var(--color-coral, #FF5959)" />
-            <label class="lfgLabel">
-              <input type="checkbox" v-model="lfgOnly" class="lfgCheck" />
-              LFG only
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <button class="applyBtn" @click="applyFilters">Apply</button>
-    </div>
-
-    <!-- Regular user notice -->
-    <div v-if="authStore.isRegularUser" class="noticeBox">
-      <p class="noticeTitle">42 students only</p>
-      <p class="noticeText">The Buddy Finder is only available for users connected with a 42 account.</p>
-    </div>
-
-    <!-- Loading -->
-    <div v-else-if="isLoading" class="loading">Loading...</div>
-
-    <!-- Error -->
-    <p v-else-if="error" class="errorMsg">{{ error }}</p>
-
-    <!-- Cards -->
-    <div v-else class="cardList">
-      <div v-for="user in users" :key="user.id" class="card">
-
-        <img
-          :src="user.custom_avatar_url || user.image?.versions?.medium || '/design/assets/placeholder/avatar.jpg'"
-          :alt="user.login"
-          class="avatar"
-        />
-
-        <div class="cardMain">
-          <div class="cardTop">
-            <h2 class="login">{{ user.login }}</h2>
-            <span v-if="user.lfg" class="lfgTag">LFG: {{ user.lfg }}</span>
-          </div>
-
-          <div class="cardDetails">
-            <div class="detailBlock">
-              <Corner :vSize="70" :hSize="16" :thickness="3" color="var(--color-turquoise)" />
-              <div class="detailContent">
-                <p class="detailTitle">Info:</p>
-                <div class="detailRow">
-                  <Corner :vSize="20" :hSize="16" :thickness="2" color="var(--color-turquoise)" />
-                  <span>Name: {{ user.first_name }} {{ user.last_name }}</span>
-                </div>
-                <div class="detailRow">
-                  <Corner :vSize="20" :hSize="16" :thickness="2" color="var(--color-turquoise)" />
-                  <span>Pool: {{ user.pool_month }} {{ user.pool_year }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="detailBlock">
-              <Corner :vSize="70" :hSize="16" :thickness="3" color="var(--color-green)" />
-              <div class="detailContent">
-                <p class="detailTitle">Common core:</p>
-                <div class="detailRow">
-                  <Corner :vSize="20" :hSize="16" :thickness="2" color="var(--color-green)" />
-                  <span>Rank: {{ user.rank }}</span>
-                </div>
-                <div class="detailRow">
-                  <Corner :vSize="20" :hSize="16" :thickness="2" color="var(--color-green)" />
-                  <span>Current rank progress: {{ user.rank_progress_percent }}%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <button class="profileBtn" @click="goToProfile(user.login)">
-            Check {{ user.login }} profile
-          </button>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Pagination -->
-    <div v-if="totalPages > 1" class="pagination">
-      <button class="pageBtn" :disabled="filters.page === 0" @click="changePage(filters.page - 1)">←</button>
-      <span class="pageInfo">{{ filters.page + 1 }} / {{ totalPages }}</span>
-      <button class="pageBtn" :disabled="filters.page >= totalPages - 1" @click="changePage(filters.page + 1)">→</button>
-    </div>
-
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { getUsers } from '../api/api42'
-import type { User42 } from '../api/api42'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+  import type { SelectOption } from '@/components/ui/SelectField.vue'
+  import { computed, onMounted, reactive, ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { getUsers, type User42 } from '@/api/api42'
+  import { useViewports } from '@/composables/useViewports.ts'
+  import { viewportValue } from '@/composables/viewportsValue.ts'
+  import { useAuthStore } from '@/stores/auth'
+  import { colors } from '@/styles/Colors.ts'
 
-definePage({
-  meta: { requiresAuth: true, layout: 'dashboard' },
-})
+  definePage({
+    meta: { requiresAuth: true, layout: 'dashboard' },
+  })
 
-const router = useRouter()
-const authStore = useAuthStore()
-const users = ref<User42[]>([])
-const isLoading = ref(false)
-const error = ref('')
-const totalElements = ref(0)
-const totalPages = ref(0)
-const panelOpen = ref(false)
-const lfgOnly = ref(false)
+  const router = useRouter()
+  const authStore = useAuthStore()
+  const users = ref<User42[]>([])
+  const isLoading = ref(false)
+  const error = ref('')
+  const totalElements = ref(0)
+  const totalPages = ref(0)
+  const panelOpen = ref(false)
+  const viewPort = useViewports().currentViewport
+  const isTablet = computed(() => viewPort.value === 'tablet')
+  const isMobile = computed(() => viewPort.value === 'mobile')
+  const isFirstPage = computed(() => filters.page === 0)
+  const isLastPage = computed(() => filters.page >= totalPages.value - 1)
 
-const poolYears = ['2025', '2024', '2023', '2022', '2021', '2020']
-const poolMonths = ['january','february','march','april','may','june','july','august','september','october','november','december']
-const commonProjects = ['ft_transcendence','webserv','cub3d','minirt','philosophers','cpp-module-09','ft_irc']
+  const startYear = 2020
+  const poolYears = computed(() => {
+    const currentYear = new Date().getFullYear()
 
-const filters = reactive({
-  campusName: 'Lausanne',
-  page: 0,
-  size: 10,
-  rank: undefined as number | undefined,
-  poolYear: '',
-  poolMonth: '',
-  eligibleProject: '',
-  sort: '',
-})
+    return Array.from(
+      { length: currentYear - startYear + 1 },
+      (_, i) => (currentYear - i).toString(),
+    )
+  })
 
-async function fetchUsers() {
-  isLoading.value = true
-  error.value = ''
-  try {
-    const res = await getUsers({
-      ...filters,
-      lfg: lfgOnly.value ? true : undefined,
-    })
-    users.value = res.content
-    totalElements.value = res.page.totalElements
-    totalPages.value = res.page.totalPages
-  } catch (e) {
-    if (e instanceof Error) error.value = e.message
-  } finally {
-    isLoading.value = false
+  // const commonProjects = ['ft_transcendence', 'webserv', 'cub3d', 'minirt', 'philosophers', 'cpp-module-09', 'ft_irc']
+  const filters = reactive({
+    campusName: 'Lausanne',
+    page: 0,
+    size: '25',
+    rank: 'all',
+    poolYear: 'all',
+    poolMonth: 'all',
+    eligibleProject: 'any',
+    finishedProjects: [] as string[],
+    sort: 'performanceScore,desc',
+    search: '',
+  })
+
+  function resetFilters () {
+    filters.rank = 'all'
+    filters.poolYear = 'all'
+    filters.poolMonth = 'all'
+    filters.eligibleProject = 'any'
+    filters.finishedProjects = []
+    filters.sort = 'performanceScore,desc'
+    filters.search = ''
+    filters.page = 0
+    filters.size = '25'
   }
-}
 
-function applyFilters() {
-  filters.page = 0
-  panelOpen.value = false
-  fetchUsers()
-}
+  function closeFilters () {
+    panelOpen.value = false
+  }
 
-async function changePage(newPage: number) {
-  filters.page = newPage
-  await fetchUsers()
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
+  async function fetchUsers () {
+    isLoading.value = true
+    error.value = ''
+    try {
+      const res = await getUsers({
+        ...filters,
+      })
+      users.value = res.content
+      totalElements.value = res.page.totalElements
+      totalPages.value = res.page.totalPages
+    } catch (error_) {
+      if (error_ instanceof Error) error.value = error_.message
+    } finally {
+      isLoading.value = false
+    }
+  }
 
-function goToProfile(login: string) {
-  router.push(`/user/${login}`)
-}
+  function applyFilters () {
+    filters.page = 0
+    panelOpen.value = false
+    fetchUsers()
+  }
 
-onMounted(() => {
-  if (authStore.isRegularUser) return
-  fetchUsers()
-})
+  async function changePage (newPage: number) {
+    filters.page = newPage
+    await fetchUsers()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function goToProfile (login: string) {
+    router.push(`/user/${login}`)
+  }
+
+  onMounted(() => {
+    if (authStore.isRegularUser) return
+    fetchUsers()
+  })
+
+  const sortOptions: SelectOption[] = [
+    { id: 1, value: 'performanceScore,desc', text: 'Performance ↓' },
+    { id: 2, value: 'performanceScore,asc', text: 'Performance ↑' },
+    { id: 3, value: 'rank,desc', text: 'Rank ↓' },
+    { id: 4, value: 'rank,asc', text: 'Rank ↑' },
+    { id: 5, value: 'rankProgressPercent,desc', text: 'Progress ↓' },
+    { id: 6, value: 'rankProgressPercent,asc', text: 'Progress ↑' },
+    { id: 7, value: 'poolYear,desc', text: 'Pool year ↓' },
+    { id: 8, value: 'poolYear,asc', text: 'Pool year ↑' },
+  ]
+
+  const pageSizeOptions: SelectOption[] = [
+    { id: 1, value: '10', text: '10' },
+    { id: 2, value: '25', text: '25' },
+    { id: 3, value: '50', text: '50' },
+    { id: 4, value: '100', text: '100' },
+  ]
+
+  const rankOptions: SelectOption[] = [
+    { id: 1, value: 'all', text: 'all' },
+    { id: 2, value: '0', text: '0' },
+    { id: 3, value: '1', text: '1' },
+    { id: 4, value: '2', text: '2' },
+    { id: 5, value: '3', text: '3' },
+    { id: 6, value: '4', text: '4' },
+    { id: 7, value: '5', text: '5' },
+    { id: 8, value: '6', text: '6' },
+  ]
+
+  const poolMonthOptions: SelectOption[] = [
+    { id: 1, value: 'all', text: 'all' },
+    { id: 2, value: 'january', text: 'January' },
+    { id: 3, value: 'february', text: 'February' },
+    { id: 4, value: 'march', text: 'March' },
+    { id: 5, value: 'april', text: 'April' },
+    { id: 6, value: 'may', text: 'May' },
+    { id: 7, value: 'june', text: 'June' },
+    { id: 8, value: 'july', text: 'July' },
+    { id: 9, value: 'august', text: 'August' },
+    { id: 10, value: 'september', text: 'September' },
+    { id: 11, value: 'october', text: 'October' },
+    { id: 12, value: 'november', text: 'November' },
+    { id: 13, value: 'december', text: 'December' },
+  ]
+
+  const poolYearOptions = computed<SelectOption[]>(() => [
+    { id: 0, value: 'all', text: 'all' },
+    ...poolYears.value.map((year, index) => ({
+      id: index + 1,
+      value: year,
+      text: year,
+    })),
+  ])
+
+  const projectOptions: SelectOption[] = [
+    { id: 1, value: 'any', text: 'any' },
+    { id: 2, value: '42cursus-libft', text: 'Libft' },
+    { id: 3, value: '42cursus-get_next_line', text: 'Get next line' },
+    { id: 4, value: '42cursus-ft_printf', text: 'Ft_printf' },
+    { id: 5, value: 'born2beroot', text: 'Born2beroot' },
+    { id: 6, value: '42cursus-push_swap', text: 'Push swap' },
+    { id: 7, value: '42cursus-fdf', text: 'Fdf' },
+    { id: 8, value: '42cursus-fract-ol', text: 'Fract-ol' },
+    { id: 9, value: 'so_long', text: 'So long' },
+    { id: 10, value: 'pipex', text: 'Pipex' },
+    { id: 11, value: 'minitalk', text: 'Minitalk' },
+    { id: 12, value: '42cursus-minishell', text: 'Minishell' },
+    { id: 13, value: '42cursus-philosophers', text: 'Philosophers' },
+    { id: 14, value: 'netpractice', text: 'Netpractice' },
+    { id: 15, value: 'cpp-module-00', text: 'Cpp module 00' },
+    { id: 16, value: 'cpp-module-01', text: 'Cpp module 01' },
+    { id: 17, value: 'cpp-module-02', text: 'Cpp module 02' },
+    { id: 18, value: 'cpp-module-03', text: 'Cpp module 03' },
+    { id: 19, value: 'cpp-module-04', text: 'Cpp module 04' },
+    { id: 20, value: 'minirt', text: 'Minirt' },
+    { id: 21, value: 'cub3d', text: 'Cub3d' },
+    { id: 22, value: 'inception', text: 'Inception' },
+    { id: 23, value: 'cpp-module-05', text: 'Cpp module 05' },
+    { id: 24, value: 'cpp-module-06', text: 'Cpp module 06' },
+    { id: 25, value: 'cpp-module-07', text: 'Cpp module 07' },
+    { id: 26, value: 'cpp-module-08', text: 'Cpp module 08' },
+    { id: 27, value: 'cpp-module-09', text: 'Cpp module 09' },
+    { id: 28, value: 'webserv', text: 'Webserv' },
+    { id: 29, value: 'ft_irc', text: 'Ft_irc' },
+    { id: 30, value: 'ft_transcendence', text: 'Ft_transcendence' },
+    { id: 31, value: '42_collaborative_resume', text: 'Collaborative Resume' },
+  ]
+
+  const textConnector = viewportValue({
+    mobile: 0.8,
+    tablet: 1.1,
+    laptop: 1,
+    desktop: 1.1,
+  })
+  const filterConnector = viewportValue({
+    mobile: 1.3,
+    tablet: 1.4,
+    laptop: 1.4,
+    desktop: 1.5,
+  })
+  const filterMobileConnector = viewportValue({
+    mobile: 1.5,
+    tablet: 1.7,
+    laptop: 0,
+    desktop: 0,
+  })
 </script>
 
-<style scoped>
-.finder-page {
-  padding: 40px 48px;
-  background: white;
-  min-height: 100vh;
-  position: relative;
-}
+<template>
+  <div
+    class="flex flex-col w-full px-4 mb-32 mt-28
+           md:mt-12
+           lg:px-8 lg:mb-48
+           xl:px-18
+           2xl:px-28"
+  >
+    <div
+      v-if="authStore.isRegularUser"
+      class="flex flex-col text-center justtify-center"
+    >
+      <p
+        class="font-bold font-h2-mobile leading-12
+               md:font-h2-tablet md:leading-16
+               lg:font-h2-laptop lg:leading-24
+               xl:font-h2-desktop"
+        :style="{ color: colors.suite42Black }"
+      >42 students only</p>
+      <p
+        class="font-bold font-h5-mobile leading-12
+               md:font-h5-tablet md:leading-16
+               lg:font-h5-laptop lg:leading-24
+               xl:font-h5-desktop"
+        :style="{ color: colors.suite42Black }"
+      >The Buddy Finder is only available for users connected with a 42 account.</p>
+    </div>
+    <div v-else>
+      <h1
+        class="font-bold font-h1-mobile leading-12
+               md:font-h1-tablet md:leading-16
+               lg:font-h1-laptop lg:leading-24
+               xl:font-h1-desktop"
+        :style="{ color: colors.suite42Black }"
+      >Buddy finder</h1>
+      <SingleConnector color="suite42Blue" :height="3" />
+      <div class="flex flex-row">
+        <ConnectConnector color1="suite42Blue" color2="suite42Green" :height="textConnector" />
+        <p
+          class="font-regular font-body1-mobile
+               md:font-body1-tablet
+               lg:font-body1-laptop
+               xl:font-body1-desktop"
+          :style="{ color: colors.suite42Black }"
+        >Find a learning buddy or group members.
+          <br>Result only contains active and non alumni students between rank 0 and 6.
+          <br>Students that haven't finished <strong>42_Collaborative_resume</strong> but have already finished Common Core are still considered rank 6.</p>
+      </div>
+      <SingleConnector color="suite42Green" :height="3" />
 
-/* ── Header ── */
-.title {
-  font-family: Monda, sans-serif;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 700;
-  color: #202020;
-  margin: 0 0 24px 0;
-}
-
-.headerBody {
-  display: flex;
-  flex-direction: row;
-  gap: 16px;
-  align-items: flex-start;
-  margin-bottom: 24px;
-}
-
-.headerText {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.desc {
-  font-family: Monda, sans-serif;
-  font-size: clamp(1rem, 2vw, 1.3rem);
-  color: #202020;
-  margin: 0;
-}
-
-.hint {
-  font-family: Monda, sans-serif;
-  font-size: 0.82rem;
-  color: #888;
-  margin: 0;
-}
-
-.refineRow {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.refineBtn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: white;
-  border: 2px solid #FF5959;
-  border-radius: 6px;
-  font-family: Monda, sans-serif;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #202020;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.refineBtn.active,
-.refineBtn:hover {
-  background: #FF5959;
-  color: white;
-}
-
-.resultCount {
-  font-family: Monda, sans-serif;
-  font-size: 0.82rem;
-  color: #888;
-}
-
-/* ── Filter panel ── */
-.filterPanel {
-  position: absolute;
-  top: 220px;
-  left: 48px;
-  z-index: 100;
-  background: white;
-  border: 1.5px solid #eee;
-  border-radius: 10px;
-  padding: 24px;
-  width: 320px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.panelSection {
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  align-items: flex-start;
-}
-
-.panelSectionHeader {
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
-  align-items: flex-start;
-}
-
-.panelSectionTitle {
-  font-family: Monda, sans-serif;
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: #202020;
-  padding-top: 2px;
-}
-
-.panelFields {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-top: 24px;
-}
-
-.panelField {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-}
-
-.panelSelect {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1.5px solid #ddd;
-  border-radius: 6px;
-  font-family: Monda, sans-serif;
-  font-size: 0.82rem;
-  color: #202020;
-  background: white;
-  cursor: pointer;
-  outline: none;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23FF5959' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 28px;
-}
-
-.lfgField { align-items: center; }
-
-.lfgLabel {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: Monda, sans-serif;
-  font-size: 0.82rem;
-  color: #202020;
-  cursor: pointer;
-}
-
-.lfgCheck {
-  accent-color: #FF5959;
-  width: 15px;
-  height: 15px;
-}
-
-.applyBtn {
-  padding: 10px;
-  background: #FF5959;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-family: Monda, sans-serif;
-  font-weight: 700;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.applyBtn:hover { opacity: 0.85; }
-
-/* ── Cards ── */
-.cardList {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.card {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 24px;
-  border: 1.5px solid #eee;
-  border-radius: 10px;
-  padding: 20px;
-  transition: border-color 0.2s;
-}
-
-.card:hover { border-color: var(--color-turquoise); }
-
-.avatar {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 8px;
-  flex-shrink: 0;
-  background: #f0f0f0;
-}
-
-.cardMain {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.cardTop {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.login {
-  font-family: Monda, sans-serif;
-  font-size: clamp(1.1rem, 2vw, 1.5rem);
-  font-weight: 700;
-  color: #202020;
-  margin: 0;
-}
-
-.lfgTag {
-  font-family: Monda, sans-serif;
-  font-size: 0.8rem;
-  color: #888;
-}
-
-.cardDetails {
-  display: flex;
-  flex-direction: row;
-  gap: 32px;
-}
-
-.detailBlock {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  align-items: flex-start;
-}
-
-.detailContent {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.detailTitle {
-  font-family: Monda, sans-serif;
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: #202020;
-  margin: 0;
-}
-
-.detailRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.detailRow span {
-  font-family: Monda, sans-serif;
-  font-size: 0.82rem;
-  color: #555;
-}
-
-.profileBtn {
-  align-self: flex-start;
-  padding: 8px 20px;
-  background: white;
-  border: 1.5px solid #202020;
-  border-radius: 6px;
-  font-family: Monda, sans-serif;
-  font-size: 0.82rem;
-  color: #202020;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  margin-top: 4px;
-}
-
-.profileBtn:hover {
-  background: #202020;
-  color: white;
-}
-
-/* ── Pagination ── */
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 40px;
-}
-
-.pageBtn {
-  padding: 8px 20px;
-  background: #202020;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-family: Monda, sans-serif;
-  cursor: pointer;
-}
-
-.pageBtn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-.pageInfo {
-  font-family: Monda, sans-serif;
-  font-size: 0.85rem;
-  color: #555;
-}
-
-.noticeBox {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 60px 20px;
-  text-align: center;
-}
-
-.noticeTitle {
-  font-family: Monda, sans-serif;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #202020;
-  margin: 0;
-}
-
-.noticeText {
-  font-family: Monda, sans-serif;
-  font-size: 0.9rem;
-  color: #888;
-  margin: 0;
-}
-
-.loading {
-  font-family: Monda, sans-serif;
-  color: #888;
-  text-align: center;
-  padding: 60px;
-}
-
-.errorMsg {
-  color: #FF5959;
-  font-family: Monda, sans-serif;
-  text-align: center;
-}
-</style>
+      <div v-if="isTablet || isMobile">
+        <div class="flex flex-row">
+          <ConnectConnector color1="suite42Green" color2="suite42Red" :height="filterConnector" />
+          <div class="flex flex-row gap-4 items-center">
+            <FilterButton alt="" icon="design/assets/icons/filter_black.svg" text="Refine results" @click="panelOpen = !panelOpen" />
+            <span
+              class="font-regular font-body2-mobile
+                 md:font-body2-tablet
+                 lg:font-body2-laptop
+                 xl:font-body2-desktop"
+              :style="{ color: colors.suite42Darkgrey }"
+            >{{ totalElements }} results</span>
+          </div>
+        </div>
+        <div
+          v-if="panelOpen"
+          class="flex flex-row mt-2"
+        >
+          <Transition
+            enter-active-class="transition-opacity duration-250 ease"
+            enter-from-class="opacity-0"
+            leave-active-class="transition-opacity duration-250 ease"
+            leave-to-class="opacity-0"
+          >
+            <div
+              v-if="panelOpen"
+              class="fixed inset-0 z-40 opacity-60"
+              :style="{
+                backgroundColor: colors.suite42Black,
+              }"
+              @click="closeFilters"
+            />
+          </Transition>
+          <Transition
+            enter-active-class="transition-transform duration-300 ease"
+            enter-from-class="translate-y-full"
+            leave-active-class="transition-transform duration-300 ease"
+            leave-to-class="translate-y-full"
+          >
+            <div
+              v-if="panelOpen"
+              class="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl overflow-y-auto max-h-[85dvh]"
+              :style="{ backgroundColor: colors.suite42Background }"
+            >
+              <div class="flex justify-center pt-3 pb-2">
+                <div
+                  class="w-10 h-1 rounded-full"
+                  :style="{ backgroundColor: colors.suite42Grey }"
+                />
+              </div>
+              <div
+                class="flex flex-row items-center justify-between px-6"
+                :style="{ borderColor: colors.suite42Grey }"
+              >
+                <h4
+                  class="font-semibold font-h4-mobile md:font-h4-tablet"
+                  :style="{ color: colors.suite42Black }"
+                >Refine results</h4>
+                <button
+                  class="w-8 h-8 flex items-center justify-center cursor-pointer"
+                  :style="{ color: colors.suite42Darkgrey }"
+                  @click="closeFilters"
+                >✕</button>
+              </div>
+              <div class="flex flex-col px-6 pb-6">
+                <SingleConnector color="suite42Green" :height="2" />
+                <div class="flex flex-row">
+                  <ConnectConnector color1="suite42Green" color2="suite42Blue" :height="filterMobileConnector" />
+                  <InputField
+                    v-model="filters.search"
+                    label="Search"
+                    placeholder="login"
+                    tooltip="You can search by login, first name, or last name."
+                    type="text"
+                  />
+                </div>
+                <SingleConnector color="suite42Blue" :height="1" />
+                <div class="flex flex-row">
+                  <ConnectConnector color1="suite42Blue" color2="suite42Blue" :height="filterMobileConnector" />
+                  <SelectField v-model="filters.rank" label="Rank" :options="rankOptions" />
+                </div>
+                <SingleConnector color="suite42Blue" :height="1" />
+                <div class="flex flex-row">
+                  <ConnectConnector color1="suite42Blue" color2="suite42Blue" :height="filterMobileConnector" />
+                  <SelectField v-model="filters.poolMonth" label="Pool Month" :options="poolMonthOptions" />
+                </div>
+                <SingleConnector color="suite42Blue" :height="1" />
+                <div class="flex flex-row">
+                  <ConnectConnector color1="suite42Blue" color2="suite42Blue" :height="filterMobileConnector" />
+                  <SelectField v-model="filters.poolYear" label="Pool Year" :options="poolYearOptions" />
+                </div>
+                <SingleConnector color="suite42Blue" :height="1" />
+                <div class="flex flex-row">
+                  <ConnectConnector color1="suite42Blue" color2="suite42Blue" :height="filterMobileConnector" />
+                  <SelectField v-model="filters.eligibleProject" label="Eligible project" :options="projectOptions" />
+                </div>
+                <SingleConnector color="suite42Blue" :height="1" />
+                <div class="flex flex-row">
+                  <ConnectConnector color1="suite42Blue" color2="suite42Red" :height="filterMobileConnector" />
+                  <MultiSelectField v-model="filters.finishedProjects" label="Finished projects" :options="projectOptions" />
+                </div>
+                <SingleConnector color="suite42Red" :height="1" />
+                <div class="flex flex-row">
+                  <ConnectConnector color1="suite42Red" color2="suite42Red" :height="filterMobileConnector" />
+                  <SelectField v-model="filters.sort" label="Sort" :options="sortOptions" />
+                </div>
+                <SingleConnector color="suite42Red" :height="1" />
+                <div class="flex flex-row">
+                  <EndConnector color="suite42Red" :height="filterMobileConnector" />
+                  <SelectField v-model="filters.size" label="Result per page" :options="pageSizeOptions" />
+                </div>
+              </div>
+              <div
+                class="sticky bottom-0 flex flex-row gap-2 px-6 py-4 border-t"
+                :style="{
+                  backgroundColor: colors.suite42Background,
+                  borderColor: colors.suite42Grey
+                }"
+              >
+                <button
+                  class="flex-1 py-3 rounded font-bold font-body1-mobile cursor-pointer transition-opacity hover:opacity-80
+                         md:font-body1-tablet"
+                  :style="{
+                    backgroundColor: colors.suite42Blue,
+                    color: colors.suite42Black
+                  }"
+                  @click="applyFilters"
+                >Apply</button>
+                <button
+                  class="flex-1 py-3 rounded font-medium font-body1-mobile cursor-pointer transition-opacity hover:opacity-80
+                         md:font-body1-tablet"
+                  :style="{
+                    backgroundColor: colors.suite42Darkgrey,
+                    color: colors.suite42White
+                  }"
+                  @click="resetFilters"
+                >Reset</button>
+              </div>
+            </div>
+          </Transition>
+        </div>
+      </div>
+      <div
+        v-else-if="!isTablet && !isMobile"
+        class="flex flex-row"
+      >
+        <ConnectConnector color1="suite42Green" color2="suite42Red" :height="filterConnector" />
+        <div class="flex flex-col">
+          <h4
+            class="font-semibold font-h4-mobile
+            md:font-h4-tablet
+            lg:font-h4-laptop
+            xl:font-h4-desktop"
+            :style="{ color: colors.suite42Black }"
+          >Refine result
+            <span
+              class="ml-2 font-regular font-body2-mobile
+                 md:font-body2-tablet
+                 lg:font-body2-laptop
+                 xl:font-body2-desktop"
+              :style="{ color: colors.suite42Darkgrey }"
+            >{{ totalElements }} results</span>
+          </h4>
+          <div
+            class="flex flex-col border-1 py-6 px-6 gap-6"
+            :style="{
+              borderColor: colors.suite42Grey
+            }"
+          >
+            <div class="flex flex-row flex-wrap gap-6">
+              <div class="flex flex-col gap-6">
+                <InputField
+                  v-model="filters.search"
+                  label="Search"
+                  placeholder="login"
+                  tooltip="You can search by login, first name, or last name."
+                  type="text"
+                />
+                <SelectField
+                  v-model="filters.rank"
+                  label="Rank"
+                  :options="rankOptions"
+                />
+                <SelectField
+                  v-model="filters.poolMonth"
+                  label="Pool Month"
+                  :options="poolMonthOptions"
+                />
+                <SelectField
+                  v-model="filters.poolYear"
+                  label="Pool Year"
+                  :options="poolYearOptions"
+                />
+              </div>
+              <div class="flex flex-col gap-6">
+                <SelectField
+                  v-model="filters.eligibleProject"
+                  label="Eligible project"
+                  :options="projectOptions"
+                />
+                <MultiSelectField
+                  v-model="filters.finishedProjects"
+                  label="Finished projects"
+                  :options="projectOptions"
+                />
+              </div>
+              <div class="flex flex-col gap-6">
+                <SelectField
+                  v-model="filters.sort"
+                  label="Sort"
+                  :options="sortOptions"
+                />
+                <SelectField
+                  v-model="filters.size"
+                  label="Result per page"
+                  :options="pageSizeOptions"
+                />
+              </div>
+            </div>
+            <div class="flex flex-row justify-end gap-2">
+              <SmallRedButton text="Apply" @click="applyFilters" />
+              <SmallBlueButton text="Reset" @click="resetFilters" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      v-if="isLoading"
+      class="font-medium font-body1-mobile
+             md:font-body1-tablet
+             lg:font-body1-laptop
+             xl:font-body1-desktop"
+      :style="{ color: colors.suite42Black }"
+    >Loading...</div>
+    <p
+      v-else-if="error"
+      class="font-medium font-body1-mobile
+             md:font-body1-tablet
+             lg:font-body1-laptop
+             xl:font-body1-desktop"
+      :style="{ color: colors.suite42Red }"
+    >{{ error }}</p>
+    <div v-else>
+      <SingleConnector color="suite42Red" :height="2" />
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-4 mb-20">
+        <FinderProfileCard
+          v-for="user in users"
+          :key="user.id"
+          :user="user"
+          @click="goToProfile(user.login)"
+        />
+      </div>
+      <div
+        v-if="totalPages > 1"
+        class="flex flex-row gap-4 items-center justify-center"
+      >
+        <SmallBlueButton
+          v-if="!isFirstPage"
+          text="Previous"
+          @click="changePage(filters.page - 1)"
+        />
+        <span
+          class="font-regular font-body2-mobile
+                 md:font-body2-tablet
+                 lg:font-body2-laptop
+                 xl:font-body2-desktop"
+          :style="{ color: colors.suite42Black }"
+        >{{ filters.page + 1 }} / {{ totalPages }}</span>
+        <SmallBlueButton
+          v-if="!isLastPage"
+          text="Next"
+          @click="changePage(filters.page + 1)"
+        />
+      </div>
+    </div>
+  </div>
+</template>

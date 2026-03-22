@@ -110,7 +110,13 @@
       </div>
     </div>
     <div v-else-if="authStore.user">
-      <h1 class="greeting">Hello, {{ authStore.user?.username }}</h1>
+      <h1
+        class="font-bold font-h1-mobile leading-12
+             md:font-h1-tablet md:leading-16
+             lg:font-h1-laptop lg:leading-24
+             xl:font-h1-desktop"
+        :style="{ color: colors.suite42Black }"
+      >Hello, {{ authStore.user?.username }}</h1>
       <h4
         class="font-semibold font-h4-mobile
              md:font-h4-tablet

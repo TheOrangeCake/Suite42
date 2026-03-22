@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { BadRequestError, UnauthenticatedError } from '@/api/errors.ts'
+  import { colors } from '@/styles/Colors.ts'
   import { signin, verifyOtp } from '../api/auth'
   import { useAuthStore } from '../stores/auth'
 
@@ -17,6 +19,9 @@
   const emailInput = ref('')
   const otpInput = ref('')
   const otpError = ref('')
+  const isRedirecting = ref(false)
+  const isConfirmHovered = ref(false)
+  const isCancelHovered = ref(false)
 
   async function onLogin (payload: LoginPayload) {
     errorMessage.value = ''
@@ -78,7 +83,15 @@
       authStore.setSession(user, token)
       router.push('/home')
     } catch (error) {
-      if (error instanceof Error) otpError.value = error.message
+      if (error instanceof UnauthenticatedError) {
+        otpError.value = 'Wrong email or Max attempt reached. Redirecting to login page after 3 seconds...'
+        isRedirecting.value = true
+        setTimeout(() => window.location.href = '/login', 3000)
+      } else if (error instanceof BadRequestError) {
+        otpError.value = 'Invalid or expired OTP.'
+      } else if (error instanceof Error) {
+        otpError.value = error.message
+      }
     } finally {
       isLoading.value = false
     }
@@ -94,141 +107,99 @@
       @login42="onLogin42"
     />
 
-    <div v-if="showOtp" class="otp-overlay">
-      <div class="otp-modal">
-        <h2>Two-Factor Authentication</h2>
-        <p>A 6-digit code has been sent to your email.</p>
-
-        <div v-if="!pendingEmail" class="field">
-          <label>Email</label>
-          <input v-model="emailInput" placeholder="your@email.com" type="email">
-        </div>
-
-        <div class="field">
-          <label>Code</label>
-          <input
-            v-model="otpInput"
-            inputmode="numeric"
-            maxlength="6"
-            placeholder="123456"
-            type="text"
-            @keyup.enter="onVerifyOtp"
+    <div v-if="showOtp">
+      <div
+        class="fixed inset-0 z-40 opacity-70"
+        :style="{ backgroundColor: colors.suite42Black }"
+      />
+      <div class="fixed inset-0 z-50 flex items-center justify-center">
+        <div
+          class="rounded p-8 w-full max-w-md flex flex-col gap-4"
+          :style="{ backgroundColor: colors.suite42Background }"
+        >
+          <h3
+            class="leading-10 font-bold font-h3-mobile
+                         md:font-h3-tablet
+                         lg:font-h3-laptop
+                         xl:font-h3-desktop"
+            :style="{ color: colors.suite42Black }"
           >
-        </div>
-
-        <p v-if="otpError" class="otp-error">{{ otpError }}</p>
-
-        <div class="otp-actions">
-          <button class="btn-confirm" :disabled="isLoading" @click="onVerifyOtp">
-            {{ isLoading ? 'Verifying...' : 'Confirm' }}
-          </button>
-          <button class="btn-cancel" @click="showOtp = false">Cancel</button>
+            Two-Factor Authentication
+          </h3>
+          <p
+            class="mb-8 font-regular font-body2-mobile
+                         md:font-body2-tablet
+                         lg:font-body2-laptop
+                         xl:font-body2-desktop"
+            :style="{ color: colors.suite42Darkgrey }"
+          >
+            A 6-digit code has been sent to your email.
+          </p>
+          <div class="flex flex-col gap-8">
+            <InputField
+              v-if="!pendingEmail"
+              v-model="emailInput"
+              label="Email"
+              placeholder="your@email.com"
+              type="email"
+            />
+            <InputField
+              v-model="otpInput"
+              inputmode="numeric"
+              label="Code"
+              maxlength="6"
+              placeholder="123456"
+              type="text"
+              @keyup.enter="onVerifyOtp"
+            />
+            <div class="flex flex-col gap-4">
+              <p
+                v-if="otpError"
+                class="font-regular font-body2-mobile
+                 md:font-body2-tablet
+                 lg:font-body2-laptop
+                 xl:font-body2-desktop"
+                :style="{ color: colors.suite42Red}"
+              >{{ otpError }}</p>
+              <div class="flex gap-2">
+                <button
+                  class="flex-1 py-3 border-1 rounded cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed font-semibold font-body1-mobile
+                       md:font-body1-tablet
+                       lg:font-body1-laptop
+                       xl:font-body1-desktop"
+                  :disabled="isLoading || isRedirecting"
+                  :style="{
+                    backgroundColor: isConfirmHovered? colors.suite42Background : colors.suite42Blue,
+                    color: colors.suite42Black,
+                    borderColor: colors.suite42Blue
+                  }"
+                  @click="onVerifyOtp"
+                  @mouseleave="isConfirmHovered = false"
+                  @mouseover="isConfirmHovered = true"
+                >
+                  {{ isLoading ? 'Verifying...' : 'Confirm' }}
+                </button>
+                <button
+                  class="px-5 py-3 border-1 rounded cursor-pointer font-regular font-body1-mobile
+                       md:font-body1-tablet
+                       lg:font-body1-laptop
+                       xl:font-body1-desktop"
+                  :style="{
+                    backgroundColor: isCancelHovered ? colors.suite42Red : colors.suite42Background,
+                    color: isCancelHovered ? colors.suite42White : colors.suite42Black,
+                    borderColor: isCancelHovered? colors.suite42Red : colors.suite42Background
+                  }"
+                  @click="showOtp = false"
+                  @mouseleave="isCancelHovered = false"
+                  @mouseover="isCancelHovered = true"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.otp-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.otp-modal {
-  background: white;
-  border-radius: 8px;
-  padding: 32px;
-  width: 100%;
-  max-width: 380px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.otp-modal h2 {
-  font-family: Monda, sans-serif;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #202020;
-  margin: 0;
-}
-
-.otp-modal p {
-  font-family: Monda, sans-serif;
-  font-size: 0.9rem;
-  color: #555;
-  margin: 0;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.field label {
-  font-family: Monda, sans-serif;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #202020;
-}
-
-.field input {
-  padding: 10px 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-family: Monda, sans-serif;
-  font-size: 1rem;
-  outline: none;
-}
-
-.field input:focus {
-  border-color: #202020;
-}
-
-.otp-error {
-  color: #FF5959;
-  font-size: 0.85rem;
-  margin: 0;
-}
-
-.otp-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.btn-confirm {
-  flex: 1;
-  padding: 12px;
-  background: #202020;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-family: Monda, sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-confirm:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btn-cancel {
-  padding: 12px 20px;
-  background: transparent;
-  color: #555;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-family: Monda, sans-serif;
-  font-size: 0.95rem;
-  cursor: pointer;
-}
-</style>

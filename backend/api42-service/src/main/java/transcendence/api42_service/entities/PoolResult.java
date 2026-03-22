@@ -54,6 +54,6 @@ public class PoolResult {
     @Column(name="exam_3")
     private Integer exam3Score;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(mappedBy = "poolResult")
     private User user;
 }

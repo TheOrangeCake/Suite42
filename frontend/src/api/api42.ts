@@ -67,7 +67,7 @@ export interface User42 {
   pool_year: string | null
   rank: number
   rank_progress_percent: number
-  lfg: string | null
+  performance_score: number
 }
 
 export interface PagedResponse<T> {
@@ -83,35 +83,53 @@ export interface PagedResponse<T> {
 export interface FinderFilters {
   campusName: string
   page: number
-  size: number
-  rank?: number
+  size: string
+  rank?: string
   poolYear?: string
   poolMonth?: string
   eligibleProject?: string
-  lfg?: boolean
+  finishedProjects?: string[]
   sort?: string
+  search?: string
 }
 
-export function getUsers(filters: FinderFilters) {
-  const params: Record<string, string> = {
-    campusName: filters.campusName,
-    page: filters.page.toString(),
-    size: filters.size.toString(),
+export function getUsers (filters: FinderFilters) {
+  const params = new URLSearchParams()
+  params.set('campusName', filters.campusName)
+  params.set('page', filters.page.toString())
+  params.set('size', filters.size)
+
+  if (filters.rank && filters.rank !== 'all') {
+    params.set('rank', filters.rank)
   }
-  if (filters.rank !== undefined) params.rank = filters.rank.toString()
-  if (filters.poolYear) params.poolYear = filters.poolYear
-  if (filters.poolMonth) params.poolMonth = filters.poolMonth
-  if (filters.eligibleProject) params.eligibleProject = filters.eligibleProject
-  if (filters.lfg !== undefined) params.lfg = filters.lfg.toString()
-  if (filters.sort) params.sort = filters.sort
+  if (filters.poolYear && filters.poolYear !== 'all') {
+    params.set('poolYear', filters.poolYear)
+  }
+  if (filters.poolMonth && filters.poolMonth !== 'all') {
+    params.set('poolMonth', filters.poolMonth)
+  }
+  if (filters.eligibleProject && filters.eligibleProject !== 'any') {
+    params.set('eligibleProject', filters.eligibleProject)
+  }
+  if (filters.finishedProjects) {
+    for (const p of filters.finishedProjects) {
+      params.append('finishedProjects', p)
+    }
+  }
+  if (filters.sort) {
+    params.set('sort', filters.sort)
+  }
+  if (filters.search) {
+    params.set('search', filters.search)
+  }
 
   return http.get<PagedResponse<User42>>('/api/api42/v1/42users', params)
 }
 
-export function getUserProfile() {
+export function getUserProfile () {
   return http.get<UserDetailed>('/api/api42/v1/42users/profile')
 }
 
-export function getUserByLogin(login: string) {
+export function getUserByLogin (login: string) {
   return http.get<UserDetailed>(`/api/api42/v1/42users/profile/login/${login}`)
 }
