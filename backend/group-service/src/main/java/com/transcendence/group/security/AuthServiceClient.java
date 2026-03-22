@@ -21,7 +21,7 @@ public class AuthServiceClient {
 
         // auth-service is the docker DNS name from inside the network
         return rest.exchange(
-                "http://auth-service:8080/api/auth/me",
+                "http://auth-service:8081/api/auth/me",
                 HttpMethod.GET,
                 req,
                 String.class

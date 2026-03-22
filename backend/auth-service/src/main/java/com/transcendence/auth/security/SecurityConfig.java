@@ -33,7 +33,7 @@ public class SecurityConfig {
     http
       .csrf(csrf -> csrf.disable())
       .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/public/**", "/oauth2/**", "/login/**", "/debug/**", "/me", "/callback").permitAll()
+        .requestMatchers("/public/**", "/oauth2/**", "/login/**", "/debug/**", "/me", "/callback", "/actuator/**").permitAll()
         .anyRequest().authenticated()
       )
       .oauth2Login(oauth -> oauth
