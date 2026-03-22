@@ -1,5 +1,5 @@
 {
-  "title": "Transcendence Services Overview",
+  "title": "Transcendence",
   "uid": "transcendence-overview",
   "tags": ["transcendence", "spring-boot"],
   "timezone": "browser",
@@ -58,7 +58,7 @@
           "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
         }
       },
-      "targets": [{ "expr": "up{job=\"auth-service\"}", "legendFormat": "auth-service" }]
+      "targets": [{ "expr": "max(up{job=\"auth-service\"})", "legendFormat": "auth-service" }]
     },
     {
       "type": "stat",
@@ -81,7 +81,7 @@
           "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
         }
       },
-      "targets": [{ "expr": "up{job=\"group-service\"}", "legendFormat": "group-service" }]
+      "targets": [{ "expr": "max(up{job=\"group-service\"})", "legendFormat": "group-service" }]
     },
     {
       "type": "stat",
@@ -131,8 +131,8 @@
     },
     {
       "type": "stat",
-      "id": 7,
-      "title": "Services Up",
+      "id": 8,
+      "title": "chat-service",
       "gridPos": { "x": 20, "y": 1, "w": 4, "h": 3 },
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "options": {
@@ -144,14 +144,13 @@
       },
       "fieldConfig": {
         "defaults": {
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "red", "value": null }, { "color": "orange", "value": 3 }, { "color": "green", "value": 5 }]
-          },
-          "unit": "short"
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN", "color": "red", "index": 0 }, "1": { "text": "UP", "color": "green", "index": 1 } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
         }
       },
-      "targets": [{ "expr": "sum(up{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\"})", "legendFormat": "up" }]
+      "targets": [{ "expr": "up{job=\"chat-service\"}", "legendFormat": "chat-service" }]
     },
 
     {
@@ -175,7 +174,7 @@
       },
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
       "targets": [
-        { "expr": "sum by (job) (rate(http_server_requests_seconds_count{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\"}[2m]))", "legendFormat": "{{job}}" }
+        { "expr": "sum by (job) (rate(http_server_requests_seconds_count{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}[2m]))", "legendFormat": "{{job}}" }
       ]
     },
     {
@@ -197,7 +196,7 @@
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
       "targets": [
         {
-          "expr": "sum by (job) (rate(http_server_requests_seconds_count{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\",status=~\"5..\"}[2m])) / sum by (job) (rate(http_server_requests_seconds_count{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\"}[2m]))",
+          "expr": "sum by (job) (rate(http_server_requests_seconds_count{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\",status=~\"5..\"}[2m])) / sum by (job) (rate(http_server_requests_seconds_count{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}[2m]))",
           "legendFormat": "{{job}}"
         }
       ]
@@ -225,7 +224,7 @@
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum by (job, le) (rate(http_server_requests_seconds_bucket{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\"}[5m]))) * 1000",
+          "expr": "histogram_quantile(0.99, sum by (job, le) (rate(http_server_requests_seconds_bucket{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}[5m]))) * 1000",
           "legendFormat": "p99 {{job}}"
         }
       ]
@@ -245,7 +244,7 @@
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
       "targets": [
         {
-          "expr": "histogram_quantile(0.50, sum by (job, le) (rate(http_server_requests_seconds_bucket{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\"}[5m]))) * 1000",
+          "expr": "histogram_quantile(0.50, sum by (job, le) (rate(http_server_requests_seconds_bucket{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}[5m]))) * 1000",
           "legendFormat": "p50 {{job}}"
         }
       ]
@@ -273,7 +272,7 @@
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
       "targets": [
         {
-          "expr": "jvm_memory_used_bytes{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\", area=\"heap\"}",
+          "expr": "jvm_memory_used_bytes{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\", area=\"heap\"}",
           "legendFormat": "{{job}}"
         }
       ]
@@ -303,7 +302,7 @@
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
       "targets": [
         {
-          "expr": "process_cpu_usage{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\"}",
+          "expr": "process_cpu_usage{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}",
           "legendFormat": "{{job}}"
         }
       ]
@@ -323,7 +322,7 @@
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
       "targets": [
         {
-          "expr": "jvm_threads_live_threads{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\"}",
+          "expr": "jvm_threads_live_threads{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}",
           "legendFormat": "{{job}}"
         }
       ]
@@ -351,7 +350,7 @@
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
       "targets": [
         {
-          "expr": "hikaricp_connections_active{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\"}",
+          "expr": "hikaricp_connections_active{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}",
           "legendFormat": "{{job}}"
         }
       ]
@@ -371,7 +370,7 @@
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
       "targets": [
         {
-          "expr": "hikaricp_connections_pending{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\"}",
+          "expr": "hikaricp_connections_pending{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}",
           "legendFormat": "{{job}}"
         }
       ]
@@ -399,7 +398,7 @@
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
       "targets": [
         {
-          "expr": "rate(jvm_gc_pause_seconds_sum{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\"}[2m]) / rate(jvm_gc_pause_seconds_count{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\"}[2m]) * 1000",
+          "expr": "rate(jvm_gc_pause_seconds_sum{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}[2m]) / rate(jvm_gc_pause_seconds_count{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}[2m]) * 1000",
           "legendFormat": "{{job}} ({{action}})"
         }
       ]
@@ -427,7 +426,7 @@
           "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "right" } },
           "targets": [
             {
-              "expr": "sum by (job, uri, method, status) (rate(http_server_requests_seconds_count{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service\"}[2m]))",
+              "expr": "sum by (job, uri, method, status) (rate(http_server_requests_seconds_count{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}[2m]))",
               "legendFormat": "[{{job}}] {{method}} {{uri}} {{status}}"
             }
           ]

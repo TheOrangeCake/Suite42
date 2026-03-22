@@ -25,7 +25,7 @@ public class AuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        if (path.startsWith("/api/group/public/")) {
+        if (path.startsWith("/api/group/public/") || path.startsWith("/api/group/actuator/")) {
             chain.doFilter(request, response);
             return;
         }

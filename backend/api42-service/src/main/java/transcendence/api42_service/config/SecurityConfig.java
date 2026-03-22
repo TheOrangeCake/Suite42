@@ -27,6 +27,7 @@ public class SecurityConfig {
 						.requestMatchers("/v1/api42/campuses").permitAll()
 						.requestMatchers("/v1/42users/friends/check-internal").permitAll()
 						.requestMatchers("/h2-console").permitAll()
+						.requestMatchers("/actuator/**").permitAll()
 						.anyRequest().authenticated())
 				.sessionManagement(session -> session
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
