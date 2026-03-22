@@ -253,49 +253,20 @@
     {
       "type": "row",
       "id": 30,
-      "title": "JVM",
+      "title": "JVM & Resources",
       "gridPos": { "x": 0, "y": 22, "w": 24, "h": 1 },
-      "collapsed": false
-    },
-    {
-      "type": "timeseries",
-      "id": 31,
-      "title": "Heap Memory Used",
-      "gridPos": { "x": 0, "y": 23, "w": 24, "h": 8 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "bytes",
-          "custom": { "lineWidth": 2, "fillOpacity": 10 }
-        }
-      },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
-      "targets": [
-        {
-          "expr": "jvm_memory_used_bytes{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\", area=\"heap\"}",
-          "legendFormat": "{{job}}"
-        }
-      ]
-    },
-
-    {
-      "type": "row",
-      "id": 40,
-      "title": "CPU & Threads",
-      "gridPos": { "x": 0, "y": 31, "w": 24, "h": 1 },
       "collapsed": false
     },
     {
       "type": "timeseries",
       "id": 41,
       "title": "Process CPU Usage",
-      "gridPos": { "x": 0, "y": 32, "w": 12, "h": 8 },
+      "gridPos": { "x": 0, "y": 23, "w": 12, "h": 8 },
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
           "min": 0,
-          "max": 1,
           "custom": { "lineWidth": 2, "fillOpacity": 10 }
         }
       },
@@ -309,9 +280,29 @@
     },
     {
       "type": "timeseries",
+      "id": 31,
+      "title": "Heap Memory Used",
+      "gridPos": { "x": 12, "y": 23, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        }
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        {
+          "expr": "sum by (job) (jvm_memory_used_bytes{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\", area=\"heap\"})",
+          "legendFormat": "{{job}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
       "id": 42,
       "title": "JVM Live Threads",
-      "gridPos": { "x": 12, "y": 32, "w": 12, "h": 8 },
+      "gridPos": { "x": 0, "y": 31, "w": 12, "h": 8 },
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "fieldConfig": {
         "defaults": {
@@ -322,72 +313,16 @@
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
       "targets": [
         {
-          "expr": "jvm_threads_live_threads{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}",
+          "expr": "sum by (job) (jvm_threads_live_threads{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"})",
           "legendFormat": "{{job}}"
         }
       ]
-    },
-
-    {
-      "type": "row",
-      "id": 50,
-      "title": "Database (HikariCP)",
-      "gridPos": { "x": 0, "y": 40, "w": 24, "h": 1 },
-      "collapsed": false
-    },
-    {
-      "type": "timeseries",
-      "id": 51,
-      "title": "Active DB Connections",
-      "gridPos": { "x": 0, "y": 41, "w": 12, "h": 8 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": { "lineWidth": 2, "fillOpacity": 10 }
-        }
-      },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
-      "targets": [
-        {
-          "expr": "hikaricp_connections_active{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}",
-          "legendFormat": "{{job}}"
-        }
-      ]
-    },
-    {
-      "type": "timeseries",
-      "id": 52,
-      "title": "Pending DB Connections",
-      "gridPos": { "x": 12, "y": 41, "w": 12, "h": 8 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": { "lineWidth": 2, "fillOpacity": 10 }
-        }
-      },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
-      "targets": [
-        {
-          "expr": "hikaricp_connections_pending{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"}",
-          "legendFormat": "{{job}}"
-        }
-      ]
-    },
-
-    {
-      "type": "row",
-      "id": 60,
-      "title": "GC",
-      "gridPos": { "x": 0, "y": 49, "w": 24, "h": 1 },
-      "collapsed": false
     },
     {
       "type": "timeseries",
       "id": 61,
       "title": "GC Pause Duration (avg, ms)",
-      "gridPos": { "x": 0, "y": 50, "w": 24, "h": 8 },
+      "gridPos": { "x": 12, "y": 31, "w": 12, "h": 8 },
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "fieldConfig": {
         "defaults": {
@@ -406,9 +341,57 @@
 
     {
       "type": "row",
+      "id": 50,
+      "title": "Database (HikariCP)",
+      "gridPos": { "x": 0, "y": 39, "w": 24, "h": 1 },
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "id": 51,
+      "title": "Active DB Connections",
+      "gridPos": { "x": 0, "y": 40, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        }
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        {
+          "expr": "sum by (job) (hikaricp_connections_active{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"})",
+          "legendFormat": "{{job}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "id": 52,
+      "title": "Pending DB Connections",
+      "gridPos": { "x": 12, "y": 40, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        }
+      },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        {
+          "expr": "sum by (job) (hikaricp_connections_pending{job=~\"api-gateway|auth-service|group-service|api42-service|regular-user-service|chat-service\"})",
+          "legendFormat": "{{job}}"
+        }
+      ]
+    },
+
+    {
+      "type": "row",
       "id": 70,
       "title": "HTTP Breakdown by Endpoint",
-      "gridPos": { "x": 0, "y": 58, "w": 24, "h": 1 },
+      "gridPos": { "x": 0, "y": 48, "w": 24, "h": 1 },
       "collapsed": true,
       "panels": [
         {
