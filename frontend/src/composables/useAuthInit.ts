@@ -14,10 +14,14 @@ export function useAuthInit() {
   ;(async () => {
     try {
       authStore.loadFromStorage()
-      const user = await refreshToken()
-      const token = authStore.accessToken
-      if (!token) throw new Error('No access token received after refresh')
-      authStore.setSession(user, token)
+      if (authStore.accessToken) {
+        const user = await refreshToken()
+        const token = authStore.accessToken
+        if (!token) throw new Error('No access token received after refresh')
+        authStore.setSession(user, token)
+      } else {
+        await tryRestore42Session(authStore, router)
+      }
     } catch {
       await tryRestore42Session(authStore, router)
     } finally {
@@ -35,7 +39,7 @@ async function tryRestore42Session(
     if (me.authenticated) {
       authStore.setSession42({ login: me.sub }, me.token)
       if (window.location.pathname === '/') {
-        router.push('/profile')
+        router.push('/home')
       }
     } else {
       authStore.clearSession()
