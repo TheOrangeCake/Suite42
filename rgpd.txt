@@ -1,0 +1,145 @@
+# Politique de Confidentialité – Transcendance
+
+Dernière mise à jour : [à compléter]
+
+Bienvenue sur le site Transcendance. La protection de vos données personnelles est une priorité. Cette politique de confidentialité explique quelles données nous collectons, comment nous les utilisons, et quels sont vos droits conformément au Règlement Général sur la Protection des Données (RGPD).
+
+---
+
+## 1. Responsable du traitement
+
+Le responsable du traitement des données est :  
+Transcendance
+Conza Dimitri
+
+---
+
+## 2. Données collectées
+
+Nous collectons les catégories de données suivantes :
+
+### a) Données issues de l’API 42
+Dans le cadre de l’utilisation de l’API de 42, nous pouvons collecter :
+- Identifiant utilisateur
+- Nom / pseudonyme
+- Adresse email (si accessible)
+- Informations de profil (niveau, projets, cursus, etc.)
+
+Ces données sont récupérées uniquement avec votre autorisation via le système d’authentification de 42 (OAuth).
+
+### b) Données fournies via la chatbox
+Lorsque vous utilisez notre chatbox :
+- Messages échangés
+- Données techniques (adresse IP, navigateur, horodatage)
+
+### c) Données techniques
+- Adresse IP
+- Type de navigateur
+- Cookies et données de session
+
+---
+
+## 3. Finalités du traitement
+
+Vos données sont utilisées pour :
+- Fournir et améliorer les fonctionnalités du site
+- Permettre l’authentification via l’API 42
+- Assurer le fonctionnement de la chatbox
+- Répondre à vos demandes via le chat
+- Garantir la sécurité du site
+- Respecter nos obligations légales
+
+---
+
+## 4. Base légale
+
+Les traitements reposent sur :
+- Votre consentement (chatbox, cookies, API 42)
+- L’exécution d’un service (fonctionnement du site)
+- L’intérêt légitime (sécurité, amélioration)
+
+---
+
+## 5. Conservation des données
+
+Les données sont conservées :
+- Pendant la durée d’utilisation du service
+- Maximum [durée à définir, ex : 12 mois] pour les logs
+- Les messages de chat peuvent être conservés pour améliorer le service, puis anonymisés
+
+---
+
+## 6. Partage des données
+
+Vos données ne sont pas vendues.
+
+Elles peuvent être partagées uniquement avec :
+- Prestataires techniques (hébergement, chatbox)
+- API 42 (dans le cadre de l’authentification)
+- Autorités légales si requis
+
+Tous les prestataires respectent le RGPD.
+
+---
+
+## 7. Cookies
+
+Nous utilisons des cookies pour :
+- Assurer le bon fonctionnement du site
+- Améliorer l’expérience utilisateur
+
+Un bandeau de consentement vous permet de gérer vos préférences.
+
+---
+
+## 8. Sécurité
+
+Nous mettons en œuvre des mesures de sécurité adaptées :
+- Chiffrement des communications (HTTPS)
+- Accès restreint aux données
+- Surveillance et protection contre les accès non autorisés
+
+---
+
+## 9. Vos droits (RGPD)
+
+Conformément au RGPD, vous disposez des droits suivants :
+- Droit d’accès
+- Droit de rectification
+- Droit à l’effacement
+- Droit à la limitation du traitement
+- Droit d’opposition
+- Droit à la portabilité
+
+Pour exercer vos droits :  
+📧 Contactez-nous à : dimitri.conza@gmail.com
+
+Vous pouvez également introduire une réclamation auprès de la CNIL.
+
+---
+
+## 10. Chatbox et conformité RGPD
+
+La chatbox :
+- Ne collecte que les données strictement nécessaires
+- Informe l’utilisateur avant toute collecte
+- Permet d’éviter les données sensibles
+- Peut proposer une option d’anonymisation
+
+---
+
+## 11. Modification de la politique
+
+Cette politique peut être mise à jour à tout moment.  
+Nous vous encourageons à la consulter régulièrement.
+
+---
+
+## 12. Contact
+
+Pour toute question :  
+📧 dimitri.conza@gmail.com
+
+---
+
+En utilisant Transcendance, vous acceptez cette politique de confidentialité.
