@@ -2,7 +2,7 @@
   import { colors } from '@/styles/Colors.ts'
 
   const inputFieldProps = defineProps<{
-    label: string
+    label?: string
     modelValue: string | number
     tooltip?: string
     type?: string
@@ -19,6 +19,7 @@
 <template>
   <div class="relative w-full">
     <label
+      v-if="label"
       class="flex flex-row items-center gap-2 absolute -top-3 left-5 px-3 font-regular font-body2-mobile
                 md:font-body2-tablet
                 lg:font-body2-laptop

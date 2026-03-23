@@ -27,10 +27,12 @@ declare module 'vue-router/auto-routes' {
     '/home': RouteRecordInfo<'/home', '/home', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/modify_profile': RouteRecordInfo<'/modify_profile', '/modify_profile', Record<never, never>, Record<never, never>>,
+    '/privacy': RouteRecordInfo<'/privacy', '/privacy', Record<never, never>, Record<never, never>>,
     '/profile': RouteRecordInfo<'/profile', '/profile', Record<never, never>, Record<never, never>>,
     '/projects': RouteRecordInfo<'/projects', '/projects', Record<never, never>, Record<never, never>>,
     '/signup': RouteRecordInfo<'/signup', '/signup', Record<never, never>, Record<never, never>>,
     '/tasks': RouteRecordInfo<'/tasks', '/tasks', Record<never, never>, Record<never, never>>,
+    '/tos': RouteRecordInfo<'/tos', '/tos', Record<never, never>, Record<never, never>>,
     '/user/[login]': RouteRecordInfo<'/user/[login]', '/user/:login', { login: ParamValue<true> }, { login: ParamValue<false> }>,
   }
 
@@ -81,6 +83,10 @@ declare module 'vue-router/auto-routes' {
       routes: '/modify_profile'
       views: never
     }
+    'src/pages/privacy.vue': {
+      routes: '/privacy'
+      views: never
+    }
     'src/pages/profile.vue': {
       routes: '/profile'
       views: never
@@ -95,6 +101,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/tasks.vue': {
       routes: '/tasks'
+      views: never
+    }
+    'src/pages/tos.vue': {
+      routes: '/tos'
       views: never
     }
     'src/pages/user/[login].vue': {

@@ -162,8 +162,16 @@
               v-for="u in searchResults"
               :key="u.id"
             >
-              <FriendSearchCard :user="u" @click="sendRequest(u.id)" />
+              <FriendSearchCard text="Add friend" :user="u" @click="sendRequest(u.id)" />
             </div>
+          </div>
+          <div v-else-if="searchQuery && searchResults.length === 0">
+            <p
+              class="font-regular font-body1-mobile
+                     md:font-body1-tablet
+                     lg:font-body1-laptop
+                     xl:font-body1-desktop"
+            >No user with that name</p>
           </div>
         </div>
       </div>

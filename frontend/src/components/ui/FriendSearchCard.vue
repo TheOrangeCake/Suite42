@@ -4,6 +4,7 @@
 
   defineProps<{
     user: UserSearchResult
+    text: string
   }>()
   const emit = defineEmits(['click'])
 </script>
@@ -27,7 +28,7 @@
       >{{ user.login }}</span>
     </div>
     <div class="flex flex-row gap-4">
-      <SmallBlueButton text="Add friend" @click="emit('click')" />
+      <SmallBlueButton :text="text" @click="emit('click')" />
     </div>
   </div>
 </template>
