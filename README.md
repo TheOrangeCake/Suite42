@@ -2,6 +2,14 @@
 
 Projet full-stack en microservices : application web de gestion de projets 42 avec chat, profils, et authentification OAuth 42.
 
+## Members:
+
+- hoannguy:PO
+- vgomes: Tech lead
+- dconza: Dev
+- alletond: PM
+- dengelba: Dev
+
 ## Stack
 
 | Couche | Techno |
