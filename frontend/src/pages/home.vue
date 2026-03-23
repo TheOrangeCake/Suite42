@@ -41,7 +41,6 @@
     laptop: 1.6,
     desktop: 1.8,
   })
-
 </script>
 
 <template>

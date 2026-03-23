@@ -98,16 +98,15 @@ color palette, typography, and icons. (1p)</li>
 |  9 | Small Blue Button            | Button    | Small blue cta, small focus.                                |
 | 10 | Oauth Button                 | Button    | Oauth button to log in.                                     |
 | 11 | Filter Button                | Button    | Filter button for fitlering directories.                    |
-| 12 | Public Navigation Bar Link   | Button    | Public navigation individual link.                          |
-| 13 | Intranet Navigation Bar Link | Button    | Intranet navigation individual link.                        |
-| 14 | Input Field         | Field     | Custom input field.                                         |
-| 15 | Multi Select Field  | Field     | Custom multi select field.                                  |
-| 16 | Seclect Field       | Field     | Custom select field.                                        |
-| 17 | Upload Field        | Field     | Custom file upload field.                                   |
-| 18 | Finder Profile Card | Card      | Student profile card in finder search result.               | 
-| 19 | Friend Search Card | Card      | Simple friend card in friend search result.                 |
-| 20 | Friend Tab Card | Card      | Simple friend card in friend tab.                           |
-| 21 | Tool Card | Card      | Service card for available services.                        |
+| 12 | Intranet Navigation Bar Link | Button    | Intranet navigation individual link.                        |
+| 13 | Input Field         | Field     | Custom input field.                                         |
+| 14 | Multi Select Field  | Field     | Custom multi select field.                                  |
+| 15 | Seclect Field       | Field     | Custom select field.                                        |
+| 16 | Upload Field        | Field     | Custom file upload field.                                   |
+| 17 | Finder Profile Card | Card      | Student profile card in finder search result.               | 
+| 18 | Friend Search Card | Card      | Simple friend card in friend search result.                 |
+| 19 | Friend Tab Card | Card      | Simple friend card in friend tab.                           |
+| 20 | Tool Card | Card      | Service card for available services.                        |
 
 
 <br>

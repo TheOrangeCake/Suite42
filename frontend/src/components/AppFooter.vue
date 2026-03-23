@@ -4,7 +4,7 @@
 
   const router = useRouter()
   const legalLinks = [
-    { id: 1, label: 'Privacy Policy', link: '/privacy-policy' },
+    { id: 1, label: 'Privacy Policy', link: '/privacy' },
     { id: 2, label: 'Terms of Service', link: '/tos' },
   ]
 </script>
