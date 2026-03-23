@@ -4,7 +4,7 @@ Projet full-stack en microservices : application web de gestion de projets 42 av
 
 ## Members:
 
-- hoannguy:PO
+- hoannguy: PO
 - vgomes: Tech lead
 - dconza: Dev
 - alletond: PM
