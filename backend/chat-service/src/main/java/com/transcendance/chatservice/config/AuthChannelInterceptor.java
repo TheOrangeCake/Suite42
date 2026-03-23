@@ -1,6 +1,7 @@
 package com.transcendance.chatservice.config;
 
 import com.transcendance.chatservice.service.JwtService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -25,8 +26,12 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             String token = accessor.getFirstNativeHeader("Authorization");
             if (token != null && token.startsWith("Bearer ")) {
-                String user = jwtService.extractUsername(token.substring(7));
-                accessor.setUser(new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList()));
+                try {
+                    String user = jwtService.extractUsername(token.substring(7));
+                    accessor.setUser(new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList()));
+                } catch (JwtException | IllegalArgumentException e) {
+                    return null;
+                }
             }
         }
         return message;
