@@ -54,48 +54,7 @@ cd Transcendence
 
 ### 2. Configurer les variables d'environnement
 
-Cree un fichier `.env` a la racine du projet avec les variables suivantes :
-
-```env
-# URLs frontend
-VITE_API_URL=https://localhost
-VITE_CHAT_URL=wss://localhost/ws-chat
-
-SPRING_PROFILES_ACTIVE=prod
-
-# Base de donnees principale (auth, chat, group)
-POSTGRES_DB=transcendence
-POSTGRES_USER=transcendence
-POSTGRES_PASSWORD=<mot-de-passe-fort>
-
-FRONTEND_BASE_URL=https://localhost
-
-# OAuth 42 (creer une app sur profile.intra.42.fr/oauth/applications)
-FORTYTWO_CLIENT_ID=<ton-client-id>
-FORTYTWO_CLIENT_SECRET=<ton-client-secret>
-FORTYTWO_REDIRECT_URI=https://localhost/api/auth/callback/42
-
-# JWT (cle aleatoire longue)
-JWT_SECRET=<cle-aleatoire-256-bits>
-
-# Base de donnees api42-service
-API42_POSTGRES_DB=api42
-API42_POSTGRES_USER=api42
-API42_POSTGRES_PASSWORD=<mot-de-passe>
-
-# Credentials API 42 (meme app que OAuth ci-dessus)
-API42_NEXT_SECRET=<secret>
-API42_UID=<uid-de-l-app-42>
-API42_SECRET=<secret-de-l-app-42>
-
-# Base de donnees regular-user-service
-REGULAR_USER_POSTGRES_DB=regularuser
-REGULAR_USER_POSTGRES_USER=regularuser
-REGULAR_USER_POSTGRES_PASSWORD=<mot-de-passe>
-REGULAR_USER_JWT_KEY=<cle-jwt>
-REGULAR_USER_EMAIL=<email-pour-envoi-otp>
-REGULAR_USER_APP_PASSWORD=<mot-de-passe-app-gmail>
-```
+Modifier les variables d'env du fichier .env.exemple a la racine du projet avec le clientid et le secret de l'application 42
 
 ### 3. Lancer le projet
 
