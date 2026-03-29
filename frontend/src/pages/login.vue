@@ -58,8 +58,12 @@
     }
   }
 
+  // function onLogin42 () {
+  //   window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/oauth2/authorization/42`
+  // }
+
   function onLogin42 () {
-    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/oauth2/authorization/42`
+    window.location.href = `/api/auth/oauth2/authorization/42`
   }
 
   async function onVerifyOtp () {

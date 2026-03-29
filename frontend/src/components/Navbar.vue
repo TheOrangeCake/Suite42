@@ -31,7 +31,12 @@
       class="flex flex-row gap-4 items-center
              md:gap-8"
     >
-<!--      <PublicNavLink color="suite42Black" label="Campuses" link="/campuses" />-->
+     <PublicNavLink
+      link="https://grafana.suite42.dev"
+      label="Grafana"
+      color="suite42Black"
+      :external="true"
+    />
 
       <!-- Si connecté : affiche username + logout -->
       <template v-if="authStore.isLoggedIn">

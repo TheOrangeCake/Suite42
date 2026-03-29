@@ -6,7 +6,7 @@ export const colors = {
   suite42White: '#F8F8F8',
   suite42Grey: '#D9D9D9',
   suite42Darkgrey: '#5B5B5B',
-  suite42Background: '#FFFFFF',
+  suite42Background: '#F8F8F8',
 } as const
 
 export type Colors = keyof typeof colors

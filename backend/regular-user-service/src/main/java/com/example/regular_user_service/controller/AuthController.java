@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -55,10 +56,12 @@ public class AuthController {
 			UserDto createdUser = UserMapper.mapToResponseDto(newUser, envVariables.getImageDomain());
 			return ResponseEntity.ok().body(createdUser);
 		} catch (DataIntegrityViolationException e) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("Username or Email already existed");
-		} catch (RuntimeException e) {
-			logger.severe("User creation failed: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error, user creation failed. " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+								.body(Map.of("error", "Username or Email already existed"));
+		}
+		catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+								.body(Map.of("error", "Internal server error, user creation failed. " + e.getMessage()));
 		}
 	}
 

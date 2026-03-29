@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8088
 
 spring:
   cloud:
@@ -10,13 +10,6 @@ spring:
       server:
         webmvc:
           routes:
-            - id: regular-user-service
-              uri: http://regular-user-service:8085
-              predicates:
-                - Path=/api/regular-user/**
-              filters:
-                - StripPrefix=2
-
             - id: auth-service
               uri: http://auth-service:8081
               predicates:
@@ -44,13 +37,20 @@ spring:
               filters:
                 - StripPrefix=0
 
-            - id: ragular-user-service-images
+            - id: regular-user-service-images
               uri: http://regular-user-service:8085
               predicates:
                 - Path=/images-regular/**
               filters:
                 - StripPrefix=0
 
+            - id: regular-user-service
+              uri: http://regular-user-service:8085
+              predicates:
+                - Path=/api/regular-user/**
+              filters:
+                - StripPrefix=2
+                
             # - id: chat-service
             #   uri: http://chat-service:8082
             #   predicates:
@@ -76,6 +76,8 @@ management:
 
 logging:
   level:
-    org.springframework.cloud.gateway.server.mvc: DEBUG
-    org.springframework.web: DEBUG
+    org.springframework.cloud.gateway: INFO
+    org.springframework.cloud.gateway.server.mvc: INFO
+    org.springframework.web: INFO
+    org.springframework.cloud.gateway.handler: INFO
 

@@ -20,7 +20,7 @@
 <template>
   <div class="flex justify-center items-center cursor-pointer">
     <button
-      class="flex px-5 py-2.5 justify-center items-center rounded border-2 font-medium font-h4-mobile transition-colors duration-200
+      class="flex px-5 py-2.5 justify-center items-center rounded border-2 font-medium font-h4-mobile transition-colors duration-200 cursor-pointer
              md:font-h4-tablet
              lg:font-h4-laptop
              xl:font-h4-desktop"

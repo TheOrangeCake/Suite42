@@ -5,12 +5,41 @@
     link: string
     label: string
     color: Colors
+    external?: boolean
   }>()
 </script>
 
-<template>
+<!-- <template>
   <div>
     <RouterLink :to="publicNavLinkProps.link">
+      <span
+        class="font-regular opacity-80 hover:opacity-100 hover:underline font-h5-mobile
+                md:font-h5-tablet
+                lg:font-h5-laptop
+                xl:font-h5-desktop"
+        :style="{ color: colors[publicNavLinkProps.color] }"
+      >{{ publicNavLinkProps.label }}</span>
+    </RouterLink>
+  </div>
+</template> -->
+
+<template>
+  <div>
+    <a
+      v-if="publicNavLinkProps.external"
+      :href="publicNavLinkProps.link"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <span
+        class="font-regular opacity-80 hover:opacity-100 hover:underline font-h5-mobile
+                md:font-h5-tablet
+                lg:font-h5-laptop
+                xl:font-h5-desktop"
+        :style="{ color: colors[publicNavLinkProps.color] }"
+      >{{ publicNavLinkProps.label }}</span>
+    </a>
+    <RouterLink v-else :to="publicNavLinkProps.link">
       <span
         class="font-regular opacity-80 hover:opacity-100 hover:underline font-h5-mobile
                 md:font-h5-tablet

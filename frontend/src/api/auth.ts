@@ -18,7 +18,6 @@ export type SigninResult =
   | { twoFa: true; email: string }
 
 const BASE = '/api/regular-user/v1/regular-user'
-const API_BASE_URL = import.meta.env.VITE_API_URL
 
 export function signup(username: string, email: string, password: string) {
   return http.post<User>(`${BASE}/auth/signup`, { username, email, password })
@@ -27,7 +26,7 @@ export function signup(username: string, email: string, password: string) {
 export async function signin(login: string, password: string): Promise<SigninResult> {
   const authStore = useAuthStore()
 
-  const response = await fetch(`${API_BASE_URL}${BASE}/auth/signin`, {
+  const response = await fetch(`${BASE}/auth/signin`, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -36,7 +35,7 @@ export async function signin(login: string, password: string): Promise<SigninRes
     },
     body: JSON.stringify({ login, password }),
   })
-
+  
   if (response.status === 202) {
     return { twoFa: true, email: login.includes('@') ? login : '' }
   }

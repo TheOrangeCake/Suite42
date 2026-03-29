@@ -1,9 +1,9 @@
 <template>
-  <v-app class="app-root">
+  <div class="app-root">
     <Navbar v-if="!isDashboardRoute" />
     <router-view />
     <AppFooter v-if="!isDashboardRoute" />
-  </v-app>
+  </div>
 </template>
 
 <script setup lang="ts">

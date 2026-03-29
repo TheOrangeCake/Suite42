@@ -213,7 +213,7 @@ public class GroupController {
 Si vous ne voulez pas gérer la validation JWT, vous pouvez appeler le endpoint `/me` du service auth.
 
 ```bash
-curl -b "access_token=<JWT>" http://localhost:8080/api/auth/me
+curl -b "access_token=<JWT>" http://localhost:8081/api/auth/me
 ```
 
 Réponse en cas de succès :
@@ -247,14 +247,14 @@ FORTYTWO_CLIENT_ID=votre-client-id
 FORTYTWO_CLIENT_SECRET=votre-client-secret
 
 # URL du frontend (pour la redirection post-login)
-FRONTEND_BASE_URL=http://localhost:8080
+FRONTEND_BASE_URL=
 ```
 
 ### Configuration application.yml
 
 ```yaml
 server:
-  port: 8080
+  port: 8081
   servlet:
     context-path: /api/auth
 
@@ -264,7 +264,7 @@ app:
     cookie-name: access_token
     ttl-minutes: 120  # Durée de validité du token (2h)
   frontend:
-    base-url: ${FRONTEND_BASE_URL:http://localhost:8080}
+    base-url: ${FRONTEND_BASE_URL}
   allowed-campus-ids: [47]  # Campus autorisés (Nice = 47)
 
 spring:
@@ -305,7 +305,7 @@ spring:
 export JWT_SECRET="mon-super-secret-de-minimum-32-caracteres-pour-securite"
 export FORTYTWO_CLIENT_ID="votre-client-id"
 export FORTYTWO_CLIENT_SECRET="votre-client-secret"
-export FRONTEND_BASE_URL="http://localhost:8080"
+export FRONTEND_BASE_URL=""
 
 # 2. Compiler et lancer
 ./mvnw clean package
@@ -316,11 +316,11 @@ java -jar target/auth-service-0.0.1-SNAPSHOT.jar
 
 ```bash
 docker build -t auth-service .
-docker run -p 8080:8080 \
+docker run -p 8081:8081 \
   -e JWT_SECRET="mon-super-secret" \
   -e FORTYTWO_CLIENT_ID="..." \
   -e FORTYTWO_CLIENT_SECRET="..." \
-  -e FRONTEND_BASE_URL="http://localhost:8080" \
+  -e FRONTEND_BASE_URL="" \
   auth-service
 ```
 

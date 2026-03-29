@@ -12,7 +12,6 @@ export interface ChatMessage {
 
 let stompClient: Client | null = null
 
-const WS_URL = import.meta.env.VITE_CHAT_URL
 
 export function connectChat(
   userId: string,
@@ -25,12 +24,10 @@ export function connectChat(
     return
   }
 
-  console.log(`Connecting to chat WebSocket at ${WS_URL}/ws-chat`)
-
   stompClient = new Client({
     // SockJS retourne un objet WebSocket-like
     // @ts-ignore
-    webSocketFactory: () => new SockJS(`${WS_URL}/ws-chat`),
+    webSocketFactory: () => new SockJS(`/ws-chat`),
 
     connectHeaders: authStore.accessToken
       ? { Authorization: `Bearer ${authStore.accessToken}` } as StompHeaders
@@ -38,19 +35,14 @@ export function connectChat(
 
     reconnectDelay: 5000, // reconnect automatique
 
-    debug: (msg: string) => console.log('STOMP:', msg),
-
     onConnect: () => {
-      console.log('Chat WebSocket connected')
       onConnectionChange?.(true)
 
       stompClient?.subscribe(
         `/user/queue/messages`,
         (frame: IMessage) => {
-          console.log('[WS] MESSAGE RECEIVED — raw body:', frame.body)
           try {
             const message: ChatMessage = JSON.parse(frame.body)
-            console.log('[WS] Parsed message:', message)
             onMessage(message)
           } catch (err) {
             console.error('[WS] Failed to parse message:', err)
@@ -64,13 +56,10 @@ export function connectChat(
     },
 
     onStompError: (frame) => {
-      console.error('Broker error:', frame.headers['message'])
-      console.error('Details:', frame.body)
       onConnectionChange?.(false)
     },
 
     onWebSocketError: (event: Event) => {
-      console.error('WebSocket error:', event)
       onConnectionChange?.(false)
     },
   })
@@ -80,7 +69,6 @@ export function connectChat(
 
 export function sendMessage(msg: ChatMessage) {
   if (!stompClient || !stompClient.connected) {
-    console.warn('STOMP client not connected')
     return
   }
 
@@ -94,7 +82,6 @@ export function disconnectChat() {
   if (stompClient) {
     stompClient.deactivate()
     stompClient = null
-    console.log('Chat WebSocket disconnected')
   }
 }
 

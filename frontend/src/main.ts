@@ -14,7 +14,6 @@ import App from './App.vue'
 
 // Styles
 import 'tailwindcss'
-import 'unfonts.css'
 import '@/styles/tailwind.css'
 import '@/styles/themes.css'
 

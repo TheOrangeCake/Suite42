@@ -1,35 +1,31 @@
-# Build stage
-FROM node:lts-slim AS builder
+# Stage 1: build Vue app
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json ./
+# Copy package.json & install dependencies
+COPY ../../package*.json ./
+RUN npm install
 
-# Install dependencies
-RUN npm ci
+# Copy Vue source
+COPY ../../ ./
 
-# Copy source code
-COPY . .
-
-# Build the application
+# Build production
 RUN npm run build
 
-# Runtime stage
-FROM nginx:mainline-alpine3.23-slim
+# Stage 2: serve built files with "serve"
+FROM node:20-alpine
 
-# Copy nginx configuration
-COPY ./ressources/nginx.conf /etc/nginx/nginx.conf
+WORKDIR /app
 
-# Copy built application from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
-RUN rm -rf /usr/share/nginx/html/50x.html
-# Expose port
-EXPOSE 8080
+# Install static server
+RUN npm install -g serve
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost/ || exit 1
+# Copy built files
+COPY --from=build /app/dist ./dist
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Expose port for API gateway
+EXPOSE 3100
+
+# Start SPA
+CMD ["serve", "-s", "dist", "-l", "3100"]

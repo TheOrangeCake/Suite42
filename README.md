@@ -91,12 +91,12 @@ https://localhost
        v
     WAF (nginx + ModSecurity) :443
        |
-       |-- /           -> frontend:3000     (Vue/Vite dev server)
-       |-- /api/       -> api-gateway:8080  (routing general)
+       |-- /           -> frontend:3100     (Vue/Vite dev server)
+       |-- /api/       -> api-gateway:8088  (routing general)
        |-- /api/chat/  -> chat-service:8082 (REST chat, bypass gateway)
        +-- /ws-chat/   -> chat-service:8082 (WebSocket STOMP)
 
-api-gateway:8080
+api-gateway:8088
        |-- /api/auth/**             -> auth-service
        |-- /api/api42/**            -> api42-service
        |-- /api/regular-user/**     -> regular-user-service

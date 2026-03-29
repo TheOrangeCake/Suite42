@@ -8,12 +8,14 @@ import {
   UnauthenticatedError, ValidationError,
 } from './errors'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL
+// const API_BASE_URL = import.meta.env.VITE_API_URL
 
 async function request<T> (url: string, options: RequestInit = {}): Promise<T> {
   const authStore = useAuthStore()
 
-  const response = await fetch(`${API_BASE_URL}${url}`, {
+  // const response = await fetch(`${API_BASE_URL}${url}`, {
+
+  const response = await fetch(`${url}`, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',

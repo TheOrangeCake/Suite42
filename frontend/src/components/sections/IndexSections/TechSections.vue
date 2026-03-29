@@ -1,10 +1,19 @@
 <script setup lang="ts">
   import { useRouter } from 'vue-router'
   import { viewportValue } from '@/composables/viewportsValue'
-  import { colors } from '@/styles/Colors.ts'
+  import { colors, type Colors } from '@/styles/Colors.ts'
 
   const router = useRouter()
-  const categories = [
+
+  type Category = {
+    id: number
+    name: string
+    color1: Colors
+    color2: Colors
+    items: string[]
+  }
+
+  const categories: Category[] = [
     {
       id: 1,
       name: 'Front-end',

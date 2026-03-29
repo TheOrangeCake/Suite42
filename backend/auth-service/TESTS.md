@@ -138,7 +138,7 @@ app:
     secret: mon-super-secret-de-minimum-32-caracteres-pour-securite
     ttl-minutes: 120
   frontend:
-    base-url: http://localhost:8080
+    base-url:
   allowed-campus-ids: [47]
 ```
 

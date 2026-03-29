@@ -38,7 +38,7 @@
   const twoFaEnabled = ref(false)
   const confirmPassword = ref('')
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL
+  // const API_BASE_URL = import.meta.env.VITE_API_URL
 
   const fullName42 = computed(() => {
     if (!profile42.value) return ''
@@ -107,7 +107,8 @@
     if (authStore.accessToken) {
       headers['Authorization'] = `Bearer ${authStore.accessToken}`
     }
-    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    // const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const res = await fetch(`${endpoint}`, {
       method: 'PATCH',
       credentials: 'include',
       headers,
@@ -128,7 +129,8 @@
     if (authStore.accessToken) {
       headers['Authorization'] = `Bearer ${authStore.accessToken}`
     }
-    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    // const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const res = await fetch(`${endpoint}`, {
       method: 'PATCH',
       credentials: 'include',
       headers,
