@@ -18,7 +18,7 @@
   const teamMembers = [
     { id: 1, name: 'Alex', role: 'Frontend', img: '/design/assets/photo/alletond.jpg' },
     { id: 2, name: 'Vincent', role: 'Backend', img: '/design/assets/photo/vgomes.jpg' },
-    { id: 3, name: 'Dan', role: 'Backend', img: '/design/assets/photo/dengelba.jpg' },
+    { id: 3, name: 'Daan', role: 'Backend', img: '/design/assets/photo/dengelba.jpg' },
     { id: 4, name: 'Dimitri', role: 'Backend', img: '/design/assets/photo/dconza.jpg' },
     { id: 5, name: 'Nguyen', role: 'Full-stack', img: '/design/assets/photo/hoannguy.jpg' },
   ]
@@ -66,7 +66,7 @@
                    lg:font-body1-laptop
                    xl:font-body1-desktop"
               :style="{ color: colors.suite42White }"
-            >Suite42 is a ft_transcendence project by Alex, Vincent, Dan, Dimitri and Nguyen, from the 2023–2024 cohort at 42 Lausanne.</p>
+            >Suite42 is a ft_transcendence project by Alex, Vincent, Daan, Dimitri and Nguyen, from the 2023–2024 cohort at 42 Lausanne.</p>
           </div>
           <SingleConnector color="suite42Blue" :height="2" />
           <div class="flex flex-row">
